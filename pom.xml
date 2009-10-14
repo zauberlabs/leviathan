@@ -15,8 +15,7 @@
   </description>
   <modules>
      <module>api</module>
-     <module>common</module>
-     <module>httpclient</module>
+     <module>impl</module>
   </modules>
 
 </project>
