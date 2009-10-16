@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -16,6 +17,11 @@ import org.junit.Test;
 
 import ar.com.zauber.labs.kraken.fetcher.api.BulkURIFetcherResponse;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
+import ar.com.zauber.labs.kraken.fetcher.common.ExecutorServiceBulkURIFetcher;
+import ar.com.zauber.labs.kraken.fetcher.common.InmutableBulkURIFetcherResponse;
+import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIFetcherHttpResponse;
+import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIFetcherResponse;
+import ar.com.zauber.labs.kraken.fetcher.common.mock.FixedURIFetcher;
 
 
 /**
@@ -40,8 +46,10 @@ public class ExecutorServiceBulkURIFetcherTest {
         map.put(lalara, resource);
         
         final BulkURIFetcherResponse response =
-            BulkURIFetchers.createFixed(map).fetch(Arrays.asList(
-                bar, lalara, foo));
+            new ExecutorServiceBulkURIFetcher(
+                    Executors.newSingleThreadExecutor(),
+                    new FixedURIFetcher(map)).fetch(
+                            Arrays.asList(bar, lalara, foo));
         Assert.assertNotNull(response);
         
         Assert.assertEquals(new InmutableBulkURIFetcherResponse(Arrays.asList(

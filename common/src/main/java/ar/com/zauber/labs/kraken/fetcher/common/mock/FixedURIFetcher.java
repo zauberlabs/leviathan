@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009 Zauber S.A.  -- All rights reserved
  */
-package ar.com.zauber.labs.kraken.core.fetcher.impl.mock;
+package ar.com.zauber.labs.kraken.fetcher.common.mock;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,10 +12,10 @@ import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 
-import ar.com.zauber.labs.kraken.core.fetcher.impl.InmutableURIFetcherHttpResponse;
-import ar.com.zauber.labs.kraken.core.fetcher.impl.InmutableURIFetcherResponse;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
+import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIFetcherHttpResponse;
+import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIFetcherResponse;
 
 /**
  * {@link URIFetcher} used for tests. Get the content from the classpath.

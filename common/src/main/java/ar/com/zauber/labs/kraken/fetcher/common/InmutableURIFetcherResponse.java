@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009 Zauber S.A.  -- All rights reserved
  */
-package ar.com.zauber.labs.kraken.core.fetcher.impl;
+package ar.com.zauber.labs.kraken.fetcher.common;
 
 import java.net.URI;
 

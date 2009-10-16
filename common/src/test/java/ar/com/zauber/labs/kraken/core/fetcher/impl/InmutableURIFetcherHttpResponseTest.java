@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
+import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIFetcherHttpResponse;
+
 
 /**
  * Tests {@link InmutableURIFetcherHttpResponse

@@ -15,6 +15,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
+import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIFetcherHttpResponse;
+import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIFetcherResponse;
 
 
 /**
