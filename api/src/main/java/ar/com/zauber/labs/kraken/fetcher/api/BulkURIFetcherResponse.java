@@ -4,6 +4,7 @@
 package ar.com.zauber.labs.kraken.fetcher.api;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Map;
 
 
@@ -17,4 +18,10 @@ public interface BulkURIFetcherResponse {
 
     /** the details of each retrieval */
     Map<URI, URIFetcherResponse> getDetails();
+    
+    /** @return the successful uris */
+    Collection<URIFetcherResponse> getSuccessfulURIs();
+    
+    /** @return the successful uris */
+    Collection<URIFetcherResponse> getFailedURIs();
 }

@@ -16,10 +16,10 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 
-import ar.com.zauber.labs.kraken.core.fetcher.impl.InmutableURIFetcherHttpResponse;
-import ar.com.zauber.labs.kraken.core.fetcher.impl.InmutableURIFetcherResponse;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
+import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIFetcherHttpResponse;
+import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIFetcherResponse;
 
 /**
  * {@link URIFetcher} that uses Apache's HttpClient components

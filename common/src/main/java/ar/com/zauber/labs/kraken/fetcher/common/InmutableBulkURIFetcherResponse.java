@@ -1,13 +1,16 @@
 /*
  * Copyright (c) 2009 Zauber S.A.  -- All rights reserved
  */
-package ar.com.zauber.labs.kraken.core.fetcher.impl;
+package ar.com.zauber.labs.kraken.fetcher.common;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.Validate;
 
@@ -38,7 +41,29 @@ public class InmutableBulkURIFetcherResponse implements BulkURIFetcherResponse {
     public final Map<URI, URIFetcherResponse> getDetails() {
         return details;
     }
-    
+
+    /** @see BulkURIFetcherResponse#getFailedURIs() */
+    public final Collection<URIFetcherResponse> getFailedURIs() {
+        final Collection<URIFetcherResponse> ret = 
+            new LinkedList<URIFetcherResponse>();
+        for(final URIFetcherResponse e : details.values()) {
+            if(!e.isSucceeded()) {
+                ret.add(e);
+            }
+        }
+        return ret;
+    }
+    /** @see BulkURIFetcherResponse#getSuccessfulURIs() */
+    public final Collection<URIFetcherResponse> getSuccessfulURIs() {
+        final Collection<URIFetcherResponse> ret = 
+            new LinkedList<URIFetcherResponse>();
+        for(final URIFetcherResponse e : details.values()) {
+            if(e.isSucceeded()) {
+                ret.add(e);
+            }
+        }
+        return ret;
+    }
     
     /** @see Object#equals(Object) */
     @Override

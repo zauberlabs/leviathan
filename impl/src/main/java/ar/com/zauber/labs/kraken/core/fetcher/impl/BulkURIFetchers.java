@@ -21,8 +21,9 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 
 import ar.com.zauber.labs.kraken.core.fetcher.impl.httpclient.HTTPClientURIFetcher;
-import ar.com.zauber.labs.kraken.core.fetcher.impl.mock.FixedURIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.api.BulkURIFetcher;
+import ar.com.zauber.labs.kraken.fetcher.common.ExecutorServiceBulkURIFetcher;
+import ar.com.zauber.labs.kraken.fetcher.common.mock.FixedURIFetcher;
 
 /**
  * Helps with the creation of {@link BulkURIFetcher}s.

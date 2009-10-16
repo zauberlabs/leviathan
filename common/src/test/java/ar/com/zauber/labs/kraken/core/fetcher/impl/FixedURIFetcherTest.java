@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009 Zauber S.A.  -- All rights reserved
  */
-package ar.com.zauber.labs.kraken.core.fetcher.impl.mock;
+package ar.com.zauber.labs.kraken.core.fetcher.impl;
 
 import java.io.IOException;
 import java.net.URI;
@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
+import ar.com.zauber.labs.kraken.fetcher.common.mock.FixedURIFetcher;
 
 
 /**
