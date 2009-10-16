@@ -6,9 +6,9 @@
         <artifactId>kraken-fetcher-parent</artifactId>
         <version>0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>kraken-fetcher-api-impl</artifactId>
+    <artifactId>kraken-fetcher-api-httpclient</artifactId>
     <packaging>bundle</packaging>
-    <name>Zauber Kraken::Fetcher::API Impl</name>
+    <name>Zauber Kraken::Fetcher::API HttpClient</name>
 
     <dependencies>
         <dependency>
