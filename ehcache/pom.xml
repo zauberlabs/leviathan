@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ar.com.zauber.labs.kraken.fetcher</groupId>
+        <artifactId>kraken-fetcher-parent</artifactId>
+        <version>0.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>kraken-fetcher-api-ehcache</artifactId>
+    <packaging>bundle</packaging>
+    <name>Zauber Kraken::Fetcher::API EHCache</name>
+
+    <dependencies>
+        <dependency>
+            <artifactId>kraken-fetcher-api-common</artifactId>
+            <groupId>${pom.groupId}</groupId>
+            <version>${pom.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>kraken-fetcher-api-httpclient</artifactId>
+            <groupId>${pom.groupId}</groupId>
+            <version>${pom.version}</version>
+        </dependency>
+
+        <dependency>
+           <groupId>org.apache.commons</groupId>
+           <artifactId>com.springsource.org.apache.commons.lang</artifactId>
+        </dependency>
+
+       <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+          <version>1.1.1</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${pom.groupId}.api.impl</Bundle-SymbolicName>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
