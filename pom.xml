@@ -17,6 +17,7 @@
      <module>api</module>
      <module>common</module>
      <module>httpclient</module>
+     <module>ehcache</module>
   </modules>
 
 </project>

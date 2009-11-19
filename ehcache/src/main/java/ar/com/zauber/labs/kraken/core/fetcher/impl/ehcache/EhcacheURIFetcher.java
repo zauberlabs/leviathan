@@ -10,7 +10,6 @@ import net.sf.ehcache.Element;
 
 import org.apache.commons.lang.Validate;
 
-import ar.com.zauber.commons.web.rest.impl.EhcacheContentProvider;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
 
