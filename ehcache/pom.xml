@@ -16,12 +16,6 @@
             <groupId>${pom.groupId}</groupId>
             <version>${pom.version}</version>
         </dependency>
-        <dependency>
-            <artifactId>kraken-fetcher-api-common</artifactId>
-            <groupId>${pom.groupId}</groupId>
-            <version>${pom.version}</version>
-            <scope>test</scope>
-        </dependency>
         
         <dependency>
             <groupId>net.sf.ehcache</groupId>
