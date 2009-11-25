@@ -22,6 +22,7 @@ import org.apache.http.params.HttpProtocolParams;
 
 import ar.com.zauber.labs.kraken.core.fetcher.impl.httpclient.HTTPClientURIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.api.BulkURIFetcher;
+import ar.com.zauber.labs.kraken.fetcher.api.URIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.common.ExecutorServiceBulkURIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.common.mock.FixedURIFetcher;
 
@@ -53,8 +54,21 @@ public final class BulkURIFetchers {
         );
     }
     
+    /** @return un {@link BulkURIFetchers} usando un uriFetcher especifico */
+    public static BulkURIFetcher createBulkURIFetcher(final int nThreads,
+            final URIFetcher uriFetcher) {
+
+        return new ExecutorServiceBulkURIFetcher(
+                Executors.newFixedThreadPool(nThreads), uriFetcher);
+    }
+    
     /** create a single threaded {@link BulkURIFetcher} */
     public static BulkURIFetcher createHttpMultithreaded(final int nThreads) {
+        return createBulkURIFetcher(nThreads, createHttpURIFetcher());
+    }
+
+    /** @return un HTTP Fetcher */
+    public static URIFetcher createHttpURIFetcher() {
         final SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register(
                 new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
@@ -63,12 +77,9 @@ public final class BulkURIFetchers {
         
         final ClientConnectionManager cm = new ThreadSafeClientConnManager(
                 PARAMS, schemeRegistry);
-
-
-        return new ExecutorServiceBulkURIFetcher(
-                Executors.newSingleThreadExecutor(),
-                new HTTPClientURIFetcher(new DefaultHttpClient(cm, PARAMS))
-        );
+        final URIFetcher fetcher = new HTTPClientURIFetcher(
+                new DefaultHttpClient(cm, PARAMS));
+        return fetcher;
     }
 
     /** @return an offline {@link BulkURIFetcher} */
