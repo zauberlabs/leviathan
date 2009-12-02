@@ -15,13 +15,13 @@ import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
 
 /**
  * EhCache URI fetcher.
- * 
+ *
  * Inicialmente se pensaba usar
  * {@link ar.com.zauber.commons.web.rest.impl.EhcacheContentProvider}, pero en
  * ese caso se pierde la info del response, específicamente el statusCode. En
  * caso de no ser necesario se podría considerar ya que la funcionalidad es
  * similar.
- * 
+ *
  * @author Francisco J. Gonzalez Costanzo
  * @since Nov 19, 2009
  */
@@ -39,8 +39,9 @@ public class EhcacheURIFetcher implements URIFetcher {
         this.cache = cache;
     }
 
-    /** @see ar.com.zauber.labs.kraken.fetcher.api.URIFetcher#fetch(java.net.URI) */
+    /** @see URIFetcher#fetch(URI) */
     public final URIFetcherResponse fetch(final URI uri) {
+        System.out.println("-------------------------------");
         final Element e = cache.get(uri);
         if (e == null) {
             final URIFetcherResponse response = fetcher.fetch(uri);

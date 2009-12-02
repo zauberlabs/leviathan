@@ -21,7 +21,7 @@ import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIFetcherResponse;
 
 /**
  * Test
- * 
+ *
  * @author Juan F. Codagnone
  * @since Oct 12, 2009
  */
@@ -36,7 +36,7 @@ public class InmutableURIFetcherResponseTest {
         assertFalse(r.isSucceeded());
         assertEquals(IllegalArgumentException.class, r.getError().getClass());
         assertEquals("foo", r.getError().getMessage());
-        assertEquals(new URI("http://bar"), r.getURI());
+        assertEquals(new URI("http://bar"), r.getURIAndCtx().getURI());
         try {
             r.getHttpResponse();
             fail();
@@ -44,7 +44,7 @@ public class InmutableURIFetcherResponseTest {
             // ok
         }
     }
-    
+
     /** test failed */
     @Test
     public final void success() throws Exception {
@@ -56,8 +56,8 @@ public class InmutableURIFetcherResponseTest {
         assertTrue(r.isSucceeded());
         assertEquals(200, r.getHttpResponse().getStatusCode());
         assertEquals("foo", IOUtils.toString(r.getHttpResponse().getContent()));
-        assertEquals(new URI("http://bar"), r.getURI());
-        
+        assertEquals(new URI("http://bar"), r.getURIAndCtx().getURI());
+
         try {
             r.getError();
             fail();
@@ -72,7 +72,7 @@ public class InmutableURIFetcherResponseTest {
         assertEquals(
             new InmutableURIFetcherResponse(new URI("http://bar"),
                 new InmutableURIFetcherHttpResponse(
-                    new InputStreamReader(IOUtils.toInputStream("foo")), 200)), 
+                    new InputStreamReader(IOUtils.toInputStream("foo")), 200)),
             new InmutableURIFetcherResponse(new URI("http://bar"),
                 new InmutableURIFetcherHttpResponse(
                     new InputStreamReader(
@@ -83,9 +83,9 @@ public class InmutableURIFetcherResponseTest {
     public final void equalsFail() throws Exception {
         assertEquals(
             new InmutableURIFetcherResponse(new URI("http://bar"),
-                new IllegalArgumentException("a")), 
+                new IllegalArgumentException("a")),
             new InmutableURIFetcherResponse(new URI("http://bar"),
                     new IllegalArgumentException("a")));
     }
-    
+
 }

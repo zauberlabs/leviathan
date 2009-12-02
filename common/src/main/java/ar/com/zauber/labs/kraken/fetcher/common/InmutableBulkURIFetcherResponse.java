@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang.Validate;
 
@@ -19,23 +18,23 @@ import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
 
 /**
  * Inmutable implementation of {@link BulkURIFetcherResponse}.
- * 
+ *
  * @author Juan F. Codagnone
  * @since Oct 12, 2009
  */
 public class InmutableBulkURIFetcherResponse implements BulkURIFetcherResponse {
     private final Map<URI, URIFetcherResponse> details;
-    
+
     /** constructor */
     public InmutableBulkURIFetcherResponse(
             final List<URIFetcherResponse> responses) {
         Validate.noNullElements(responses);
-        final Map<URI, URIFetcherResponse> tmp = 
+        final Map<URI, URIFetcherResponse> tmp =
             new HashMap<URI, URIFetcherResponse>();
         for(final URIFetcherResponse r : responses) {
-            tmp.put(r.getURI(), r);
+            tmp.put(r.getURIAndCtx().getURI(), r);
         }
-        details = Collections.unmodifiableMap(tmp); 
+        details = Collections.unmodifiableMap(tmp);
     }
     /** @see BulkURIFetcherResponse#getDetails() */
     public final Map<URI, URIFetcherResponse> getDetails() {
@@ -44,7 +43,7 @@ public class InmutableBulkURIFetcherResponse implements BulkURIFetcherResponse {
 
     /** @see BulkURIFetcherResponse#getFailedURIs() */
     public final Collection<URIFetcherResponse> getFailedURIs() {
-        final Collection<URIFetcherResponse> ret = 
+        final Collection<URIFetcherResponse> ret =
             new LinkedList<URIFetcherResponse>();
         for(final URIFetcherResponse e : details.values()) {
             if(!e.isSucceeded()) {
@@ -55,7 +54,7 @@ public class InmutableBulkURIFetcherResponse implements BulkURIFetcherResponse {
     }
     /** @see BulkURIFetcherResponse#getSuccessfulURIs() */
     public final Collection<URIFetcherResponse> getSuccessfulURIs() {
-        final Collection<URIFetcherResponse> ret = 
+        final Collection<URIFetcherResponse> ret =
             new LinkedList<URIFetcherResponse>();
         for(final URIFetcherResponse e : details.values()) {
             if(e.isSucceeded()) {
@@ -64,28 +63,28 @@ public class InmutableBulkURIFetcherResponse implements BulkURIFetcherResponse {
         }
         return ret;
     }
-    
+
     /** @see Object#equals(Object) */
     @Override
     public final boolean equals(final Object obj) {
         boolean ret = false;
-        
+
         if(obj == this) {
             ret = true;
         } else if(obj instanceof InmutableBulkURIFetcherResponse) {
-            final InmutableBulkURIFetcherResponse r = 
+            final InmutableBulkURIFetcherResponse r =
                 (InmutableBulkURIFetcherResponse) obj;
             ret = details.equals(r.details);
         }
         return ret;
     }
-    
+
     /** @see Object#hashCode() */
     @Override
     public final int hashCode() {
         return details.hashCode();
     }
-    
+
     /** @see Object#toString() */
     @Override
     public final String toString() {
