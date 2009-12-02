@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
+import org.junit.Test;
 
 import ar.com.zauber.labs.kraken.fetcher.api.BulkURIFetcherResponse;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
@@ -32,6 +33,7 @@ import ar.com.zauber.labs.kraken.fetcher.common.mock.FixedURIFetcher;
 public class ExecutorServiceBulkURIFetcherTest {
 
     /** */
+    @Test
     public final void foo() throws Exception {
         final URI bar = new URI("http://bar");
         final URI lalara = new URI("http://lalara");
