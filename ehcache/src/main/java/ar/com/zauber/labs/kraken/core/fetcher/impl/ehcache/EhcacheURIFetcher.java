@@ -42,12 +42,13 @@ public class EhcacheURIFetcher implements URIFetcher {
     /** @see URIFetcher#fetch(URI) */
     public final URIFetcherResponse fetch(final URI uri) {
         final Element e = cache.get(uri);
+        URIFetcherResponse ret;
         if (e == null) {
-            final URIFetcherResponse response = fetcher.fetch(uri);
-            cache.put(new Element(uri, response));
-            return response;
+            ret = fetcher.fetch(uri);
+            cache.put(new Element(uri, ret));
         } else {
-            return fetcher.fetch(uri);
+            ret = (URIFetcherResponse) e.getValue();
         }
+        return ret;
     }
 }
