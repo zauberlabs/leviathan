@@ -6,9 +6,6 @@ package ar.com.zauber.labs.kraken.core.fetcher.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-import java.io.InputStreamReader;
-
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIFetcherHttpResponse;
@@ -26,24 +23,16 @@ public class InmutableURIFetcherHttpResponseTest {
     @Test
     public final void testEquals()  {
         assertEquals(
-            new InmutableURIFetcherHttpResponse(
-                new InputStreamReader(
-                    IOUtils.toInputStream("foo")), 200),
+            new InmutableURIFetcherHttpResponse("foo", 200),
                             
-            new InmutableURIFetcherHttpResponse(
-                new InputStreamReader(
-                    IOUtils.toInputStream("foo")), 200));
+            new InmutableURIFetcherHttpResponse("foo", 200));
     }
     
     /** test */
     @Test
     public final void testNotEquals()  {
         assertFalse(
-            new InmutableURIFetcherHttpResponse(
-                new InputStreamReader(
-                    IOUtils.toInputStream("foo")), 404).equals(
-            new InmutableURIFetcherHttpResponse(
-                new InputStreamReader(
-                    IOUtils.toInputStream("foo")), 200)));
+            new InmutableURIFetcherHttpResponse("foo", 404).equals(
+            new InmutableURIFetcherHttpResponse("foo", 200)));
     }
 }

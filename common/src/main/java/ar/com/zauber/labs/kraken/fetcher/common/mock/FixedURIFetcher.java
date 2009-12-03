@@ -3,13 +3,15 @@
  */
 package ar.com.zauber.labs.kraken.fetcher.common.mock;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
 
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcher;
@@ -58,9 +60,15 @@ public class FixedURIFetcher implements URIFetcher {
                 ret = new  InmutableURIFetcherResponse(uri,
                         new UnknownHostException(uri.getHost()));
             } else {
-                ret = new InmutableURIFetcherResponse(uri,
-                        new InmutableURIFetcherHttpResponse(
-                            new InputStreamReader(is, charset), 200));
+                try {
+                    ret = new InmutableURIFetcherResponse(uri,
+                            new InmutableURIFetcherHttpResponse(
+                                new String(IOUtils.toByteArray(is), charset), 200));
+                } catch (IOException e) {
+                    throw new UnhandledException(e);
+                } finally {
+                    IOUtils.closeQuietly(is);
+                }
             }
         }
         

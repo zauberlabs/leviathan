@@ -4,6 +4,8 @@
 package ar.com.zauber.labs.kraken.fetcher.common;
 
 import java.io.Reader;
+import java.io.Serializable;
+import java.io.StringReader;
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -17,12 +19,13 @@ import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
  * @author Juan F. Codagnone
  * @since Oct 12, 2009
  */
-public class InmutableURIFetcherHttpResponse implements URIFetcherHttpResponse {
-    private final Reader content;
+public class InmutableURIFetcherHttpResponse implements URIFetcherHttpResponse,
+                                                        Serializable {
+    private final String content;
     private final int statusCode;
 
     /** Creates the InmutableURIFetcherResponse. */
-    public InmutableURIFetcherHttpResponse(final Reader content,
+    public InmutableURIFetcherHttpResponse(final String  content,
             final int statusCode) {
         Validate.notNull(content, "content is null");
         
@@ -32,7 +35,7 @@ public class InmutableURIFetcherHttpResponse implements URIFetcherHttpResponse {
     
     /** @see URIFetcherResponse#getContent() */
     public final Reader getContent() {
-        return content;
+        return new StringReader(content);
     }
     /** @see URIFetcherResponse#getStatusCode() */
     public final int getStatusCode() {

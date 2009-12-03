@@ -3,9 +3,7 @@
  */
 package ar.com.zauber.labs.kraken.core.fetcher.impl.httpclient;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.Charset;
 
@@ -47,8 +45,7 @@ public class HTTPClientURIFetcher implements URIFetcher {
             
             return new InmutableURIFetcherResponse(
                 uri, new InmutableURIFetcherHttpResponse(
-                    new InputStreamReader(
-                        new ByteArrayInputStream(EntityUtils.toByteArray(entity)),
+                    new String(EntityUtils.toByteArray(entity),
                         getCharset(entity)
                     ), 
                     response.getStatusLine().getStatusCode()));

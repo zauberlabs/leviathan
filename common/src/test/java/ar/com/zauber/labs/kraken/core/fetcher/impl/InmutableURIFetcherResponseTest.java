@@ -8,7 +8,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.InputStreamReader;
 import java.net.URI;
 
 import org.apache.commons.io.IOUtils;
@@ -50,9 +49,7 @@ public class InmutableURIFetcherResponseTest {
     public final void success() throws Exception {
         final URIFetcherResponse r = new InmutableURIFetcherResponse(
                 new URI("http://bar"),
-                new InmutableURIFetcherHttpResponse(
-                    new InputStreamReader(
-                        IOUtils.toInputStream("foo")), 200));
+                new InmutableURIFetcherHttpResponse("foo", 200));
         assertTrue(r.isSucceeded());
         assertEquals(200, r.getHttpResponse().getStatusCode());
         assertEquals("foo", IOUtils.toString(r.getHttpResponse().getContent()));
@@ -71,12 +68,9 @@ public class InmutableURIFetcherResponseTest {
     public final void equalsHttp() throws Exception {
         assertEquals(
             new InmutableURIFetcherResponse(new URI("http://bar"),
-                new InmutableURIFetcherHttpResponse(
-                    new InputStreamReader(IOUtils.toInputStream("foo")), 200)),
+                new InmutableURIFetcherHttpResponse("foo", 200)),
             new InmutableURIFetcherResponse(new URI("http://bar"),
-                new InmutableURIFetcherHttpResponse(
-                    new InputStreamReader(
-                        IOUtils.toInputStream("foo")), 200)));
+                new InmutableURIFetcherHttpResponse("foo", 200)));
     }
     /** test failed */
     @Test

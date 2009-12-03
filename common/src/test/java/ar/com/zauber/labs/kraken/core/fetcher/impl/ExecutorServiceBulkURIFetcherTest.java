@@ -3,7 +3,6 @@
  */
 package ar.com.zauber.labs.kraken.core.fetcher.impl;
 
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -11,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -56,12 +54,9 @@ public class ExecutorServiceBulkURIFetcherTest {
             new URIFetcherResponse[] {
                 new InmutableURIFetcherResponse(bar,
                     new InmutableURIFetcherHttpResponse(
-                        new InputStreamReader(
-                            IOUtils.toInputStream("foo")), 200)),
+                            "foo", 200)),
                 new InmutableURIFetcherResponse(lalara,
-                    new InmutableURIFetcherHttpResponse(
-                            new InputStreamReader(
-                                IOUtils.toInputStream("foo")), 200)),
+                    new InmutableURIFetcherHttpResponse("foo", 200)),
                 new InmutableURIFetcherResponse(foo,
                         new UnknownHostException("foo"))
         })), response);
