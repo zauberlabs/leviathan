@@ -3,6 +3,7 @@
  */
 package ar.com.zauber.labs.kraken.fetcher.common;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
@@ -18,7 +19,8 @@ import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
  * @author Mariano Semelman
  * @since Dec 2, 2009
  */
-public class InmutableURIAndCtx implements URIFetcherResponse.URIAndCtx {
+public class InmutableURIAndCtx implements URIFetcherResponse.URIAndCtx,
+                                           Serializable {
     private final URI uri;
     private final Map<String, Object> ctx;
 

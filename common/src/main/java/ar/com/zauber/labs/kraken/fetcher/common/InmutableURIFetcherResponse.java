@@ -3,6 +3,7 @@
  */
 package ar.com.zauber.labs.kraken.fetcher.common;
 
+import java.io.Serializable;
 import java.net.URI;
 
 import org.apache.commons.lang.Validate;
@@ -17,7 +18,7 @@ import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
  * @author Juan F. Codagnone
  * @since Oct 12, 2009
  */
-public class InmutableURIFetcherResponse implements URIFetcherResponse {
+public class InmutableURIFetcherResponse implements URIFetcherResponse, Serializable {
     private final URIAndCtx ctx;
     private final Throwable throwable;
     private final URIFetcherHttpResponse httpResponse;
