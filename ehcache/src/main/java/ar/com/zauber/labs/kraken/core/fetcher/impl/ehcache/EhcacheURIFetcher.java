@@ -41,7 +41,6 @@ public class EhcacheURIFetcher implements URIFetcher {
 
     /** @see URIFetcher#fetch(URI) */
     public final URIFetcherResponse fetch(final URI uri) {
-        System.out.println("-------------------------------");
         final Element e = cache.get(uri);
         if (e == null) {
             final URIFetcherResponse response = fetcher.fetch(uri);
