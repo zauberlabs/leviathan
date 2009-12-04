@@ -12,6 +12,9 @@ import org.apache.commons.lang.Validate;
 
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
+import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse.URIAndCtx;
+import ar.com.zauber.labs.kraken.fetcher.common.CtxDecorableURIFetcherResponse;
+import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIAndCtx;
 
 /**
  * EhCache URI fetcher.
@@ -40,15 +43,22 @@ public class EhcacheURIFetcher implements URIFetcher {
     }
 
     /** @see URIFetcher#fetch(URI) */
-    public final URIFetcherResponse fetch(final URI uri) {
-        final Element e = cache.get(uri);
+    public final URIFetcherResponse fetch(final URIAndCtx uriAndCtx) {
+        final Element e = cache.get(uriAndCtx);
         URIFetcherResponse ret;
         if (e == null) {
-            ret = fetcher.fetch(uri);
-            cache.put(new Element(uri, ret));
+            ret = fetcher.fetch(uriAndCtx);
+            cache.put(new Element(uriAndCtx, ret));
         } else {
-            ret = (URIFetcherResponse) e.getValue();
+
+            ret = new CtxDecorableURIFetcherResponse((URIFetcherResponse) e.getValue(),
+                    uriAndCtx);
         }
         return ret;
+    }
+
+    /** @see URIFetcher#fetch(URIAndCtx) */
+    public final URIFetcherResponse fetch(final URI uri) {
+        return fetch(new InmutableURIAndCtx(uri));
     }
 }

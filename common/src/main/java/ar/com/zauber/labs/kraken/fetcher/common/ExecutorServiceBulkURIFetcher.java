@@ -48,7 +48,7 @@ public class ExecutorServiceBulkURIFetcher implements BulkURIFetcher {
         this.uriFetcher = uriFetcher;
     }
 
-    /** @see BulkURIFetcher#fetchCtx(java.util.Collection) */
+    /** @see BulkURIFetcher#fetchCtx(Collection) */
     public final BulkURIFetcherResponse fetch(final Iterable<URI> urisIn) {
         return fetchCtx(new Iterable<URIAndCtx>() {
             public Iterator<URIAndCtx> iterator() {
@@ -70,6 +70,7 @@ public class ExecutorServiceBulkURIFetcher implements BulkURIFetcher {
         });
     }
 
+
     /** @see BulkURIFetcher#fetch(Collection) */
     public final BulkURIFetcherResponse fetchCtx(
             final Iterable<URIAndCtx> uriAndCtxs) {
@@ -82,10 +83,10 @@ public class ExecutorServiceBulkURIFetcher implements BulkURIFetcher {
             new ExecutorCompletionService<URIFetcherResponse>(executorService);
 
 
-        for(final URIAndCtx uri : uris) {
+        for(final URIAndCtx contexteableURI : uris) {
             completion.submit(new Callable<URIFetcherResponse>() {
                 public URIFetcherResponse call() throws Exception {
-                    return uriFetcher.fetch(uri.getURI());
+                    return uriFetcher.fetch(contexteableURI);
                 }
             });
         }
@@ -108,5 +109,10 @@ public class ExecutorServiceBulkURIFetcher implements BulkURIFetcher {
     /** @see BulkURIFetcher#fetch(java.net.URI) */
     public final URIFetcherResponse fetch(final URI uri) {
         return fetch(Arrays.asList(uri)).getDetails().get(uri);
+    }
+
+    /** @see URIFetcher#fetch(URIFetcherResponse.URIAndCtx) */
+    public final URIFetcherResponse fetch(final URIAndCtx uri) {
+        return fetchCtx(Arrays.asList(uri)).getDetails().get(uri);
     }
 }

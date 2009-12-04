@@ -21,8 +21,10 @@ import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
  */
 public class InmutableURIAndCtx implements URIFetcherResponse.URIAndCtx,
                                            Serializable {
+    private static final long serialVersionUID = 5270026214580346190L;
+
     private final URI uri;
-    private final Map<String, Object> ctx;
+    private final transient Map<String, Object> ctx;
 
     /** Creates the InmutableURIAndCtx. */
     public InmutableURIAndCtx(final URI uri) {
