@@ -8,7 +8,7 @@
         current working directory java.io.tmpdir - Default temp file
         path
     -->
-    <diskStore path="runtime-cache" />
+    <diskStore path="target/runtime-cache" />
 
     <cache name="fetcher"
         diskPersistent="true"
