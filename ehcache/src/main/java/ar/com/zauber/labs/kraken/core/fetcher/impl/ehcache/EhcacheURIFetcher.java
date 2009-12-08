@@ -4,11 +4,13 @@
 package ar.com.zauber.labs.kraken.core.fetcher.impl.ehcache;
 
 import java.net.URI;
+import java.util.Formatter;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 import org.apache.commons.lang.Validate;
+import org.apache.log4j.Logger;
 
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
@@ -29,6 +31,7 @@ import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIAndCtx;
  * @since Nov 19, 2009
  */
 public class EhcacheURIFetcher implements URIFetcher {
+    private final static Logger LOGGER  = Logger.getLogger(EhcacheURIFetcher.class); 
     private final URIFetcher fetcher;
     private final Cache cache;
     private long hits;
@@ -63,5 +66,24 @@ public class EhcacheURIFetcher implements URIFetcher {
     /** @see URIFetcher#fetch(URIAndCtx) */
     public final URIFetcherResponse fetch(final URI uri) {
         return fetch(new InmutableURIAndCtx(uri));
+    }
+    
+    
+    public final long getHits() {
+        return hits;
+    }
+
+    public final long getTotal() {
+        return total;
+    }
+
+    /** log the status of the fetcher */
+    public final void logStatus(){
+        if(total > 0) {
+            LOGGER.info(
+               new Formatter(new StringBuilder()).format(
+                    "Fetcher cache hit ratio: %2.2f%% (%d/%d).",
+                    100.0 * hits / total, hits, total).toString());
+        }
     }
 }
