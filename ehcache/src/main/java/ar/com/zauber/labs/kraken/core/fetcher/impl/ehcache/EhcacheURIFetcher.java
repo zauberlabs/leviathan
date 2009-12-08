@@ -31,7 +31,9 @@ import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIAndCtx;
 public class EhcacheURIFetcher implements URIFetcher {
     private final URIFetcher fetcher;
     private final Cache cache;
-
+    private long hits;
+    private long total;
+    
     /**
      * Creates the EHCacheURIFetcher.
      */
@@ -44,16 +46,17 @@ public class EhcacheURIFetcher implements URIFetcher {
 
     /** @see URIFetcher#fetch(URI) */
     public final URIFetcherResponse fetch(final URIAndCtx uriAndCtx) {
-        final Element e = cache.get(uriAndCtx);
+        final Element e = cache.get(uriAndCtx.getURI());
         URIFetcherResponse ret;
         if (e == null) {
             ret = fetcher.fetch(uriAndCtx);
-            cache.put(new Element(uriAndCtx, ret));
+            cache.put(new Element(uriAndCtx.getURI(), ret));
         } else {
-
             ret = new CtxDecorableURIFetcherResponse((URIFetcherResponse) e.getValue(),
                     uriAndCtx);
+            hits++;
         }
+        total++;
         return ret;
     }
 
