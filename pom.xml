@@ -3,7 +3,7 @@
   <parent>
      <artifactId>kraken-parent</artifactId>
      <groupId>ar.com.zauber.labs.kraken</groupId>
-     <version>0.0-SNAPSHOT</version>
+     <version>0.1-SNAPSHOT</version>
   </parent>
   <groupId>ar.com.zauber.labs.kraken.fetcher</groupId>
   <artifactId>kraken-fetcher-parent</artifactId>

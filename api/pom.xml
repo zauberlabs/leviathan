@@ -4,7 +4,7 @@
     <parent>
         <groupId>ar.com.zauber.labs.kraken.fetcher</groupId>
         <artifactId>kraken-fetcher-parent</artifactId>
-        <version>0.0-SNAPSHOT</version>
+        <version>0.1-SNAPSHOT</version>
     </parent>
     <artifactId>kraken-fetcher-api</artifactId>
     <packaging>bundle</packaging>
