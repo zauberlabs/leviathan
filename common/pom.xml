@@ -22,6 +22,10 @@
            <artifactId>com.springsource.org.apache.commons.lang</artifactId>
         </dependency>
         
+        <dependency>
+           <groupId>ar.com.zauber.commons.web</groupId>
+           <artifactId>commons-web-proxy</artifactId>
+        </dependency>
         
         <!-- TEST -->
         <dependency>

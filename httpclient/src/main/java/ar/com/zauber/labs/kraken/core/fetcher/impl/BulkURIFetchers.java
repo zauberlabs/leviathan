@@ -23,12 +23,13 @@ import org.apache.http.params.HttpProtocolParams;
 import ar.com.zauber.labs.kraken.core.fetcher.impl.httpclient.HTTPClientURIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.api.BulkURIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcher;
+import ar.com.zauber.labs.kraken.fetcher.common.CharsetStrategy;
 import ar.com.zauber.labs.kraken.fetcher.common.ExecutorServiceBulkURIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.common.mock.FixedURIFetcher;
 
 /**
  * Helps with the creation of {@link BulkURIFetcher}s.
- * 
+ *
  * @author Juan F. Codagnone
  * @since Oct 12, 2009
  */
@@ -39,13 +40,13 @@ public final class BulkURIFetchers {
         HttpConnectionParams.setConnectionTimeout(PARAMS, 20 * 1000);
         HttpProtocolParams.setVersion(PARAMS, HttpVersion.HTTP_1_1);
     }
-    
+
     /** utility class */
     private BulkURIFetchers() {
         // void
     }
 
-    
+
     /** create a single threaded {@link BulkURIFetcher} */
     public static BulkURIFetcher createHttpSingleThreaded() {
         return new ExecutorServiceBulkURIFetcher(
@@ -53,7 +54,7 @@ public final class BulkURIFetchers {
                 new HTTPClientURIFetcher(new DefaultHttpClient(PARAMS))
         );
     }
-    
+
     /** @return un {@link BulkURIFetchers} usando un uriFetcher especifico */
     public static BulkURIFetcher createBulkURIFetcher(final int nThreads,
             final URIFetcher uriFetcher) {
@@ -61,7 +62,7 @@ public final class BulkURIFetchers {
         return new ExecutorServiceBulkURIFetcher(
                 Executors.newFixedThreadPool(nThreads), uriFetcher);
     }
-    
+
     /** create a single threaded {@link BulkURIFetcher} */
     public static BulkURIFetcher createHttpMultithreaded(final int nThreads) {
         return createBulkURIFetcher(nThreads, createHttpURIFetcher());
@@ -72,13 +73,28 @@ public final class BulkURIFetchers {
         final SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register(
                 new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        schemeRegistry.register(new Scheme("https", 
+        schemeRegistry.register(new Scheme("https",
                 SSLSocketFactory.getSocketFactory(), 443));
-        
+
         final ClientConnectionManager cm = new ThreadSafeClientConnManager(
                 PARAMS, schemeRegistry);
         final URIFetcher fetcher = new HTTPClientURIFetcher(
                 new DefaultHttpClient(cm, PARAMS));
+        return fetcher;
+    }
+
+    /** @return un HTTP Fetcher */
+    public static URIFetcher createHttpURIFetcher(final CharsetStrategy strategy) {
+        final SchemeRegistry schemeRegistry = new SchemeRegistry();
+        schemeRegistry.register(
+                new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+        schemeRegistry.register(new Scheme("https",
+                SSLSocketFactory.getSocketFactory(), 443));
+
+        final ClientConnectionManager cm = new ThreadSafeClientConnManager(
+                PARAMS, schemeRegistry);
+        final URIFetcher fetcher = new HTTPClientURIFetcher(
+                new DefaultHttpClient(cm, PARAMS), strategy);
         return fetcher;
     }
 
