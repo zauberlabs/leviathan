@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2009 Zauber S.A.  -- All rights reserved
+/**
+ *  Copyright (c) 2009-2010 Zauber S.A.  -- All rights reserved
  */
 package ar.com.zauber.labs.kraken.fetcher.common.mock;
 
