@@ -25,4 +25,10 @@
             </plugin>
         </plugins>
     </build>
+    <dependencies>
+        <dependency>
+            <groupId>ar.com.zauber.commons</groupId>
+            <artifactId>commons-dao</artifactId>
+        </dependency>
+    </dependencies>
 </project>
