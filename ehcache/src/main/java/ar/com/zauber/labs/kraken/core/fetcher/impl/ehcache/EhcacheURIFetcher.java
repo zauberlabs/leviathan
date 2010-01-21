@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse.URIAndCtx;
+import ar.com.zauber.labs.kraken.fetcher.common.AbstractURIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.common.CtxDecorableURIFetcherResponse;
 import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIAndCtx;
 
@@ -30,7 +31,7 @@ import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIAndCtx;
  * @author Francisco J. Gonzalez Costanzo
  * @since Nov 19, 2009
  */
-public class EhcacheURIFetcher implements URIFetcher {
+public class EhcacheURIFetcher extends AbstractURIFetcher {
     private final static Logger LOGGER  = Logger.getLogger(EhcacheURIFetcher.class); 
     private final URIFetcher fetcher;
     private final Cache cache;
@@ -62,12 +63,6 @@ public class EhcacheURIFetcher implements URIFetcher {
         total++;
         return ret;
     }
-
-    /** @see URIFetcher#fetch(URIAndCtx) */
-    public final URIFetcherResponse fetch(final URI uri) {
-        return fetch(new InmutableURIAndCtx(uri));
-    }
-    
     
     public final long getHits() {
         return hits;

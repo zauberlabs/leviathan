@@ -19,8 +19,8 @@ import ar.com.zauber.labs.kraken.core.fetcher.impl.httpclient.charset.DefaultHtt
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
 import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse.URIAndCtx;
+import ar.com.zauber.labs.kraken.fetcher.common.AbstractURIFetcher;
 import ar.com.zauber.labs.kraken.fetcher.common.CharsetStrategy;
-import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIAndCtx;
 import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIFetcherHttpResponse;
 import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIFetcherResponse;
 import ar.com.zauber.labs.kraken.fetcher.common.ResponseMetadata;
@@ -31,24 +31,16 @@ import ar.com.zauber.labs.kraken.fetcher.common.ResponseMetadata;
  * @author Juan F. Codagnone
  * @since Oct 12, 2009
  */
-public class HTTPClientURIFetcher implements URIFetcher {
+public class HTTPClientURIFetcher extends AbstractURIFetcher {
     private final HttpClient httpClient;
     private final CharsetStrategy charsetStrategy;
 
-    /** constructor
-     * utiliza la default charset strategy */
+    /** constructor utiliza la default charset strategy */
     public HTTPClientURIFetcher(final HttpClient httpClient) {
         this(httpClient, new DefaultHttpCharsetStrategy());
     }
-
-
-
-    /**
-     * Creates the HTTPClientURIFetcher.
-     *
-     * @param httpClient2
-     * @param defaultStrategy
-     */
+     
+    /** Creates the HTTPClientURIFetcher.*/
     public HTTPClientURIFetcher(final HttpClient httpClient,
             final CharsetStrategy defaultStrategy) {
         Validate.notNull(httpClient);
@@ -56,13 +48,6 @@ public class HTTPClientURIFetcher implements URIFetcher {
 
         this.charsetStrategy = defaultStrategy;
         this.httpClient = httpClient;
-    }
-
-
-
-    /** @see URIFetcher#fetch(URI) */
-    public final URIFetcherResponse fetch(final URI uri) {
-        return fetch(new InmutableURIAndCtx(uri));
     }
 
     /** @see URIFetcher#fetch(URIFetcherResponse.URIAndCtx) */
@@ -101,12 +86,7 @@ public class HTTPClientURIFetcher implements URIFetcher {
 
 
 
-    /**
-     * @param uri
-     * @param response
-     * @param entity
-     * @return
-     */
+    /** obtiene el encoding */
     private ResponseMetadata getMetaResponse(final URI uri,
             final HttpResponse response, final HttpEntity entity) {
         String contentType = null;
