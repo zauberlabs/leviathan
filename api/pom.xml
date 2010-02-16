@@ -2,13 +2,13 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>ar.com.zauber.labs.kraken.fetcher</groupId>
-        <artifactId>kraken-fetcher-parent</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <groupId>ar.com.zauber.leviathan</groupId>
+        <artifactId>leviathan-parent</artifactId>
+        <version>0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>kraken-fetcher-api</artifactId>
+    <artifactId>leviathan-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Zauber Kraken::Fetcher::API</name>
+    <name>Leviathan::API</name>
 
     <build>
         <plugins>
@@ -18,7 +18,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Export-Package>ar.com.zauber.labs.kraken.fetcher.api</Export-Package>
+                        <Export-Package>ar.com.zauber.labs.kraken.api</Export-Package>
                         <Bundle-SymbolicName>${pom.groupId}.api</Bundle-SymbolicName>
                     </instructions>
                 </configuration>

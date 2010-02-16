@@ -2,17 +2,17 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>ar.com.zauber.labs.kraken.fetcher</groupId>
-        <artifactId>kraken-fetcher-parent</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <groupId>ar.com.zauber.leviathan</groupId>
+        <artifactId>leviathan-parent</artifactId>
+        <version>0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>kraken-fetcher-api-ehcache</artifactId>
+    <artifactId>leviathan-api-ehcache</artifactId>
     <packaging>bundle</packaging>
-    <name>Zauber Kraken::Fetcher::API EHCache</name>
+    <name>Leviathan::API EHCache</name>
 
     <dependencies>
         <dependency>
-            <artifactId>kraken-fetcher-api-common</artifactId>
+            <artifactId>leviathan-api-common</artifactId>
             <groupId>${pom.groupId}</groupId>
             <version>${pom.version}</version>
         </dependency>
@@ -23,8 +23,8 @@
         </dependency>
         
         <dependency>
-           <groupId>org.apache.commons</groupId>
-           <artifactId>com.springsource.org.apache.commons.lang</artifactId>
+           <groupId>commons-lang</groupId>
+           <artifactId>commons-lang</artifactId>
         </dependency>
         <dependency>
            <groupId>log4j</groupId>
