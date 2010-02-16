@@ -45,7 +45,7 @@ public class FixedURIFetcherTest {
     public FixedURIFetcherTest() throws URISyntaxException {
         final Map<URI, String> map = new HashMap<URI, String>();
         map.put(new URI("http://noexiste"), 
-               "ar/com/zauber/labs/kraken/core/fetcher/impl/mock/noexiste.txt");
+               "ar/com/zauber/leviathan/impl/mock/noexiste.txt");
         fetcher = new FixedURIFetcher(map, Charset.forName("iso-8859-1"));
     }
 
