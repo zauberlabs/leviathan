@@ -20,9 +20,9 @@
   <packaging>pom</packaging>
 
   <scm>
-     <connection>scm:svn:https://code.zaubersoftware.com/repos/sandbox/leviathan/code/trunk</connection>
-     <developerConnection>scm:svn:https://code.zaubersoftware.com/repos/sandbox/leviathan/code/trunk</developerConnection>
-     <url>https://code.zaubersoftware.com/repos/sandbox/leviathan/code/trunk</url>
+     <connection>scm:svn:https://code.zaubersoftware.com/repos/sandbox/components/leviathan/code/trunk/</connection>
+     <developerConnection>scm:svn:https://code.zaubersoftware.com/repos/sandbox/components/leviathan/code/trunk/</developerConnection>
+     <url>https://code.zaubersoftware.com/repos/sandbox/components/leviathan/code/trunk/</url>
   </scm>
   <licenses>
      <license>
