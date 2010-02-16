@@ -66,7 +66,7 @@ public class ExecutorServiceAsyncUriFetcherTest {
 
         final Map<URI, String> map = new HashMap<URI, String>();
         final String resource =
-            "ar/com/zauber/labs/kraken/core/fetcher/impl/mock/noexiste.txt";
+            "ar/com/zauber/leviathan/impl/mock/noexiste.txt";
         map.put(foo, resource);
         map.put(foo2, resource);
         final URIFetcher fixedUriFetcher = new FixedURIFetcher(map);
