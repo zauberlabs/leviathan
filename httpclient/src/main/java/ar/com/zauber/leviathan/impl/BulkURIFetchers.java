@@ -32,12 +32,12 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 
-import ar.com.zauber.labs.kraken.core.fetcher.impl.httpclient.HTTPClientURIFetcher;
 import ar.com.zauber.leviathan.api.BulkURIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.common.CharsetStrategy;
 import ar.com.zauber.leviathan.common.ExecutorServiceBulkURIFetcher;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
+import ar.com.zauber.leviathan.impl.httpclient.HTTPClientURIFetcher;
 
 /**
  * Helps with the creation of {@link BulkURIFetcher}s.

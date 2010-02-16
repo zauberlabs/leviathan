@@ -24,9 +24,9 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import ar.com.zauber.labs.kraken.core.fetcher.impl.httpclient.InmutableResponseMetadata;
-import ar.com.zauber.labs.kraken.core.fetcher.impl.httpclient.charset.FixedCharsetStrategy;
 import ar.com.zauber.leviathan.common.CharsetStrategy;
+import ar.com.zauber.leviathan.impl.httpclient.InmutableResponseMetadata;
+import ar.com.zauber.leviathan.impl.httpclient.charset.FixedCharsetStrategy;
 
 
 /**

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ar.com.zauber.labs.kraken.core.fetcher.impl.httpclient;
+package ar.com.zauber.leviathan.impl.httpclient;
 
 import java.net.URI;
 

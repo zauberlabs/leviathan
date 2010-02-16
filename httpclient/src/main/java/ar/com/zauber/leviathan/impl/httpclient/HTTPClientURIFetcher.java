@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ar.com.zauber.labs.kraken.core.fetcher.impl.httpclient;
+package ar.com.zauber.leviathan.impl.httpclient;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +27,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 
-import ar.com.zauber.labs.kraken.core.fetcher.impl.httpclient.charset.DefaultHttpCharsetStrategy;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
@@ -36,6 +35,7 @@ import ar.com.zauber.leviathan.common.CharsetStrategy;
 import ar.com.zauber.leviathan.common.InmutableURIFetcherHttpResponse;
 import ar.com.zauber.leviathan.common.InmutableURIFetcherResponse;
 import ar.com.zauber.leviathan.common.ResponseMetadata;
+import ar.com.zauber.leviathan.impl.httpclient.charset.DefaultHttpCharsetStrategy;
 
 /**
  * {@link URIFetcher} that uses Apache's HttpClient components
