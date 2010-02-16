@@ -28,14 +28,14 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 
 import ar.com.zauber.labs.kraken.core.fetcher.impl.httpclient.charset.DefaultHttpCharsetStrategy;
-import ar.com.zauber.labs.kraken.fetcher.api.URIFetcher;
-import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse;
-import ar.com.zauber.labs.kraken.fetcher.api.URIFetcherResponse.URIAndCtx;
-import ar.com.zauber.labs.kraken.fetcher.common.AbstractURIFetcher;
-import ar.com.zauber.labs.kraken.fetcher.common.CharsetStrategy;
-import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIFetcherHttpResponse;
-import ar.com.zauber.labs.kraken.fetcher.common.InmutableURIFetcherResponse;
-import ar.com.zauber.labs.kraken.fetcher.common.ResponseMetadata;
+import ar.com.zauber.leviathan.api.URIFetcher;
+import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
+import ar.com.zauber.leviathan.common.AbstractURIFetcher;
+import ar.com.zauber.leviathan.common.CharsetStrategy;
+import ar.com.zauber.leviathan.common.InmutableURIFetcherHttpResponse;
+import ar.com.zauber.leviathan.common.InmutableURIFetcherResponse;
+import ar.com.zauber.leviathan.common.ResponseMetadata;
 
 /**
  * {@link URIFetcher} that uses Apache's HttpClient components

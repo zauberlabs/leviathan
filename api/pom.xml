@@ -18,7 +18,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Export-Package>ar.com.zauber.labs.kraken.api</Export-Package>
+                        <Export-Package>ar.com.zauber.kraken.api</Export-Package>
                         <Bundle-SymbolicName>${pom.groupId}.api</Bundle-SymbolicName>
                     </instructions>
                 </configuration>

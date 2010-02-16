@@ -21,8 +21,8 @@ import java.nio.charset.UnsupportedCharsetException;
 
 import org.apache.commons.lang.Validate;
 
-import ar.com.zauber.labs.kraken.fetcher.common.CharsetStrategy;
-import ar.com.zauber.labs.kraken.fetcher.common.ResponseMetadata;
+import ar.com.zauber.leviathan.common.CharsetStrategy;
+import ar.com.zauber.leviathan.common.ResponseMetadata;
 
 /**
  * TODO Descripcion de la clase. Los comentarios van en castellano.

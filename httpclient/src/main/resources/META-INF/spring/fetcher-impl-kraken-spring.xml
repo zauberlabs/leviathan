@@ -12,7 +12,7 @@
 
     <bean name="multitheadedBulkURIFetcher"
         class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-        <property name="staticMethod" value="ar.com.zauber.labs.kraken.core.fetcher.impl.BulkURIFetchers.createHttpMultithreaded" />
+        <property name="staticMethod" value="ar.com.zauber.leviathan.core.fetcher.impl.BulkURIFetchers.createHttpMultithreaded" />
         <property name="arguments">
             <list>
                 <value>20</value>

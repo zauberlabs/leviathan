@@ -20,7 +20,7 @@ import java.net.URI;
 import org.apache.commons.lang.Validate;
 
 import ar.com.zauber.commons.web.proxy.ContentTransformer;
-import ar.com.zauber.labs.kraken.fetcher.common.ResponseMetadata;
+import ar.com.zauber.leviathan.common.ResponseMetadata;
 
 /**
  * Un {@link ResponseMetadata} inmutable

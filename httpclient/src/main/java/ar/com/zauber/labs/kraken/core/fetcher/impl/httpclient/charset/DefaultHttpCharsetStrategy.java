@@ -20,8 +20,8 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.lang.Validate;
 
-import ar.com.zauber.labs.kraken.fetcher.common.CharsetStrategy;
-import ar.com.zauber.labs.kraken.fetcher.common.ResponseMetadata;
+import ar.com.zauber.leviathan.common.CharsetStrategy;
+import ar.com.zauber.leviathan.common.ResponseMetadata;
 
 /**
  * Estrategia estandar para tratar de obtener la codificacion de un http response.
