@@ -78,7 +78,8 @@ public class FixedURIFetcher extends AbstractURIFetcher {
                 try {
                     ret = new InmutableURIFetcherResponse(uriAndCtx,
                             new InmutableURIFetcherHttpResponse(
-                                new String(IOUtils.toByteArray(is), charset), 200));
+                                new String(IOUtils.toByteArray(is), 
+                                        charset.displayName()), 200));
                 } catch (IOException e) {
                     throw new UnhandledException(e);
                 } finally {
