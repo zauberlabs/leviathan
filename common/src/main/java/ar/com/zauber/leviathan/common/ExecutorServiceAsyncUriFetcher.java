@@ -17,6 +17,7 @@ package ar.com.zauber.leviathan.common;
 
 import java.net.URI;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.Validate;
 
@@ -25,6 +26,7 @@ import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
+import ar.com.zauber.leviathan.common.async.FetcherScheduler;
 
 /**
  * {@link AsyncUriFetcher} que utiliza un {@link ExecutorService} para no 
@@ -65,6 +67,17 @@ public class ExecutorServiceAsyncUriFetcher implements AsyncUriFetcher {
                 closure.execute(fetcher.fetch(uriAndCtx));
             }
         });
+    }
+    
+    /** @see AsyncUriFetcher#shutdown() */
+    public final void shutdown() {
+        executorService.shutdown();
+    }
+
+    /** @see AsyncUriFetcher#awaitTermination(long, TimeUnit) */
+    public final boolean awaitTermination(final long timeout, final TimeUnit unit)
+            throws InterruptedException {
+        return false;
     }
 }
 

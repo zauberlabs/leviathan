@@ -15,6 +15,8 @@
  */
 package ar.com.zauber.leviathan.common;
 
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.lang.Validate;
 
 import ar.com.zauber.commons.dao.Closure;
@@ -42,5 +44,16 @@ public class NotsoAsyncUriFetcher extends AbstractAsyncUriFetcher {
     public final void fetch(final URIAndCtx uriAndCtx, 
             final Closure<URIFetcherResponse> closure) {
         closure.execute(uriFetcher.fetch(uriAndCtx));
+    }
+
+    /** @see AsyncUriFetcher#shutdown() */
+    public final void shutdown() {
+        // nothing to do
+    }
+    
+    /** @see AsyncUriFetcher#awaitTermination(long, TimeUnit) */
+    public final boolean awaitTermination(final long timeout, final TimeUnit unit)
+            throws InterruptedException {
+        return false;
     }
 }

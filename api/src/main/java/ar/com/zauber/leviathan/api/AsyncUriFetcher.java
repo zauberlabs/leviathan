@@ -16,6 +16,7 @@
 package ar.com.zauber.leviathan.api;
 
 import java.net.URI;
+import java.util.concurrent.TimeUnit;
 
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
@@ -48,4 +49,62 @@ public interface AsyncUriFetcher {
      *        la pagina, los errores; etc).
      */
     void fetch(URIAndCtx uriAndCtx, Closure<URIFetcherResponse> closure);
+    
+    /**
+     * Initiates an orderly shutdown in which previously submitted
+     * tasks are executed, but no new tasks will be accepted.
+     * Invocation has no additional effect if already shut down.
+     */
+    void shutdown();
+
+//    /**
+//     * Attempts to stop all actively executing tasks, halts the
+//     * processing of waiting tasks, and returns a list of the tasks that were
+//     * awaiting execution.
+//     *
+//     * <p>There are no guarantees beyond best-effort attempts to stop
+//     * processing actively executing tasks.  For example, typical
+//     * implementations will cancel via {@link Thread#interrupt}, so any
+//     * task that fails to respond to interrupts may never terminate.
+//     *
+//     * @throws SecurityException if a security manager exists and
+//     *         shutting down this ExecutorService may manipulate
+//     *         threads that the caller is not permitted to modify
+//     *         because it does not hold {@link
+//     *         java.lang.RuntimePermission}<tt>("modifyThread")</tt>,
+//     *         or the security manager's <tt>checkAccess</tt> method
+//     *         denies access.
+//     */
+//    void shutdownNow();
+//
+//    /**
+//     * Returns <tt>true</tt> if this executor has been shut down.
+//     *
+//     * @return <tt>true</tt> if this executor has been shut down
+//     */
+//    boolean isShutdown();
+//
+//    /**
+//     * Returns <tt>true</tt> if all tasks have completed following shut down.
+//     * Note that <tt>isTerminated</tt> is never <tt>true</tt> unless
+//     * either <tt>shutdown</tt> or <tt>shutdownNow</tt> was called first.
+//     *
+//     * @return <tt>true</tt> if all tasks have completed following shut down
+//     */
+//    boolean isTerminated();
+//
+//    /**
+//     * Blocks until all tasks have completed execution after a shutdown
+//     * request, or the timeout occurs, or the current thread is
+//     * interrupted, whichever happens first.
+//     *
+//     * @param timeout the maximum time to wait
+//     * @param unit the time unit of the timeout argument
+//     * @return <tt>true</tt> if this executor terminated and
+//     *         <tt>false</tt> if the timeout elapsed before termination
+//     * @throws InterruptedException if interrupted while waiting
+//     */
+//    boolean awaitTermination(long timeout, TimeUnit unit)
+//        throws InterruptedException;
+
 }
