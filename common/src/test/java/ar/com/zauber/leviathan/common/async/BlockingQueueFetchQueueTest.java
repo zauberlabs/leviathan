@@ -98,8 +98,7 @@ public class BlockingQueueFetchQueueTest {
         final FetchQueue fetchQueue = new BlockingQueueFetchQueue(
                 new LinkedBlockingQueue<FetchJob>()) {
             public void onPoll() {
-                // cuando se hace un poll() se espera un poco para verificar
-                // que el otro thread
+                // disparamos el otro thread.
                 latch.countDown();
             };
         };
