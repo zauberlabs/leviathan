@@ -26,7 +26,7 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.common.async.Job;
 import ar.com.zauber.leviathan.common.async.JobQueue;
 import ar.com.zauber.leviathan.common.async.FetchQueueAsyncUriFetcher;
-import ar.com.zauber.leviathan.common.async.FetcherScheduler;
+import ar.com.zauber.leviathan.common.async.JobScheduler;
 import ar.com.zauber.leviathan.common.async.impl.AtomicIntegerJob;
 import ar.com.zauber.leviathan.common.async.impl.BlockingQueueJobQueue;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
@@ -48,7 +48,7 @@ public class FetchQueueAsyncUriFetcherTest {
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
                 new FixedURIFetcher(new HashMap<URI, String>()), 
                 queue,
-                new FetcherScheduler(queue, Executors.newSingleThreadExecutor()));
+                new JobScheduler(queue, Executors.newSingleThreadExecutor()));
         fetcher.shutdown();
     }
     
@@ -64,7 +64,7 @@ public class FetchQueueAsyncUriFetcherTest {
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
                 new FixedURIFetcher(new HashMap<URI, String>()), 
                 queue,
-                new FetcherScheduler(queue, Executors.newSingleThreadExecutor()));
+                new JobScheduler(queue, Executors.newSingleThreadExecutor()));
         final AtomicInteger i = new AtomicInteger(0);
         final Closure<URIFetcherResponse> closure = 
             new Closure<URIFetcherResponse>() {
@@ -141,7 +141,7 @@ public class FetchQueueAsyncUriFetcherTest {
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
                 new FixedURIFetcher(new HashMap<URI, String>()), 
                 queue,
-                new FetcherScheduler(queue, Executors.newSingleThreadExecutor()));
+                new JobScheduler(queue, Executors.newSingleThreadExecutor()));
         fetcherHolder.add(fetcher);
         fetcher.fetch(uri, new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {
@@ -216,7 +216,7 @@ public class FetchQueueAsyncUriFetcherTest {
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
                 new FixedURIFetcher(new HashMap<URI, String>()), 
                 queue,
-                new FetcherScheduler(queue, Executors.newSingleThreadExecutor()));
+                new JobScheduler(queue, Executors.newSingleThreadExecutor()));
         fetcherHolder.add(fetcher);
         fetcher.fetch(uri, new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {

@@ -20,15 +20,15 @@ import ar.com.zauber.leviathan.common.async.impl.NullJob;
 
 
 /**
- * Tests {@link FetcherSchedulerTest}.
+ * Tests {@link JobSchedulerTest}.
  * 
  * @author Juan F. Codagnone
  * @since Feb 17, 2010
  */
-public class FetcherSchedulerTest {
+public class JobSchedulerTest {
 
     /**
-     * Prueba el funcionamiento del {@link FetcherScheduler}. 
+     * Prueba el funcionamiento del {@link JobScheduler}. 
      * Encola 3 tareas. Las primeras dos incrementan un entero, y la
      * tercera incicia el shutdown.
      */
@@ -48,7 +48,7 @@ public class FetcherSchedulerTest {
         
         Assert.assertEquals(0, i.get());
         final ExecutorService executorService = new DirectExecutorService();
-        new FetcherScheduler(queue, executorService).run();
+        new JobScheduler(queue, executorService).run();
         Assert.assertEquals(2, i.get());
         Assert.assertTrue(executorService.isShutdown());
     }

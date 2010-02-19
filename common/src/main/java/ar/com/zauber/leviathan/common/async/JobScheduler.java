@@ -19,13 +19,13 @@ import org.apache.log4j.Logger;
  * @author Juan F. Codagnone
  * @since Feb 16, 2010
  */
-public class FetcherScheduler implements Runnable {
+public class JobScheduler implements Runnable {
     private final JobQueue queue;
     private final ExecutorService executorService;
-    private final Logger logger = Logger.getLogger(FetcherScheduler.class);
+    private final Logger logger = Logger.getLogger(JobScheduler.class);
     
     /** Creates the FetcherScheduler. */
-    public FetcherScheduler(final JobQueue queue, 
+    public JobScheduler(final JobQueue queue, 
             final ExecutorService executorService) {
         Validate.notNull(queue);
         Validate.notNull(executorService);

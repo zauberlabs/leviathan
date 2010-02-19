@@ -26,7 +26,7 @@ import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
-import ar.com.zauber.leviathan.common.async.FetcherScheduler;
+import ar.com.zauber.leviathan.common.async.JobScheduler;
 
 /**
  * {@link AsyncUriFetcher} que utiliza un {@link ExecutorService} para no 

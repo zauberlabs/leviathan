@@ -34,7 +34,7 @@ public class FetchQueueAsyncUriFetcher implements AsyncUriFetcher {
     public FetchQueueAsyncUriFetcher(
             final URIFetcher fetcher,
             final JobQueue fetchQueue,
-            final FetcherScheduler fetcherScheduler) {
+            final JobScheduler fetcherScheduler) {
         Validate.notNull(fetcher);
         Validate.notNull(fetcherScheduler);
         
