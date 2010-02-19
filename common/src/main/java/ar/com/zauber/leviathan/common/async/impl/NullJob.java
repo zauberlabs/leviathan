@@ -3,15 +3,15 @@
  */
 package ar.com.zauber.leviathan.common.async.impl;
 
-import ar.com.zauber.leviathan.common.async.FetchJob;
+import ar.com.zauber.leviathan.common.async.Job;
 
 /**
- * {@link FetchJob} que no hace nada. Util para tests.
+ * {@link Job} que no hace nada. Util para tests.
  * 
  * @author Juan F. Codagnone
  * @since Feb 17, 2010
  */
-public class NullFetchJob implements FetchJob {
+public class NullJob implements Job {
 
     /** @see Runnable#run() */
     public final void run() {

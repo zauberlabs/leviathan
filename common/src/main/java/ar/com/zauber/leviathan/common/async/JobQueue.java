@@ -11,7 +11,7 @@ import java.util.concurrent.RejectedExecutionException;
  * @author Juan F. Codagnone
  * @since Feb 16, 2010
  */
-public interface FetchQueue {
+public interface JobQueue {
 
     /** 
      * incorpora un nuevo trabajo a la cola de fetching.
@@ -19,13 +19,13 @@ public interface FetchQueue {
      * @throws RejectedExecutionException Si no puede aceptar nuevas tareas 
      *   (porque se invocó a {@link #shutdown()})  
      */
-    void add(FetchJob fetchJob) throws RejectedExecutionException;
+    void add(Job fetchJob) throws RejectedExecutionException;
     
     /** 
      * obtiene una tarea; si no tiene nada para entregar bloquea. Nunca retorna null.
      * Si fue interrumpido recibirá
      */
-    FetchJob poll() throws InterruptedException;
+    Job poll() throws InterruptedException;
     
     /** @return <code>true</code> si la cola está vacía */
     boolean isEmpty();

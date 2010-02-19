@@ -14,9 +14,9 @@ import junit.framework.Assert;
 import org.apache.commons.lang.UnhandledException;
 import org.junit.Test;
 
-import ar.com.zauber.leviathan.common.async.impl.AtomicIntegerFetchJob;
-import ar.com.zauber.leviathan.common.async.impl.BlockingQueueFetchQueue;
-import ar.com.zauber.leviathan.common.async.impl.NullFetchJob;
+import ar.com.zauber.leviathan.common.async.impl.AtomicIntegerJob;
+import ar.com.zauber.leviathan.common.async.impl.BlockingQueueJobQueue;
+import ar.com.zauber.leviathan.common.async.impl.NullJob;
 
 
 /**
@@ -34,13 +34,13 @@ public class FetcherSchedulerTest {
      */
     @Test(timeout = 2000)
     public final void testConsumeAndShutdown() {
-        final FetchQueue queue = new BlockingQueueFetchQueue(
-                new LinkedBlockingQueue<FetchJob>());
+        final JobQueue queue = new BlockingQueueJobQueue(
+                new LinkedBlockingQueue<Job>());
         final AtomicInteger i = new AtomicInteger(0);
-        final FetchJob job = new AtomicIntegerFetchJob(i);
+        final Job job = new AtomicIntegerJob(i);
         queue.add(job);
         queue.add(job);
-        queue.add(new FetchJob() {
+        queue.add(new Job() {
             public void run() {
                 queue.shutdown();
             }

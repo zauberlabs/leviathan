@@ -20,12 +20,12 @@ import org.apache.log4j.Logger;
  * @since Feb 16, 2010
  */
 public class FetcherScheduler implements Runnable {
-    private final FetchQueue queue;
+    private final JobQueue queue;
     private final ExecutorService executorService;
     private final Logger logger = Logger.getLogger(FetcherScheduler.class);
     
     /** Creates the FetcherScheduler. */
-    public FetcherScheduler(final FetchQueue queue, 
+    public FetcherScheduler(final JobQueue queue, 
             final ExecutorService executorService) {
         Validate.notNull(queue);
         Validate.notNull(executorService);

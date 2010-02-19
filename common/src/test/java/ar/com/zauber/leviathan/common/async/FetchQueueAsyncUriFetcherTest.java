@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010 Zauber S.A.  -- All rights reserved
  */
-package ar.com.zauber.leviathan.common;
+package ar.com.zauber.leviathan.common.async;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,13 +23,12 @@ import org.junit.Test;
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
-import ar.com.zauber.leviathan.common.async.DirectExecutorService;
-import ar.com.zauber.leviathan.common.async.FetchJob;
-import ar.com.zauber.leviathan.common.async.FetchQueue;
+import ar.com.zauber.leviathan.common.async.Job;
+import ar.com.zauber.leviathan.common.async.JobQueue;
 import ar.com.zauber.leviathan.common.async.FetchQueueAsyncUriFetcher;
 import ar.com.zauber.leviathan.common.async.FetcherScheduler;
-import ar.com.zauber.leviathan.common.async.impl.AtomicIntegerFetchJob;
-import ar.com.zauber.leviathan.common.async.impl.BlockingQueueFetchQueue;
+import ar.com.zauber.leviathan.common.async.impl.AtomicIntegerJob;
+import ar.com.zauber.leviathan.common.async.impl.BlockingQueueJobQueue;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
 
@@ -44,8 +43,8 @@ public class FetchQueueAsyncUriFetcherTest {
     /** intenta cerra un fetcher ya cerrado */
     @Test(timeout = 2000)
     public final void shutdownShiny() {
-        final FetchQueue queue = new BlockingQueueFetchQueue(
-                new LinkedBlockingQueue<FetchJob>());
+        final JobQueue queue = new BlockingQueueJobQueue(
+                new LinkedBlockingQueue<Job>());
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
                 new FixedURIFetcher(new HashMap<URI, String>()), 
                 queue,
@@ -59,8 +58,8 @@ public class FetchQueueAsyncUriFetcherTest {
      */
     @Test(timeout = 2000 * 1000000)
     public final void pool() throws URISyntaxException {
-        final FetchQueue queue = new BlockingQueueFetchQueue(
-                new LinkedBlockingQueue<FetchJob>());
+        final JobQueue queue = new BlockingQueueJobQueue(
+                new LinkedBlockingQueue<Job>());
         
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
                 new FixedURIFetcher(new HashMap<URI, String>()), 
@@ -111,8 +110,8 @@ public class FetchQueueAsyncUriFetcherTest {
             new ArrayList<AsyncUriFetcher>(1);
         final URI uri = new URI("http://123");
         
-        final FetchQueue queue = new BlockingQueueFetchQueue(
-                new LinkedBlockingQueue<FetchJob>()) {
+        final JobQueue queue = new BlockingQueueJobQueue(
+                new LinkedBlockingQueue<Job>()) {
             private final AtomicInteger i = new AtomicInteger(0);
             public void onPoll() {
                 i.addAndGet(1);
@@ -186,8 +185,8 @@ public class FetchQueueAsyncUriFetcherTest {
             new ArrayList<AsyncUriFetcher>(1);
         final URI uri = new URI("http://123");
         
-        final FetchQueue queue = new BlockingQueueFetchQueue(
-                new LinkedBlockingQueue<FetchJob>()) {
+        final JobQueue queue = new BlockingQueueJobQueue(
+                new LinkedBlockingQueue<Job>()) {
             private final AtomicInteger i = new AtomicInteger(0);
             public void onPoll() {
                 i.addAndGet(1);

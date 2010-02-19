@@ -9,16 +9,16 @@ import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
-import ar.com.zauber.leviathan.common.async.FetchJob;
+import ar.com.zauber.leviathan.common.async.Job;
 
 /**
- * Implementación de {@link FetchJob} que utiliza un {@link Closure} para 
+ * Implementación de {@link Job} que utiliza un {@link Closure} para 
  * difererir el procesamiento de la ejecución.
  * 
  * @author Juan F. Codagnone
  * @since Feb 17, 2010
  */
-public class ClosureFetchJob implements FetchJob {
+public class ClosureJob implements Job {
     private final URIAndCtx uriAndCtx;
     private final Closure<URIFetcherResponse> closure;
     private final URIFetcher fetcher;
@@ -30,7 +30,7 @@ public class ClosureFetchJob implements FetchJob {
      * @param closure   Accion a realizar una vez que se obtiene el recurso
      * @param fetcher   Fetcher que se utilizará para obtener el recurso
      */
-    public ClosureFetchJob(final URIAndCtx uriAndCtx, 
+    public ClosureJob(final URIAndCtx uriAndCtx, 
             final Closure<URIFetcherResponse> closure,
             final URIFetcher fetcher) {
         Validate.notNull(uriAndCtx);

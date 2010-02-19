@@ -16,7 +16,7 @@ import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.InmutableURIAndCtx;
-import ar.com.zauber.leviathan.common.async.impl.ClosureFetchJob;
+import ar.com.zauber.leviathan.common.async.impl.ClosureJob;
 
 /**
  * {@link AsyncUriFetcher} que 
@@ -26,14 +26,14 @@ import ar.com.zauber.leviathan.common.async.impl.ClosureFetchJob;
  */
 public class FetchQueueAsyncUriFetcher implements AsyncUriFetcher {
     private final URIFetcher fetcher;
-    private final FetchQueue fetchQueue;
+    private final JobQueue fetchQueue;
     private final Thread scheduler;
-    private final Logger logger = Logger.getLogger(FetchQueue.class);
+    private final Logger logger = Logger.getLogger(JobQueue.class);
     
     /** */
     public FetchQueueAsyncUriFetcher(
             final URIFetcher fetcher,
-            final FetchQueue fetchQueue,
+            final JobQueue fetchQueue,
             final FetcherScheduler fetcherScheduler) {
         Validate.notNull(fetcher);
         Validate.notNull(fetcherScheduler);
@@ -53,7 +53,7 @@ public class FetchQueueAsyncUriFetcher implements AsyncUriFetcher {
     /** @see AsyncUriFetcher#fetch(URIAndCtx, Closure) */
     public final void fetch(final URIAndCtx uriAndCtx, 
             final Closure<URIFetcherResponse> closure) {
-        fetchQueue.add(new ClosureFetchJob(uriAndCtx, closure, fetcher));
+        fetchQueue.add(new ClosureJob(uriAndCtx, closure, fetcher));
     }
 
     /** @see AsyncUriFetcher#shutdown() */

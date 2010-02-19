@@ -11,6 +11,6 @@ package ar.com.zauber.leviathan.common.async;
  * @author Juan F. Codagnone
  * @since Feb 16, 2010
  */
-public interface FetchJob extends Runnable {
+public interface Job extends Runnable {
     
 }

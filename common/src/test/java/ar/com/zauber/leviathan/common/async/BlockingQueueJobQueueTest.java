@@ -12,35 +12,35 @@ import junit.framework.Assert;
 import org.apache.commons.lang.UnhandledException;
 import org.junit.Test;
 
-import ar.com.zauber.leviathan.common.async.impl.BlockingQueueFetchQueue;
-import ar.com.zauber.leviathan.common.async.impl.NullFetchJob;
+import ar.com.zauber.leviathan.common.async.impl.BlockingQueueJobQueue;
+import ar.com.zauber.leviathan.common.async.impl.NullJob;
 
 
 /**
- * Tests {@link BlockingQueueFetchQueue}.
+ * Tests {@link BlockingQueueJobQueue}.
  * 
  * @author Juan F. Codagnone
  * @since Feb 17, 2010
  */
-public class BlockingQueueFetchQueueTest {
+public class BlockingQueueJobQueueTest {
 
     /** crea una queue */
-    private FetchQueue create() {
-        return new BlockingQueueFetchQueue(new LinkedBlockingQueue<FetchJob>());
+    private JobQueue create() {
+        return new BlockingQueueJobQueue(new LinkedBlockingQueue<Job>());
     }
     
     /**
-     *  una vez que se hizo un {@link FetchQueue#shutdown()} no se deben 
+     *  una vez que se hizo un {@link JobQueue#shutdown()} no se deben 
      *  aceptar nuevas tareas
      */
     @Test
     public final void testShutdownRejectNewTasksNotEmptyQueue() {
-        final FetchQueue fetchQueue = create(); 
+        final JobQueue fetchQueue = create(); 
         
-        fetchQueue.add(new NullFetchJob());
+        fetchQueue.add(new NullJob());
         fetchQueue.shutdown();
         try {
-            fetchQueue.add(new NullFetchJob());
+            fetchQueue.add(new NullJob());
             Assert.fail("No se debia aceptar la tareas luego de un shutdown");
         } catch(RejectedExecutionException e) {
             // ok
@@ -48,16 +48,16 @@ public class BlockingQueueFetchQueueTest {
     }
     
     /**
-     *  una vez que se hizo un {@link FetchQueue#shutdown()} no se deben 
+     *  una vez que se hizo un {@link JobQueue#shutdown()} no se deben 
      *  aceptar nuevas tareas
      */
     @Test
     public final void testShutdownRejectNewTasksEmptyQueue() {
-        final FetchQueue fetchQueue = create();
+        final JobQueue fetchQueue = create();
         
         fetchQueue.shutdown();
         try {
-            fetchQueue.add(new NullFetchJob());
+            fetchQueue.add(new NullJob());
             Assert.fail("No se debia aceptar la tareas luego de un shutdown");
         } catch(RejectedExecutionException e) {
             // ok
@@ -69,7 +69,7 @@ public class BlockingQueueFetchQueueTest {
      */
     @Test
     public final void testValidateNullJobs()  {
-        final FetchQueue fetchQueue = create();
+        final JobQueue fetchQueue = create();
         try {
             fetchQueue.add(null);
             Assert.fail("No debe aceptar tareas nulas");
@@ -95,8 +95,8 @@ public class BlockingQueueFetchQueueTest {
         final CountDownLatch latch = new CountDownLatch(1);
         
         // Uso una cola que no se bloquea (capacidad infinita) es importante...
-        final FetchQueue fetchQueue = new BlockingQueueFetchQueue(
-                new LinkedBlockingQueue<FetchJob>()) {
+        final JobQueue fetchQueue = new BlockingQueueJobQueue(
+                new LinkedBlockingQueue<Job>()) {
             public void onPoll() {
                 // disparamos el otro thread.
                 latch.countDown();
@@ -111,14 +111,14 @@ public class BlockingQueueFetchQueueTest {
                     // avisó que "casi se hizo el poll()". Pero para estar
                     // seguros de  la prueba lo agrego
                     Thread.sleep(200);
-                    fetchQueue.add(new NullFetchJob());
+                    fetchQueue.add(new NullJob());
                 } catch (InterruptedException e) {
                     throw new UnhandledException(e);
                 }
             }
         }).start();
         
-        final FetchJob job = fetchQueue.poll();
+        final Job job = fetchQueue.poll();
         Assert.assertNotNull("la cola nunca debe retorar null (segun javadoc)", 
                 job);
     }
@@ -139,8 +139,8 @@ public class BlockingQueueFetchQueueTest {
         final CountDownLatch latch = new CountDownLatch(1);
         
         // Uso una cola que no se bloquea (capacidad infinita) es importante...
-        final FetchQueue fetchQueue = new BlockingQueueFetchQueue(
-                new LinkedBlockingQueue<FetchJob>()) {
+        final JobQueue fetchQueue = new BlockingQueueJobQueue(
+                new LinkedBlockingQueue<Job>()) {
             public void onPoll() {
                 // cuando se hace un poll() se espera un poco para verificar
                 // que el otro thread
@@ -163,7 +163,7 @@ public class BlockingQueueFetchQueueTest {
             }
         }).start();
         
-        FetchJob job = null;
+        Job job = null;
         try {
             job = fetchQueue.poll();
             Assert.fail("codigo al cual no se deberia llegar");

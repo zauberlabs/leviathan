@@ -7,26 +7,26 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.Validate;
 
-import ar.com.zauber.leviathan.common.async.FetchJob;
+import ar.com.zauber.leviathan.common.async.Job;
 
 /**
- * {@link FetchJob} que incrementa un {@link AtomicInteger}. Es de utilidad
+ * {@link Job} que incrementa un {@link AtomicInteger}. Es de utilidad
  * en tests para saber cuantas veces se ha ejecutado.
  * 
  * @author Juan F. Codagnone
  * @since Feb 19, 2010
  */
-public class AtomicIntegerFetchJob implements FetchJob {
+public class AtomicIntegerJob implements Job {
     private final AtomicInteger atomic;
     private final int delta;
 
     /** Creates the AtomicIntegerFetchJob. */
-    public AtomicIntegerFetchJob(final AtomicInteger atomic) {
+    public AtomicIntegerJob(final AtomicInteger atomic) {
         this(atomic, 1);
     }
     
     /** Creates the AtomicIntegerFetchJob. */
-    public AtomicIntegerFetchJob(final AtomicInteger atomic,
+    public AtomicIntegerJob(final AtomicInteger atomic,
             final int delta) {
         Validate.notNull(atomic);
         

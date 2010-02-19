@@ -11,22 +11,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
 
-import ar.com.zauber.leviathan.common.async.FetchJob;
-import ar.com.zauber.leviathan.common.async.FetchQueue;
+import ar.com.zauber.leviathan.common.async.Job;
+import ar.com.zauber.leviathan.common.async.JobQueue;
 
 /**
- * {@link FetchQueue} que delega su funcionamiento en un {@link BlockingQueue}.
+ * {@link JobQueue} que delega su funcionamiento en un {@link BlockingQueue}.
  * 
  * @author Juan F. Codagnone
  * @since Feb 16, 2010
  */
-public class BlockingQueueFetchQueue implements FetchQueue {
-    private final BlockingQueue<FetchJob> target;
+public class BlockingQueueJobQueue implements JobQueue {
+    private final BlockingQueue<Job> target;
     private AtomicBoolean shutdownFlag = new AtomicBoolean(false);
     private final long timeout;
     
-    /** @see BlockingQueueFetchQueue */
-    public BlockingQueueFetchQueue(final BlockingQueue<FetchJob> target) {
+    /** @see BlockingQueueJobQueue */
+    public BlockingQueueJobQueue(final BlockingQueue<Job> target) {
         this(target, 500);
     }
     
@@ -38,7 +38,7 @@ public class BlockingQueueFetchQueue implements FetchQueue {
      *                 volver a ver si hay elementos (y de esta forma "blockear").
      *                 Está dicho en milisegundos.  
      */
-    public BlockingQueueFetchQueue(final BlockingQueue<FetchJob> target,
+    public BlockingQueueJobQueue(final BlockingQueue<Job> target,
             final long timeout) {
         Validate.notNull(target, "target is null");
         Validate.isTrue(timeout > 0, "timeout must be positive");
@@ -48,8 +48,8 @@ public class BlockingQueueFetchQueue implements FetchQueue {
     }
     
     
-    /** @see FetchQueue#add(FetchJob) */
-    public final void add(final  FetchJob fetchJob) {
+    /** @see JobQueue#add(Job) */
+    public final void add(final  Job fetchJob) {
         Validate.notNull(fetchJob, "null jobs are not accepted");
         if(shutdownFlag.get()) {
             throw new RejectedExecutionException(
@@ -63,7 +63,7 @@ public class BlockingQueueFetchQueue implements FetchQueue {
         }
     }
 
-    /** @see FetchQueue#isEmpty() */
+    /** @see JobQueue#isEmpty() */
     public final boolean isEmpty() {
         return target.isEmpty();
     }
@@ -74,9 +74,9 @@ public class BlockingQueueFetchQueue implements FetchQueue {
         // void
     }
     
-    /** @see FetchQueue#poll() */
-    public final FetchJob poll() throws InterruptedException {
-        FetchJob job;
+    /** @see JobQueue#poll() */
+    public final Job poll() throws InterruptedException {
+        Job job;
         onPoll();
         do {
             job = target.poll(timeout, TimeUnit.MILLISECONDS);
@@ -90,12 +90,12 @@ public class BlockingQueueFetchQueue implements FetchQueue {
         return job;
     }
     
-    /** @see FetchQueue#shutdown() */
+    /** @see JobQueue#shutdown() */
     public final void shutdown() {
         shutdownFlag.set(true);
     }
     
-    /** @see FetchQueue#isShutdown() */
+    /** @see JobQueue#isShutdown() */
     public final boolean isShutdown() {
         return shutdownFlag.get();
     }
