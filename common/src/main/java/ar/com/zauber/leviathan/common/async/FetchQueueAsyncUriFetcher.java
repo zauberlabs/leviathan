@@ -4,7 +4,6 @@
 package ar.com.zauber.leviathan.common.async;
 
 import java.net.URI;
-import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Level;
@@ -16,7 +15,6 @@ import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.InmutableURIAndCtx;
-import ar.com.zauber.leviathan.common.async.impl.ClosureJob;
 
 /**
  * {@link AsyncUriFetcher} que 
@@ -26,22 +24,41 @@ import ar.com.zauber.leviathan.common.async.impl.ClosureJob;
  */
 public class FetchQueueAsyncUriFetcher implements AsyncUriFetcher {
     private final URIFetcher fetcher;
-    private final JobQueue fetchQueue;
-    private final Thread scheduler;
+    private final JobQueue fetcherQueue;
+    private final Thread inScheduler;
+    private final JobQueue processingQueue;
+    private final Thread outScheduler;
+    
     private final Logger logger = Logger.getLogger(JobQueue.class);
     
     /** */
     public FetchQueueAsyncUriFetcher(
             final URIFetcher fetcher,
-            final JobQueue fetchQueue,
-            final JobScheduler fetcherScheduler) {
+            final JobScheduler fetcherScheduler,
+            final JobScheduler processingScheduler) {
+        
         Validate.notNull(fetcher);
         Validate.notNull(fetcherScheduler);
+        Validate.notNull(processingScheduler);
+        
+        
+        // alertamos de posibles problemas debido a copy paste:
+        // las queue y schedulers no pueden ser la misma instancia
+        Validate.isTrue(fetcherScheduler.getQueue() 
+                != processingScheduler.getQueue(),
+                "Los schedulers de fetcher y procesamiento no pueden "
+                + "compartir la misma queue");
+        Validate.isTrue(fetcherScheduler != processingScheduler);
         
         this.fetcher = fetcher;
-        this.fetchQueue = fetchQueue;
-        scheduler = new Thread(fetcherScheduler);
-        scheduler.start();
+        this.fetcherQueue = fetcherScheduler.getQueue();
+        this.processingQueue = processingScheduler.getQueue();
+        
+        inScheduler = new Thread(fetcherScheduler, "JobScheduler-IN");
+        outScheduler = new Thread(processingScheduler, "JobScheduler-IN");
+        
+        inScheduler.start();
+        outScheduler.start();
     }
     
     /** @see AsyncUriFetcher#fetch(URI, Closure) */
@@ -53,20 +70,39 @@ public class FetchQueueAsyncUriFetcher implements AsyncUriFetcher {
     /** @see AsyncUriFetcher#fetch(URIAndCtx, Closure) */
     public final void fetch(final URIAndCtx uriAndCtx, 
             final Closure<URIFetcherResponse> closure) {
-        fetchQueue.add(new ClosureJob(uriAndCtx, closure, fetcher));
+        
+        fetcherQueue.add(new Job() {
+            public void run() {
+                final URIFetcherResponse r = fetcher.fetch(uriAndCtx);
+                processingQueue.add(new Job() {
+                    public void run() {
+                        closure.execute(r);
+                    }
+                });
+                // TODO: notificar a la fetcherQueue que ya se 
+                // fetcheo el elemento. 
+            }
+        });
     }
 
     /** @see AsyncUriFetcher#shutdown() */
     public final void shutdown() {
         // no aceptamos más trabajos.
-        fetchQueue.shutdown();
+        fetcherQueue.shutdown();
+        waitForTermination(inScheduler);
+        processingQueue.shutdown();
+        waitForTermination(outScheduler);
         
-        boolean wait = true; 
+    }
 
+    /** espera que termine un thread */
+    private boolean waitForTermination(final Thread thread) {
+        boolean wait = true;
+        
         // esperamos que el scheduler consuma todos los trabajos
-        while(wait && scheduler.isAlive()) {
+        while(wait && thread.isAlive()) {
             try {
-                scheduler.join();
+                thread.join();
                 wait = false;
             } catch (InterruptedException e) {
                 logger.log(Level.WARN, "interrupted while shutting down");
@@ -78,5 +114,6 @@ public class FetchQueueAsyncUriFetcher implements AsyncUriFetcher {
                 }
             }
         }
+        return wait;
     }
 }

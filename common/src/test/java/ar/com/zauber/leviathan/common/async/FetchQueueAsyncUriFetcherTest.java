@@ -9,25 +9,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.UnhandledException;
-import org.apache.commons.lang.Validate;
 import org.junit.Assert;
 import org.junit.Test;
 
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
-import ar.com.zauber.leviathan.common.async.Job;
-import ar.com.zauber.leviathan.common.async.JobQueue;
-import ar.com.zauber.leviathan.common.async.FetchQueueAsyncUriFetcher;
-import ar.com.zauber.leviathan.common.async.JobScheduler;
-import ar.com.zauber.leviathan.common.async.impl.AtomicIntegerJob;
 import ar.com.zauber.leviathan.common.async.impl.BlockingQueueJobQueue;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
@@ -43,12 +36,16 @@ public class FetchQueueAsyncUriFetcherTest {
     /** intenta cerra un fetcher ya cerrado */
     @Test(timeout = 2000)
     public final void shutdownShiny() {
-        final JobQueue queue = new BlockingQueueJobQueue(
+        final JobQueue fetcherQueue = new BlockingQueueJobQueue(
                 new LinkedBlockingQueue<Job>());
+        final JobQueue processingQueue = new BlockingQueueJobQueue(
+                new LinkedBlockingQueue<Job>());
+        
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
                 new FixedURIFetcher(new HashMap<URI, String>()), 
-                queue,
-                new JobScheduler(queue, Executors.newSingleThreadExecutor()));
+                new JobScheduler(fetcherQueue, Executors.newSingleThreadExecutor()),
+                new JobScheduler(processingQueue, Executors.newSingleThreadExecutor())
+        );
         fetcher.shutdown();
     }
     
@@ -56,16 +53,21 @@ public class FetchQueueAsyncUriFetcherTest {
      * Arma un fetcher, le da urls para fetchear.
      * y llama al shutdown. 
      */
-    @Test(timeout = 2000 * 1000000)
-    public final void pool() throws URISyntaxException {
-        final JobQueue queue = new BlockingQueueJobQueue(
+//    @Test(timeout = 2000)
+    @Test
+    public final void poll() throws URISyntaxException {
+        final JobQueue fetcherQueue = new BlockingQueueJobQueue(
+                new LinkedBlockingQueue<Job>());
+        final JobQueue processingQueue = new BlockingQueueJobQueue(
                 new LinkedBlockingQueue<Job>());
         
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
-                new FixedURIFetcher(new HashMap<URI, String>()), 
-                queue,
-                new JobScheduler(queue, Executors.newSingleThreadExecutor()));
+              new FixedURIFetcher(new HashMap<URI, String>()), 
+              new JobScheduler(processingQueue, Executors.newSingleThreadExecutor()),
+              new JobScheduler(fetcherQueue, Executors.newSingleThreadExecutor()));
+        
         final AtomicInteger i = new AtomicInteger(0);
+        
         final Closure<URIFetcherResponse> closure = 
             new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {
@@ -138,10 +140,13 @@ public class FetchQueueAsyncUriFetcherTest {
                 }
             };
         };
+        final JobQueue processingQueue = new BlockingQueueJobQueue(
+                new LinkedBlockingQueue<Job>());
+        
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
-                new FixedURIFetcher(new HashMap<URI, String>()), 
-                queue,
-                new JobScheduler(queue, Executors.newSingleThreadExecutor()));
+            new FixedURIFetcher(new HashMap<URI, String>()), 
+            new JobScheduler(queue, Executors.newSingleThreadExecutor()),
+            new JobScheduler(processingQueue, Executors.newSingleThreadExecutor()));
         fetcherHolder.add(fetcher);
         fetcher.fetch(uri, new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {
@@ -213,10 +218,13 @@ public class FetchQueueAsyncUriFetcherTest {
                 }
             };
         };
+        final JobQueue processingQueue = new BlockingQueueJobQueue(
+                new LinkedBlockingQueue<Job>());
+        
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
-                new FixedURIFetcher(new HashMap<URI, String>()), 
-                queue,
-                new JobScheduler(queue, Executors.newSingleThreadExecutor()));
+           new FixedURIFetcher(new HashMap<URI, String>()), 
+           new JobScheduler(queue, Executors.newSingleThreadExecutor()),
+           new JobScheduler(processingQueue, Executors.newSingleThreadExecutor()));
         fetcherHolder.add(fetcher);
         fetcher.fetch(uri, new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {
@@ -229,5 +237,25 @@ public class FetchQueueAsyncUriFetcherTest {
         finish.await(); // espera que onPoll() agrege todas las tareas.
         fetcher.shutdown();
         Assert.assertEquals(cantTasks, tasksAfterFirstTask.get());
+    }
+    
+    /**
+     *  Verifica que los dos schedulers no compartan las misma colas. 
+     */
+    @Test(timeout = 2000)
+    public final void avoidUsingSameQueue() {
+        final JobQueue queue = new BlockingQueueJobQueue(
+                new LinkedBlockingQueue<Job>());
+        
+        try {
+            new FetchQueueAsyncUriFetcher(
+                    new FixedURIFetcher(new HashMap<URI, String>()), 
+                    new JobScheduler(queue, Executors.newSingleThreadExecutor()),
+                    new JobScheduler(queue, Executors.newSingleThreadExecutor()));
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            Assert.assertEquals("Los schedulers de fetcher y procesamiento no "
+                    + "pueden compartir la misma queue", e.getMessage());
+        }
     }
 }

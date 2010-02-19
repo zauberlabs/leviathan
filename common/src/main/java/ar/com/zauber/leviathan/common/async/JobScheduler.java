@@ -62,4 +62,9 @@ public class JobScheduler implements Runnable {
             }
         }
     }
+    
+    /** Returns the queue. */
+    public final JobQueue getQueue() {
+        return queue;
+    }
 }
