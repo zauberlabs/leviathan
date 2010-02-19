@@ -5,11 +5,18 @@ package ar.com.zauber.leviathan.common;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang.UnhandledException;
+import org.apache.commons.lang.Validate;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -21,6 +28,7 @@ import ar.com.zauber.leviathan.common.async.FetchJob;
 import ar.com.zauber.leviathan.common.async.FetchQueue;
 import ar.com.zauber.leviathan.common.async.FetchQueueAsyncUriFetcher;
 import ar.com.zauber.leviathan.common.async.FetcherScheduler;
+import ar.com.zauber.leviathan.common.async.impl.AtomicIntegerFetchJob;
 import ar.com.zauber.leviathan.common.async.impl.BlockingQueueFetchQueue;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
@@ -71,5 +79,156 @@ public class FetchQueueAsyncUriFetcherTest {
         }
         fetcher.shutdown();
         Assert.assertEquals(100, i.get());
+    }
+    
+
+    /**
+     * Prueba que el scheduler no termine si se queda sin jobs luego de haber
+     * procesado algunos. 
+     * 
+     *  - Se inicia el fetcher
+     *  - Se encola una tarea
+     *  - Cuando se está terminando de procesar; nos aseguramos que la cola
+     *    esté vacia. Cuando esto sucede agrega (via un truco en el onPoll de la
+     *    cola nuevas tareas para su ejecución). 
+
+     * @throws InterruptedException 
+     * @throws URISyntaxException 
+     */
+    @Test(timeout = 2000)
+    public final void testConsumeWaitConsumeAndShutdown() 
+        throws InterruptedException, URISyntaxException {
+        // cantidad de tareas a encolar una vez que se termina de procesar la primera
+        final int cantTasks = 100;
+        
+        final CountDownLatch waitForEndTask1 = new CountDownLatch(1);
+        final CountDownLatch finish = new CountDownLatch(cantTasks);
+        final AtomicBoolean firstTaskDone = new AtomicBoolean(false);
+        final AtomicInteger tasksAfterFirstTask = new AtomicInteger(0);
+
+        
+        final List<AsyncUriFetcher> fetcherHolder = 
+            new ArrayList<AsyncUriFetcher>(1);
+        final URI uri = new URI("http://123");
+        
+        final FetchQueue queue = new BlockingQueueFetchQueue(
+                new LinkedBlockingQueue<FetchJob>()) {
+            private final AtomicInteger i = new AtomicInteger(0);
+            public void onPoll() {
+                i.addAndGet(1);
+                
+                if(i.get() == 2) {
+                    try {
+                        Assert.assertFalse("faltó cargar el holder", 
+                                fetcherHolder.isEmpty());
+                        // agregamos cantTasks trabajos cuando se está terminando
+                        // de procesar la tarea primera.
+                        waitForEndTask1.await();
+                        for(int i = 0; i < cantTasks; i++) {
+                            fetcherHolder.iterator().next().fetch(uri, 
+                                    new Closure<URIFetcherResponse>() {
+                                public void execute(final URIFetcherResponse t) {
+                                    tasksAfterFirstTask.addAndGet(1);
+                                    finish.countDown();
+                                }
+                            });
+                        }
+                    } catch (InterruptedException e) {
+                        throw new UnhandledException(e);
+                    }
+                }
+            };
+        };
+        final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
+                new FixedURIFetcher(new HashMap<URI, String>()), 
+                queue,
+                new FetcherScheduler(queue, Executors.newSingleThreadExecutor()));
+        fetcherHolder.add(fetcher);
+        fetcher.fetch(uri, new Closure<URIFetcherResponse>() {
+            public void execute(final URIFetcherResponse t) {
+                firstTaskDone.set(true);
+                Assert.assertTrue(queue.isEmpty());
+                waitForEndTask1.countDown();
+            }
+        });
+        
+        finish.await(); // espera que onPoll() agrege todas las tareas.
+        fetcher.shutdown();
+        Assert.assertEquals(cantTasks, tasksAfterFirstTask.get());
+    }
+    
+    /**
+     * Prueba que el scheduler no termine si se queda sin jobs luego de haber
+     * procesado algunos. 
+     * 
+     *  - Se inicia el fetcher
+     *  - Se encola una tarea
+     *  - Cuando se está terminando de procesar; nos aseguramos que la cola
+     *    esté vacia. Cuando esto sucede agrega (via un truco en el onPoll de la
+     *    cola nuevas tareas para su ejecución). 
+
+     * @throws InterruptedException 
+     * @throws URISyntaxException 
+     */
+    @Test(timeout = 2000)
+    public final void testConsumeWaitConsumeAndShutdownMetralleta() 
+        throws InterruptedException, URISyntaxException {
+        // cantidad de tareas a encolar una vez que se termina de procesar la primera
+        final int cantTasks = 100;
+        
+        final CountDownLatch waitForEndTask1 = new CountDownLatch(1);
+        final CountDownLatch finish = new CountDownLatch(1);
+        final AtomicBoolean firstTaskDone = new AtomicBoolean(false);
+        final AtomicInteger tasksAfterFirstTask = new AtomicInteger(0);
+
+        
+        final List<AsyncUriFetcher> fetcherHolder = 
+            new ArrayList<AsyncUriFetcher>(1);
+        final URI uri = new URI("http://123");
+        
+        final FetchQueue queue = new BlockingQueueFetchQueue(
+                new LinkedBlockingQueue<FetchJob>()) {
+            private final AtomicInteger i = new AtomicInteger(0);
+            public void onPoll() {
+                i.addAndGet(1);
+                
+                if(i.get() == 2) {
+                    try {
+                        Assert.assertFalse("faltó cargar el holder", 
+                                fetcherHolder.isEmpty());
+                        // agregamos cantTasks trabajos cuando se está terminando
+                        // de procesar la tarea primera.
+                        waitForEndTask1.await();
+                        for(int i = 0; i < cantTasks; i++) {
+                            fetcherHolder.iterator().next().fetch(uri, 
+                                    new Closure<URIFetcherResponse>() {
+                                public void execute(final URIFetcherResponse t) {
+                                    tasksAfterFirstTask.addAndGet(1);
+                                }
+                            });
+                        }
+                        finish.countDown();
+                    } catch (InterruptedException e) {
+                        throw new UnhandledException(e);
+                    }
+                }
+            };
+        };
+        final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
+                new FixedURIFetcher(new HashMap<URI, String>()), 
+                queue,
+                new FetcherScheduler(queue, Executors.newSingleThreadExecutor()));
+        fetcherHolder.add(fetcher);
+        fetcher.fetch(uri, new Closure<URIFetcherResponse>() {
+            public void execute(final URIFetcherResponse t) {
+                firstTaskDone.set(true);
+                Assert.assertTrue(queue.isEmpty());
+                waitForEndTask1.countDown();
+            }
+        });
+        
+        finish.await(); // espera que onPoll() agrege todas las tareas.
+        fetcher.shutdown();
+        Assert.assertEquals(cantTasks, tasksAfterFirstTask.get());
     }
 }
