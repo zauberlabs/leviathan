@@ -18,6 +18,9 @@ import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.common.async.DirectExecutorService;
 import ar.com.zauber.leviathan.common.async.FetchJob;
+import ar.com.zauber.leviathan.common.async.FetchQueue;
+import ar.com.zauber.leviathan.common.async.FetchQueueAsyncUriFetcher;
+import ar.com.zauber.leviathan.common.async.FetcherScheduler;
 import ar.com.zauber.leviathan.common.async.impl.BlockingQueueFetchQueue;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
@@ -33,11 +36,12 @@ public class FetchQueueAsyncUriFetcherTest {
     /** intenta cerra un fetcher ya cerrado */
     @Test(timeout = 2000)
     public final void shutdownShiny() {
+        final FetchQueue queue = new BlockingQueueFetchQueue(
+                new LinkedBlockingQueue<FetchJob>());
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
-                new FixedURIFetcher(
-                new HashMap<URI, String>()), 
-                new BlockingQueueFetchQueue(new LinkedBlockingQueue<FetchJob>()),
-                new DirectExecutorService());
+                new FixedURIFetcher(new HashMap<URI, String>()), 
+                queue,
+                new FetcherScheduler(queue, Executors.newSingleThreadExecutor()));
         fetcher.shutdown();
     }
     
@@ -45,13 +49,15 @@ public class FetchQueueAsyncUriFetcherTest {
      * Arma un fetcher, le da urls para fetchear.
      * y llama al shutdown. 
      */
-    @Test(timeout = 2000)
+    @Test(timeout = 2000 * 1000000)
     public final void pool() throws URISyntaxException {
+        final FetchQueue queue = new BlockingQueueFetchQueue(
+                new LinkedBlockingQueue<FetchJob>());
+        
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
-                new FixedURIFetcher(
-                new HashMap<URI, String>()), 
-                new BlockingQueueFetchQueue(new LinkedBlockingQueue<FetchJob>()),
-                Executors.newSingleThreadExecutor());
+                new FixedURIFetcher(new HashMap<URI, String>()), 
+                queue,
+                new FetcherScheduler(queue, Executors.newSingleThreadExecutor()));
         final AtomicInteger i = new AtomicInteger(0);
         final Closure<URIFetcherResponse> closure = 
             new Closure<URIFetcherResponse>() {
@@ -59,6 +65,7 @@ public class FetchQueueAsyncUriFetcherTest {
                 i.addAndGet(1);
             }
         };
+        
         for(int j = 0; j < 100; j++) {
             fetcher.fetch(new URI("http://foo"), closure);
         }

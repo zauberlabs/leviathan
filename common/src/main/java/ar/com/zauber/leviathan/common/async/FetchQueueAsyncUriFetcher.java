@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010 Zauber S.A.  -- All rights reserved
  */
-package ar.com.zauber.leviathan.common;
+package ar.com.zauber.leviathan.common.async;
 
 import java.net.URI;
 import java.util.concurrent.ExecutorService;
@@ -15,8 +15,7 @@ import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
-import ar.com.zauber.leviathan.common.async.FetchQueue;
-import ar.com.zauber.leviathan.common.async.FetcherScheduler;
+import ar.com.zauber.leviathan.common.InmutableURIAndCtx;
 import ar.com.zauber.leviathan.common.async.impl.ClosureFetchJob;
 
 /**
@@ -35,14 +34,13 @@ public class FetchQueueAsyncUriFetcher implements AsyncUriFetcher {
     public FetchQueueAsyncUriFetcher(
             final URIFetcher fetcher,
             final FetchQueue fetchQueue,
-            final ExecutorService executorService) {
+            final FetcherScheduler fetcherScheduler) {
         Validate.notNull(fetcher);
-        Validate.notNull(fetchQueue);
+        Validate.notNull(fetcherScheduler);
         
         this.fetcher = fetcher;
         this.fetchQueue = fetchQueue;
-        scheduler = new Thread(new FetcherScheduler(fetchQueue, 
-                executorService));
+        scheduler = new Thread(fetcherScheduler);
         scheduler.start();
     }
     
