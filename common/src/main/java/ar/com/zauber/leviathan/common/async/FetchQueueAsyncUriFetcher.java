@@ -3,11 +3,7 @@
  */
 package ar.com.zauber.leviathan.common.async;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Level;
@@ -21,8 +17,78 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.AbstractAsyncUriFetcher;
 
 /**
- * {@link AsyncUriFetcher} que 
+ * {@link AsyncUriFetcher} que utiliza dos colas (de tipo  {@link JobQueue}
+ * internas para realizar el trabajo. 
  * 
+ * El flujo de la  información es mas o menos así:
+ * <ol>
+ *   <li>el cliente llama a {@link #fetch(URIAndCtx, Closure)}</li>
+ *   <li>Todo nuevo trabajo es encolado en una Fetch Queue. Dependiendo de la 
+ *    naturaleza de la cola (limitada o infinita), si llegó a su capacidad total 
+ *    podria bloquear hasta que haya espacio. 
+ *   </li>
+ *   <li>Una vez encolado el trabajo se retorna la ejecución al cliente</li>
+ *   <li>Existe otro thread que es el fetch scheduler (de tipo {@link JobScheduler})
+ *       que se encarga de consumir las tareas de fetching de la cola. Quita
+ *       de la cola la tarea y la pone ejecutar en un {@link ExecutorService}</li>
+ *   <li>Cuando el fetching termina (ya sea OK, por error o timeout), el trabajo
+ *       se encola una cola de procesamiento (también de tipo {@link JobQueue}).</li>
+ *   <li>Existe otro thread (el processing scheduler) que consume todo lo que 
+ *       se encoló para procesar y lo pone a procesar en un pool de workers 
+ *       (tambíen un executor service). Poner a ejecutar significa ejecutar el
+ *       {@link Closure} del usuario.</li>
+ * </ol>
+ * <pre>
+ *                          Fetch workers
+ *                               _
+ *                              |_|
+ *                              |_|                                 processing
+ *                              |_|                                  workers
+ *  +-------+    +----------+   |_|   +------------+   +----------+    _
+ *  | Fetch |    |  fetch   |   |_|   | processing |   |processing|   |_|
+ *  | Queue |-->-| scheduler|->-|_|->-|    queue   |->-|scheduler |->-|_|-->
+ *  +-------+    +----------+   |_|   +------------+   +----------+   |_|
+ *                              |_|
+ *                              |_|
+ * </pre>
+ * 
+ * <p>
+ * Los closures de los usuarios, por ejemplo pueden procesar el documento que se
+ * descargó y en base a la información decidir descargar más información. Es 
+ * por esto que si las colas internas que se usan tienen un límite máximo antes
+ * de bloquear, y estas se encuentra llenas; y todos los closures que se encuentran
+ * en procesamiento llaman a {@link #fetch(java.net.URI, Closure)} entonces se 
+ * llegará a un deadlock. Esta implementación deberia tener en cuenta esto. 
+ * </p>
+ * 
+ * <p>
+ * Es importante tener en cuenta a la hora de elegir la cantidad de workers la
+ * naturaleza de los dos pools: 
+ *   <ul>
+ *      <li><strong>fetch workers</strong>: Es puro I/O. La cantidad de 
+ *         descargas en paralelo que se desean realizar. Un parametro útil para
+ *         calcular este valor es dividir el ancho de banda disponible sobre la 
+ *         velocidad de descarga aceptable por documento. Muchas descargas al mismo
+ *         tiempo hará mas lenta el download y las tareas tardarán mucho en llegar
+ *         al procesamiento. Pocas descargar al mismo tiempo pueden desaprovechar
+ *         el ancho de banda. También en la decisión influye la naturaleza de 
+ *         la cola. Si la cola de fetching es polite y no entrega trabajos
+ *         que involucran a la misma dirección IP hasta un rato despues de que 
+ *         la última descarga haya terminado entonces se sabe que todas las descargas
+ *         serán a diferentes servidores, y encontes es mas previsible el cálculo
+ *         de velocidad esperada por descarga.
+ *      </li>
+ *      <li><strong>processing workers</strong>: esto ya depende de cada aplicación.
+ *        Si las tareas son intensivas en el uso de CPU; se recomienda que 
+ *        no se utilizen más threads que cores.
+ *      </li>
+ *   </ul>
+ * </p>
+ * <p>
+ * Por otro lado, dado que ya todas las tareas vienen de colas internas, no 
+ * es recomendable que los {@link ExecutorService} usados para procesar el trabajo
+ * tengan internamente colas. 
+ * </p>
  * @author Juan F. Codagnone
  * @since Feb 17, 2010
  */
@@ -32,11 +98,6 @@ public class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
     private final Thread inScheduler;
     private final JobQueue processingQueue;
     private final Thread outScheduler;
-    
-    // para implementar el awaitIdleness
-    private final Lock lock = new ReentrantLock();
-    private final Condition emptyCondition  = lock.newCondition(); 
-    private final AtomicLong activeJobs = new AtomicLong(0);
         
     private final Logger logger = Logger.getLogger(FetchQueueAsyncUriFetcher.class);
     
@@ -73,14 +134,10 @@ public class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
     /** @see AsyncUriFetcher#fetch(URIAndCtx, Closure) */
     public final void fetch(final URIAndCtx uriAndCtx, 
             final Closure<URIFetcherResponse> closure) {
-        lock.lock();
-        try {
-            activeJobs.incrementAndGet();
-        } finally {
-            lock.unlock();
-        }
+        incrementActiveJobs();
         
-        // esto puede bloquear, asi que el lock llega hasta arriba
+        // esto puede bloquear, asi que es por eso que se hizo todo el lock en
+        // en incrementActiveJobs.
         try {
             fetcherQueue.add(new Job() {
                 public void run() {
@@ -110,20 +167,6 @@ public class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
         }
     }
 
-    /** 
-     *  decrementa la cantidad de trabajos activos y notifica a quien 
-     *  este esperando por idleness si se llegó a 0.
-     */
-    private void decrementActiveJobs() {
-        lock.lock();
-        try {
-            if(activeJobs.decrementAndGet() == 0) {
-                emptyCondition.signalAll();
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
 
     /** @see AsyncUriFetcher#shutdown() */
     public final void shutdown() {
@@ -155,32 +198,5 @@ public class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
             }
         }
         return wait;
-    }
-
-    /** @see AsyncUriFetcher#awaitIdleness() */
-    public final void awaitIdleness() throws InterruptedException {
-        lock.lock();
-        try {
-            while(activeJobs.get() != 0) {
-                emptyCondition.await();
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
-    /** @see AsyncUriFetcher#awaitIdleness(long, TimeUnit) */
-    public final boolean awaitIdleness(final long timeout, final TimeUnit unit) 
-        throws InterruptedException {
-        boolean timedOut = false;
-        lock.lock();
-        try {
-            // no hago esto desde un while ya que un spurious wakeup puede ser
-            // interpretado como un wakeup.
-            timedOut = emptyCondition.await(timeout, unit);
-        } finally {
-            lock.unlock();
-        }
-        
-        return timedOut;
     }
 }
