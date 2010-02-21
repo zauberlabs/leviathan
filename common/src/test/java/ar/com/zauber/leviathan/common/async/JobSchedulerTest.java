@@ -3,20 +3,16 @@
  */
 package ar.com.zauber.leviathan.common.async;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.Assert;
 
-import org.apache.commons.lang.UnhandledException;
 import org.junit.Test;
 
 import ar.com.zauber.leviathan.common.async.impl.AtomicIntegerJob;
 import ar.com.zauber.leviathan.common.async.impl.BlockingQueueJobQueue;
-import ar.com.zauber.leviathan.common.async.impl.NullJob;
 
 
 /**
