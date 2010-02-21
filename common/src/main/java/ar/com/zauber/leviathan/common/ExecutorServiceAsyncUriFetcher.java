@@ -15,7 +15,6 @@
  */
 package ar.com.zauber.leviathan.common;
 
-import java.net.URI;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
