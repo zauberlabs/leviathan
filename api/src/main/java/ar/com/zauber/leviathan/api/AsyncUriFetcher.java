@@ -61,9 +61,13 @@ public interface AsyncUriFetcher {
     void shutdown();
 
     /**
-     * Blocks until all tasks have completed execution,
-     * or the timeout occurs, or the current thread is interrupted, whichever
-     * happens first.
+     * Bloquea hasta que  todo el motor de fetching se encuentra idle. 
+     * Esto significa que no hay trabajos en las colas internas, y que todos
+     * se ejecutaron todos los closures.
+     * 
+     * Si el clousure de fetching vuelve a realizar fetching (recursivamente) 
+     * {@link #awaitIdleness()} asegura que se termino de procesar todo.
+     *  
      */
     void awaitIdleness() throws InterruptedException;
     
