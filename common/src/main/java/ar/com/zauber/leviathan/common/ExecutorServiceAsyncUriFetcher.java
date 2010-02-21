@@ -36,7 +36,7 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
  * @author Juan F. Codagnone
  * @since Jan 21, 2010
  */
-public class ExecutorServiceAsyncUriFetcher implements AsyncUriFetcher {
+public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
     private final ExecutorService executorService;
     private URIFetcher fetcher;
 
@@ -48,12 +48,6 @@ public class ExecutorServiceAsyncUriFetcher implements AsyncUriFetcher {
         
         this.executorService = executorService;
         this.fetcher = fetcher;
-    }
-
-    /** @see AsyncUriFetcher#fetch(URI, Closure) */
-    public final void fetch(final URI uri, 
-            final Closure<URIFetcherResponse> closure) {
-        fetch(new InmutableURIAndCtx(uri), closure);
     }
     
     /** @see AsyncUriFetcher#fetch(URIFetcherResponse.URIAndCtx, Closure) */

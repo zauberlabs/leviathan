@@ -3,7 +3,6 @@
  */
 package ar.com.zauber.leviathan.common.async;
 
-import java.net.URI;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Condition;
@@ -19,7 +18,7 @@ import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
-import ar.com.zauber.leviathan.common.InmutableURIAndCtx;
+import ar.com.zauber.leviathan.common.AbstractAsyncUriFetcher;
 
 /**
  * {@link AsyncUriFetcher} que 
@@ -27,7 +26,7 @@ import ar.com.zauber.leviathan.common.InmutableURIAndCtx;
  * @author Juan F. Codagnone
  * @since Feb 17, 2010
  */
-public class FetchQueueAsyncUriFetcher implements AsyncUriFetcher {
+public class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
     private final URIFetcher fetcher;
     private final JobQueue fetcherQueue;
     private final Thread inScheduler;
@@ -38,7 +37,7 @@ public class FetchQueueAsyncUriFetcher implements AsyncUriFetcher {
     private final Lock lock = new ReentrantLock();
     private final Condition emptyCondition  = lock.newCondition(); 
     private final AtomicLong activeJobs = new AtomicLong(0);
-    
+        
     private final Logger logger = Logger.getLogger(FetchQueueAsyncUriFetcher.class);
     
     /** */
@@ -69,12 +68,6 @@ public class FetchQueueAsyncUriFetcher implements AsyncUriFetcher {
         
         inScheduler.start();
         outScheduler.start();
-    }
-    
-    /** @see AsyncUriFetcher#fetch(URI, Closure) */
-    public final void fetch(final URI uri, 
-            final Closure<URIFetcherResponse> closure) {
-        fetch(new InmutableURIAndCtx(uri), closure);
     }
 
     /** @see AsyncUriFetcher#fetch(URIAndCtx, Closure) */
