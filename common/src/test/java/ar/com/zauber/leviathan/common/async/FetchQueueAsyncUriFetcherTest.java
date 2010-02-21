@@ -11,16 +11,24 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.management.RuntimeErrorException;
+
 import org.apache.commons.lang.UnhandledException;
+import org.apache.commons.lang.Validate;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
 import ar.com.zauber.commons.dao.Closure;
+import ar.com.zauber.commons.dao.closure.NullClosure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.common.async.impl.AtomicIntegerJob;
 import ar.com.zauber.leviathan.common.async.impl.BlockingQueueJobQueue;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
@@ -258,4 +266,97 @@ public class FetchQueueAsyncUriFetcherTest {
                     + "pueden compartir la misma queue", e.getMessage());
         }
     }
+    
+    /**
+     * Prueba que funcione el {@link FetchQueueAsyncUriFetcher#awaitIdleness()}  
+     */
+    @Test(timeout = 2000)
+    public final void waitIdlenesss() 
+        throws URISyntaxException, InterruptedException {
+        final JobQueue fetchQueue = new BlockingQueueJobQueue(
+                new LinkedBlockingQueue<Job>());
+        final JobQueue processingQueue = new BlockingQueueJobQueue(
+                new LinkedBlockingQueue<Job>());
+        final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
+                new FixedURIFetcher(new HashMap<URI, String>()), 
+                new JobScheduler(fetchQueue, new DirectExecutorService()),
+                new JobScheduler(processingQueue, new DirectExecutorService()));
+        final URI uri = new URI("http://foo");
+        
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicInteger i = new AtomicInteger(0);
+        
+        final int n = 10000; 
+        
+        fetcher.fetch(uri, new Closure<URIFetcherResponse>() {
+            public void execute(final URIFetcherResponse t) {
+                for(int j = 0; j < n; j++) {
+                    fetcher.fetch(uri, new Closure<URIFetcherResponse>() {
+                        /** @see Closure#execute(Object) */
+                        public void execute(final URIFetcherResponse t) {
+                            i.incrementAndGet();
+                        }
+                    });
+                }
+                latch.countDown();
+            }
+        });
+        latch.await();
+        Assert.assertFalse(
+                "mm, no hay tareas pendientes. la prueba no sirve de mucho",
+                fetchQueue.isEmpty() && processingQueue.isEmpty());
+        fetcher.awaitIdleness();
+        Assert.assertEquals(n, i.get());
+        fetcher.shutdown();
+    }
+    
+    
+    /**
+     * Prueba que funcione el {@link FetchQueueAsyncUriFetcher#awaitIdleness()}
+     * con execpciones  
+     */
+    @Test(timeout = 2000)
+    public final void waitIdlenesssWithExceptions() 
+        throws URISyntaxException, InterruptedException {
+        final JobQueue fetchQueue = new BlockingQueueJobQueue(
+                new LinkedBlockingQueue<Job>());
+        final JobQueue processingQueue = new BlockingQueueJobQueue(
+                new LinkedBlockingQueue<Job>());
+        final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
+                new FixedURIFetcher(new HashMap<URI, String>()), 
+                new JobScheduler(fetchQueue, new DirectExecutorService()),
+                new JobScheduler(processingQueue, new DirectExecutorService()));
+        final URI uri = new URI("http://foo");
+        
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicInteger i = new AtomicInteger(0);
+        
+        final int n = 10000; 
+        
+        Logger.getLogger(FetchQueueAsyncUriFetcher.class).setLevel(Level.FATAL);
+        
+        fetcher.fetch(uri, new Closure<URIFetcherResponse>() {
+            public void execute(final URIFetcherResponse t) {
+                for(int j = 0; j < n; j++) {
+                    fetcher.fetch(uri, new Closure<URIFetcherResponse>() {
+                        /** @see Closure#execute(Object) */
+                        public void execute(final URIFetcherResponse t) {
+                            i.incrementAndGet();
+                            throw new IllegalStateException(
+                                    "solo para probar que funcione");
+                        }
+                    });
+                }
+                latch.countDown();
+            }
+        });
+        latch.await();
+        Assert.assertFalse(
+                "mm, no hay tareas pendientes. la prueba no sirve de mucho",
+                fetchQueue.isEmpty() && processingQueue.isEmpty());
+        fetcher.awaitIdleness();
+        Assert.assertEquals(n, i.get());
+        fetcher.shutdown();
+    }
+
 }

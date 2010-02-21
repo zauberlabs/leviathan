@@ -17,6 +17,7 @@ package ar.com.zauber.leviathan.common;
 
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.Validate;
 
 import ar.com.zauber.commons.dao.Closure;
@@ -55,5 +56,16 @@ public class NotsoAsyncUriFetcher extends AbstractAsyncUriFetcher {
     public final boolean awaitTermination(final long timeout, final TimeUnit unit)
             throws InterruptedException {
         return false;
+    }
+    
+    /** @see AsyncUriFetcher#awaitIdleness(long, TimeUnit) */
+    public final boolean awaitIdleness(final long timeout, final TimeUnit unit)
+            throws InterruptedException {
+        throw new NotImplementedException("not coming very soon");
+    }
+    
+    /** @see AsyncUriFetcher#awaitIdleness(long, TimeUnit) */
+    public final void awaitIdleness() throws InterruptedException {
+        throw new NotImplementedException("not coming very soon");
     }
 }

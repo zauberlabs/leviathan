@@ -4,6 +4,11 @@
 package ar.com.zauber.leviathan.common.async;
 
 import java.net.URI;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Level;
@@ -29,7 +34,12 @@ public class FetchQueueAsyncUriFetcher implements AsyncUriFetcher {
     private final JobQueue processingQueue;
     private final Thread outScheduler;
     
-    private final Logger logger = Logger.getLogger(JobQueue.class);
+    // para implementar el awaitIdleness
+    private final Lock lock = new ReentrantLock();
+    private final Condition emptyCondition  = lock.newCondition(); 
+    private final AtomicLong activeJobs = new AtomicLong(0);
+    
+    private final Logger logger = Logger.getLogger(FetchQueueAsyncUriFetcher.class);
     
     /** */
     public FetchQueueAsyncUriFetcher(
@@ -55,7 +65,7 @@ public class FetchQueueAsyncUriFetcher implements AsyncUriFetcher {
         this.processingQueue = processingScheduler.getQueue();
         
         inScheduler = new Thread(fetcherScheduler, "JobScheduler-IN");
-        outScheduler = new Thread(processingScheduler, "JobScheduler-IN");
+        outScheduler = new Thread(processingScheduler, "JobScheduler-OUT");
         
         inScheduler.start();
         outScheduler.start();
@@ -70,19 +80,56 @@ public class FetchQueueAsyncUriFetcher implements AsyncUriFetcher {
     /** @see AsyncUriFetcher#fetch(URIAndCtx, Closure) */
     public final void fetch(final URIAndCtx uriAndCtx, 
             final Closure<URIFetcherResponse> closure) {
+        lock.lock();
+        try {
+            activeJobs.incrementAndGet();
+        } finally {
+            lock.unlock();
+        }
         
-        fetcherQueue.add(new Job() {
-            public void run() {
-                final URIFetcherResponse r = fetcher.fetch(uriAndCtx);
-                processingQueue.add(new Job() {
-                    public void run() {
-                        closure.execute(r);
-                    }
-                });
-                // TODO: notificar a la fetcherQueue que ya se 
-                // fetcheo el elemento. 
+        // esto puede bloquear, asi que el lock llega hasta arriba
+        try {
+            fetcherQueue.add(new Job() {
+                public void run() {
+                    final URIFetcherResponse r = fetcher.fetch(uriAndCtx);
+                    processingQueue.add(new Job() {
+                        public void run() {
+                            try {
+                                closure.execute(r);
+                            } catch(final Throwable t) {
+                                if(logger.isEnabledFor(Level.ERROR)) {
+                                    logger.error("error while processing using "
+                                            + closure.toString() 
+                                            + " with URI: "
+                                            + uriAndCtx.getURI(), t);
+                                }
+                            } finally {
+                                decrementActiveJobs();
+                            }
+                        }
+                    });
+                    // TODO: notificar a la fetcherQueue que ya se 
+                    // fetcheo el elemento. 
+                }
+            });
+        } catch(final Throwable e) {
+            decrementActiveJobs();   
+        }
+    }
+
+    /** 
+     *  decrementa la cantidad de trabajos activos y notifica a quien 
+     *  este esperando por idleness si se llegó a 0.
+     */
+    private void decrementActiveJobs() {
+        lock.lock();
+        try {
+            if(activeJobs.decrementAndGet() == 0) {
+                emptyCondition.signalAll();
             }
-        });
+        } finally {
+            lock.unlock();
+        }
     }
 
     /** @see AsyncUriFetcher#shutdown() */
@@ -115,5 +162,32 @@ public class FetchQueueAsyncUriFetcher implements AsyncUriFetcher {
             }
         }
         return wait;
+    }
+
+    /** @see AsyncUriFetcher#awaitIdleness() */
+    public final void awaitIdleness() throws InterruptedException {
+        lock.lock();
+        try {
+            while(activeJobs.get() != 0) {
+                emptyCondition.await();
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+    /** @see AsyncUriFetcher#awaitIdleness(long, TimeUnit) */
+    public final boolean awaitIdleness(final long timeout, final TimeUnit unit) 
+        throws InterruptedException {
+        boolean timedOut = false;
+        lock.lock();
+        try {
+            // no hago esto desde un while ya que un spurious wakeup puede ser
+            // interpretado como un wakeup.
+            timedOut = emptyCondition.await(timeout, unit);
+        } finally {
+            lock.unlock();
+        }
+        
+        return timedOut;
     }
 }
