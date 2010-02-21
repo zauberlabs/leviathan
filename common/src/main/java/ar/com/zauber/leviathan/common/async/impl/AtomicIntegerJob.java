@@ -35,7 +35,7 @@ public class AtomicIntegerJob implements Job {
     }
     
     /** @see Runnable#run() */
-    public void run() {
+    public final void run() {
         atomic.addAndGet(delta);
     }
 }
