@@ -44,28 +44,16 @@ public class NotsoAsyncUriFetcher extends AbstractAsyncUriFetcher {
     /** @see AsyncUriFetcher#fetch(URIFetcherResponse.URIAndCtx, Closure) */
     public final void fetch(final URIAndCtx uriAndCtx, 
             final Closure<URIFetcherResponse> closure) {
-        closure.execute(uriFetcher.fetch(uriAndCtx));
+        incrementActiveJobs();
+        try {
+            closure.execute(uriFetcher.fetch(uriAndCtx));
+        } finally {
+            decrementActiveJobs();
+        }
     }
 
     /** @see AsyncUriFetcher#shutdown() */
     public final void shutdown() {
         // nothing to do
-    }
-    
-    /** @see AsyncUriFetcher#awaitTermination(long, TimeUnit) */
-    public final boolean awaitTermination(final long timeout, final TimeUnit unit)
-            throws InterruptedException {
-        return false;
-    }
-    
-    /** @see AsyncUriFetcher#awaitIdleness(long, TimeUnit) */
-    public final boolean awaitIdleness(final long timeout, final TimeUnit unit)
-            throws InterruptedException {
-        throw new NotImplementedException("not coming very soon");
-    }
-    
-    /** @see AsyncUriFetcher#awaitIdleness(long, TimeUnit) */
-    public final void awaitIdleness() throws InterruptedException {
-        throw new NotImplementedException("not coming very soon");
     }
 }

@@ -18,8 +18,9 @@ package ar.com.zauber.leviathan.common;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.Validate;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
@@ -37,8 +38,11 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
  */
 public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
     private final ExecutorService executorService;
-    private URIFetcher fetcher;
-
+    private final URIFetcher fetcher;
+    
+    private final Logger logger = Logger.getLogger(
+            ExecutorServiceAsyncUriFetcher.class);
+    
     /** Creates the ExecutorServiceAsyncUriFetcher. */
     public ExecutorServiceAsyncUriFetcher(final ExecutorService executorService,
             final URIFetcher fetcher) {
@@ -55,11 +59,27 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
         Validate.notNull(uriAndCtx);
         Validate.notNull(closure);
         
-        executorService.submit(new Runnable() {
-            public void run() {
-                closure.execute(fetcher.fetch(uriAndCtx));
-            }
-        });
+        incrementActiveJobs();
+        try {
+            executorService.submit(new Runnable() {
+                public void run() {
+                    try {
+                        closure.execute(fetcher.fetch(uriAndCtx));
+                    } catch(final Throwable t) {
+                        if(logger.isEnabledFor(Level.ERROR)) {
+                            logger.error("error while processing using "
+                                    + closure.toString() 
+                                    + " with URI: "
+                                    + uriAndCtx.getURI(), t);
+                        }
+                    } finally {
+                        decrementActiveJobs();
+                    }
+                }
+            });
+        } catch(final Throwable e) {
+            decrementActiveJobs();   
+        }
     }
     
     /** @see AsyncUriFetcher#shutdown() */
@@ -72,17 +92,4 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
             throws InterruptedException {
         return false;
     }
-
-    /** @see AsyncUriFetcher#awaitIdleness(long, TimeUnit) */
-    public final void awaitIdleness() throws InterruptedException {
-        throw new NotImplementedException("not coming very soon");
-    }
-    
-    /** @see AsyncUriFetcher#awaitIdleness(long, TimeUnit) */
-    public final boolean awaitIdleness(final long timeout, final TimeUnit unit)
-            throws InterruptedException {
-        throw new NotImplementedException("not coming very soon");
-    }
 }
-
-
