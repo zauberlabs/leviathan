@@ -18,8 +18,10 @@ public interface JobQueue {
      * 
      * @throws RejectedExecutionException Si no puede aceptar nuevas tareas 
      *   (porque se invocó a {@link #shutdown()})  
+     * @throws InterruptedException si el thread fue interrumpido mientras se 
+     *          esperaba que hubiera espacio para agregar la tarea.
      */
-    void add(Job fetchJob) throws RejectedExecutionException;
+    void add(Job fetchJob) throws RejectedExecutionException, InterruptedException;
     
     /** 
      * obtiene una tarea; si no tiene nada para entregar bloquea. Nunca retorna null.

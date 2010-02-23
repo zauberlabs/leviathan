@@ -3,17 +3,24 @@
  */
 package ar.com.zauber.leviathan.common.async;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -34,7 +41,7 @@ import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
  * @since Feb 17, 2010
  */
 public class FetchQueueAsyncUriFetcherTest {
-
+    
     /** intenta cerra un fetcher ya cerrado */
     @Test(timeout = 2000)
     public final void shutdownShiny() {
@@ -56,8 +63,7 @@ public class FetchQueueAsyncUriFetcherTest {
      * Arma un fetcher, le da urls para fetchear.
      * y llama al shutdown. 
      */
-//    @Test(timeout = 2000)
-    @Test
+    @Test(timeout = 2000)
     public final void poll() throws URISyntaxException {
         final JobQueue fetcherQueue = new BlockingQueueJobQueue(
                 new LinkedBlockingQueue<Job>());
@@ -354,4 +360,37 @@ public class FetchQueueAsyncUriFetcherTest {
         fetcher.shutdown();
     }
 
+    /** Verifica el timeout de tareas en tareas interrumpibles */
+    @Test(timeout = 5000)
+    public final void timeoutInterrupteableTask() 
+        throws URISyntaxException, InterruptedException {
+        final JobQueue fetchQueue = new BlockingQueueJobQueue(
+                new SynchronousQueue<Job>());
+        final JobQueue processingQueue = new BlockingQueueJobQueue(
+                new SynchronousQueue<Job>());
+        
+        final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
+                    new FixedURIFetcher(new HashMap<URI, String>()), 
+                    new JobScheduler(fetchQueue, new DirectExecutorService()),
+                    new JobScheduler(processingQueue, 
+                            Executors.newSingleThreadExecutor(),
+                            new Timer(), 1000));
+        
+        final URI uri = new URI("http://foo");
+        final List<String> l = new ArrayList<String>(1); 
+        fetcher.fetch(uri, new Closure<URIFetcherResponse>() {
+            public void execute(final URIFetcherResponse t) {
+                while(true) {
+                    if(Thread.interrupted()) {
+                        break;
+                    }
+                }
+                l.add("termino");
+            }
+        });
+        fetcher.awaitIdleness();
+        fetcher.shutdown();
+        
+        Assert.assertEquals("termino", l.iterator().next());
+    }
 }

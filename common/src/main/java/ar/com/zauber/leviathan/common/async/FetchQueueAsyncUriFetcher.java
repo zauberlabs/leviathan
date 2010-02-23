@@ -4,6 +4,7 @@
 package ar.com.zauber.leviathan.common.async;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Level;
@@ -15,6 +16,9 @@ import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.AbstractAsyncUriFetcher;
+import ar.com.zauber.leviathan.common.InmutableURIAndCtx;
+import ar.com.zauber.leviathan.common.InmutableURIFetcherHttpResponse;
+import ar.com.zauber.leviathan.common.InmutableURIFetcherResponse;
 
 /**
  * {@link AsyncUriFetcher} que utiliza dos colas (de tipo  {@link JobQueue}
@@ -136,7 +140,7 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
     }
 
     /** @see AsyncUriFetcher#fetch(URIAndCtx, Closure) */
-    public final void fetch(final URIAndCtx uriAndCtx, 
+    public void fetch(final URIAndCtx uriAndCtx, 
             final Closure<URIFetcherResponse> closure) {
         incrementActiveJobs();
         
@@ -146,22 +150,27 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
             fetcherQueue.add(new Job() {
                 public void run() {
                     final URIFetcherResponse r = fetcher.fetch(uriAndCtx);
-                    processingQueue.add(new Job() {
-                        public void run() {
-                            try {
-                                closure.execute(r);
-                            } catch(final Throwable t) {
-                                if(logger.isEnabledFor(Level.ERROR)) {
-                                    logger.error("error while processing using "
-                                            + closure.toString() 
-                                            + " with URI: "
-                                            + uriAndCtx.getURI(), t);
+                    try {
+                        processingQueue.add(new Job() {
+                            public void run() {
+                                try {
+                                    closure.execute(r);
+                                } catch(final Throwable t) {
+                                    if(logger.isEnabledFor(Level.ERROR)) {
+                                        logger.error("error while processing using "
+                                                + closure.toString() 
+                                                + " with URI: "
+                                                + uriAndCtx.getURI(), t);
+                                    }
+                                } finally {
+                                    decrementActiveJobs();
                                 }
-                            } finally {
-                                decrementActiveJobs();
                             }
-                        }
-                    });
+                        });
+                    } catch (final Throwable e) {
+                        closure.execute(new InmutableURIFetcherResponse(
+                                uriAndCtx, e));
+                    }
                     // TODO: notificar a la fetcherQueue que ya se 
                     // fetcheo el elemento. 
                 }

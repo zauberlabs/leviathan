@@ -48,18 +48,14 @@ public class BlockingQueueJobQueue implements JobQueue {
     }
     
     
-    /** @see JobQueue#add(Job) */
-    public final void add(final  Job fetchJob) {
+    /**  @see JobQueue#add(Job) */
+    public final void add(final  Job fetchJob) throws InterruptedException {
         Validate.notNull(fetchJob, "null jobs are not accepted");
         if(shutdownFlag.get()) {
             throw new RejectedExecutionException(
                     "We do not accept jobs, while shutting down");
         } else {
-            try {
-                target.put(fetchJob);
-            } catch (final InterruptedException e) {
-                throw new UnhandledException(e);
-            }
+            target.put(fetchJob);
         }
     }
 

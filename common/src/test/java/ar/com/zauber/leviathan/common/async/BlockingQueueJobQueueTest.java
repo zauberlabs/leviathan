@@ -34,7 +34,8 @@ public class BlockingQueueJobQueueTest {
      *  aceptar nuevas tareas
      */
     @Test
-    public final void testShutdownRejectNewTasksNotEmptyQueue() {
+    public final void testShutdownRejectNewTasksNotEmptyQueue() 
+        throws InterruptedException {
         final JobQueue fetchQueue = create(); 
         
         fetchQueue.add(new NullJob());
@@ -52,7 +53,8 @@ public class BlockingQueueJobQueueTest {
      *  aceptar nuevas tareas
      */
     @Test
-    public final void testShutdownRejectNewTasksEmptyQueue() {
+    public final void testShutdownRejectNewTasksEmptyQueue() 
+      throws InterruptedException {
         final JobQueue fetchQueue = create();
         
         fetchQueue.shutdown();
@@ -68,7 +70,7 @@ public class BlockingQueueJobQueueTest {
      *  No se aceptan tareas nulas
      */
     @Test
-    public final void testValidateNullJobs()  {
+    public final void testValidateNullJobs() throws InterruptedException {
         final JobQueue fetchQueue = create();
         try {
             fetchQueue.add(null);

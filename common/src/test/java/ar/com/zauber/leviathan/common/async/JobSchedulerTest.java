@@ -29,7 +29,7 @@ public class JobSchedulerTest {
      * tercera incicia el shutdown.
      */
     @Test(timeout = 2000)
-    public final void testConsumeAndShutdown() {
+    public final void testConsumeAndShutdown() throws InterruptedException {
         final JobQueue queue = new BlockingQueueJobQueue(
                 new LinkedBlockingQueue<Job>());
         final AtomicInteger i = new AtomicInteger(0);
