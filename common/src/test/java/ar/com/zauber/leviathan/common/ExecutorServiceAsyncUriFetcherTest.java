@@ -25,7 +25,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -42,10 +41,6 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.async.DirectExecutorService;
 import ar.com.zauber.leviathan.common.async.FetchQueueAsyncUriFetcher;
-import ar.com.zauber.leviathan.common.async.Job;
-import ar.com.zauber.leviathan.common.async.JobQueue;
-import ar.com.zauber.leviathan.common.async.JobScheduler;
-import ar.com.zauber.leviathan.common.async.impl.BlockingQueueJobQueue;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
 

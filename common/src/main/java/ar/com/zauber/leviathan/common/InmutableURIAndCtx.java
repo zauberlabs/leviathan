@@ -39,6 +39,7 @@ public class InmutableURIAndCtx implements URIFetcherResponse.URIAndCtx,
     private final transient Map<String, Object> ctx;
 
     /** Creates the InmutableURIAndCtx. */
+    @SuppressWarnings("unchecked")
     public InmutableURIAndCtx(final URI uri) {
         this(uri, Collections.EMPTY_MAP);
     }

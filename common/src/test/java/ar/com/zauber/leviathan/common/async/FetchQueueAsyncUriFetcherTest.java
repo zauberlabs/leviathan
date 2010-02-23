@@ -46,7 +46,8 @@ public class FetchQueueAsyncUriFetcherTest {
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
                 new FixedURIFetcher(new HashMap<URI, String>()), 
                 new JobScheduler(fetcherQueue, Executors.newSingleThreadExecutor()),
-                new JobScheduler(processingQueue, Executors.newSingleThreadExecutor())
+                new JobScheduler(processingQueue, 
+                        Executors.newSingleThreadExecutor())
         );
         fetcher.shutdown();
     }

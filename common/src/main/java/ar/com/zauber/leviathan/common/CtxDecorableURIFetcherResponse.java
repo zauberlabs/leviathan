@@ -63,7 +63,7 @@ public class CtxDecorableURIFetcherResponse implements URIFetcherResponse {
 
     /** @see URIFetcherResponse#getURI() */
     public final URI getURI() {
-        return target.getURI();
+        return target.getURIAndCtx().getURI();
     }
 
     /** @see URIFetcherResponse#isSucceeded() */
