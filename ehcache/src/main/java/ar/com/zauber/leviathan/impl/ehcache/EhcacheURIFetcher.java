@@ -43,7 +43,7 @@ import ar.com.zauber.leviathan.common.CtxDecorableURIFetcherResponse;
  * @since Nov 19, 2009
  */
 public class EhcacheURIFetcher extends AbstractURIFetcher {
-    private final static Logger LOGGER  = Logger.getLogger(EhcacheURIFetcher.class); 
+    private static final Logger LOGGER  = Logger.getLogger(EhcacheURIFetcher.class); 
     private final URIFetcher fetcher;
     private final Cache cache;
     private long hits;
@@ -67,8 +67,8 @@ public class EhcacheURIFetcher extends AbstractURIFetcher {
             ret = fetcher.fetch(uriAndCtx);
             cache.put(new Element(uriAndCtx.getURI(), ret));
         } else {
-            ret = new CtxDecorableURIFetcherResponse((URIFetcherResponse) e.getValue(),
-                    uriAndCtx);
+            ret = new CtxDecorableURIFetcherResponse(
+                    (URIFetcherResponse) e.getValue(), uriAndCtx);
             hits++;
         }
         total++;
@@ -84,7 +84,7 @@ public class EhcacheURIFetcher extends AbstractURIFetcher {
     }
 
     /** log the status of the fetcher */
-    public final void logStatus(){
+    public final void logStatus() {
         if(total > 0) {
             LOGGER.info(
                new Formatter(new StringBuilder()).format(
