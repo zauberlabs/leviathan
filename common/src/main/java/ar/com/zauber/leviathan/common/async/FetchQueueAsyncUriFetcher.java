@@ -92,7 +92,11 @@ import ar.com.zauber.leviathan.common.AbstractAsyncUriFetcher;
  * @author Juan F. Codagnone
  * @since Feb 17, 2010
  */
-public class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
+public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
+    // la clase es final ya que como se lanzan threads desde el constructor
+    // si se extiende los threads se van a lanzar antes que se termine de crear
+    // el objeto...no nos afectaria, pero asi somo correctos 
+    
     private final URIFetcher fetcher;
     private final JobQueue fetcherQueue;
     private final Thread inScheduler;
