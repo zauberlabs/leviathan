@@ -8,6 +8,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Level;
@@ -35,6 +36,7 @@ public class JobScheduler implements Runnable {
     private final Logger logger = Logger.getLogger(JobScheduler.class);
     private Timer timer;
     private long timeout = 0;
+    private final AtomicBoolean shutdownNowFlag = new AtomicBoolean(false);
     
     /** Creates the FetcherScheduler. */
     public JobScheduler(final JobQueue queue, 
@@ -90,15 +92,21 @@ public class JobScheduler implements Runnable {
                 break;
             }
         }
-        // si es que nos encontramos aqui ya no quedó nada por consumir  
-        executorService.shutdown();
         
-        while(!executorService.isTerminated()) {
-            try {
-                executorService.awaitTermination(1000, TimeUnit.MILLISECONDS);
-            } catch (final InterruptedException e) {
-                logger.log(Level.WARN, 
-                  "Interrupted awaitTermination on FetcherScheduler shutdown", e);
+        if(shutdownNowFlag.get()) {
+            executorService.shutdownNow();
+        } else {
+            // si es que nos encontramos aqui ya no quedó nada por consumir  
+            executorService.shutdown();
+            
+            while(!executorService.isTerminated()) {
+                try {
+                    executorService.awaitTermination(1000, TimeUnit.MILLISECONDS);
+                } catch (final InterruptedException e) {
+                    logger.log(Level.WARN, 
+                      "Interrupted awaitTermination on FetcherScheduler shutdown",
+                      e);
+                }
             }
         }
     }
@@ -106,5 +114,10 @@ public class JobScheduler implements Runnable {
     /** Returns the queue. */
     public final JobQueue getQueue() {
         return queue;
+    }
+    
+    /** Returns the queue. */
+    public final void shutdownNow() {
+        shutdownNowFlag.set(true);
     }
 }

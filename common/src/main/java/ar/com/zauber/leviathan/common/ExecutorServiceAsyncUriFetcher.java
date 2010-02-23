@@ -18,6 +18,7 @@ package ar.com.zauber.leviathan.common;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -91,5 +92,10 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
     public final boolean awaitTermination(final long timeout, final TimeUnit unit)
             throws InterruptedException {
         return false;
+    }
+
+    /** @see AsyncUriFetcher#shutdownNow() */
+    public final void shutdownNow() {
+        throw new NotImplementedException("TODO");
     }
 }

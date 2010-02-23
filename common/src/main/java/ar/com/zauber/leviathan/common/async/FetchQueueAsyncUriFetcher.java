@@ -4,7 +4,6 @@
 package ar.com.zauber.leviathan.common.async;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionException;
 
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Level;
@@ -16,8 +15,6 @@ import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.AbstractAsyncUriFetcher;
-import ar.com.zauber.leviathan.common.InmutableURIAndCtx;
-import ar.com.zauber.leviathan.common.InmutableURIFetcherHttpResponse;
 import ar.com.zauber.leviathan.common.InmutableURIFetcherResponse;
 
 /**
@@ -108,6 +105,8 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
     private final Thread outScheduler;
         
     private final Logger logger = Logger.getLogger(FetchQueueAsyncUriFetcher.class);
+    private final JobScheduler fetcherScheduler;
+    private final JobScheduler processingScheduler;
     
     /** */
     public FetchQueueAsyncUriFetcher(
@@ -131,6 +130,9 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
         this.fetcher = fetcher;
         this.fetcherQueue = fetcherScheduler.getQueue();
         this.processingQueue = processingScheduler.getQueue();
+        
+        this.fetcherScheduler  = fetcherScheduler;
+        this.processingScheduler = processingScheduler;
         
         inScheduler = new Thread(fetcherScheduler, "JobScheduler-IN");
         outScheduler = new Thread(processingScheduler, "JobScheduler-OUT");
@@ -182,7 +184,7 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
 
 
     /** @see AsyncUriFetcher#shutdown() */
-    public final void shutdown() {
+    public void shutdown() {
         // no aceptamos más trabajos.
         fetcherQueue.shutdown();
         waitForTermination(inScheduler);
@@ -211,5 +213,16 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
             }
         }
         return wait;
+    }
+    
+    /** @see AsyncUriFetcher#shutdownNow() */
+    public void shutdownNow() {
+        fetcherQueue.shutdown();
+        processingQueue.shutdown();
+        fetcherScheduler.shutdownNow();
+        processingScheduler.shutdownNow();
+        
+        inScheduler.interrupt();
+        outScheduler.interrupt();
     }
 }

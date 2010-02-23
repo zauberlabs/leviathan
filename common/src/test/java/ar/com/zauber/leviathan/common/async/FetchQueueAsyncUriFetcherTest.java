@@ -3,10 +3,6 @@
  */
 package ar.com.zauber.leviathan.common.async;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -20,7 +16,6 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -392,5 +387,42 @@ public class FetchQueueAsyncUriFetcherTest {
         fetcher.shutdown();
         
         Assert.assertEquals("termino", l.iterator().next());
+    }
+    
+    
+    /** 
+     * Prueba el shutdownNow, encolando tareas interrumpibles pero que nunca
+     * terminan. 
+     */
+    @Test(timeout = 2000)
+    public final void shutdownNow() throws Exception {
+        final JobQueue fetchQueue = new BlockingQueueJobQueue(
+                new SynchronousQueue<Job>());
+        final JobQueue processingQueue = new BlockingQueueJobQueue(
+                new SynchronousQueue<Job>());
+        
+        final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
+                    new FixedURIFetcher(new HashMap<URI, String>()), 
+                    new JobScheduler(fetchQueue, new DirectExecutorService()),
+                    new JobScheduler(processingQueue, new DirectExecutorService()));
+        
+        final CountDownLatch latch = new CountDownLatch(1);
+        final URI uri = new URI("http://foo");
+        
+        final CountDownLatch finish = new CountDownLatch(1);
+        final List<String> store = new ArrayList<String>(1);
+        fetcher.fetch(uri, new Closure<URIFetcherResponse>() {
+            public void execute(final URIFetcherResponse t) {
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    store.add("foo");
+                    finish.countDown();
+                }
+            }
+        });
+        fetcher.shutdownNow();
+        finish.await();
+        Assert.assertFalse(store.isEmpty());
     }
 }

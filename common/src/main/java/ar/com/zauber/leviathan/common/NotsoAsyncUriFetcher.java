@@ -53,4 +53,9 @@ public class NotsoAsyncUriFetcher extends AbstractAsyncUriFetcher {
     public final void shutdown() {
         // nothing to do
     }
+    
+    /** @see AsyncUriFetcher#shutdownNow() */
+    public final void shutdownNow() {
+        // nothing to do
+    }
 }

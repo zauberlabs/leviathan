@@ -25,7 +25,6 @@ public interface JobQueue {
     
     /** 
      * obtiene una tarea; si no tiene nada para entregar bloquea. Nunca retorna null.
-     * Si fue interrumpido recibirá
      */
     Job poll() throws InterruptedException;
     
