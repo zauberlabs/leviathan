@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010 Zauber S.A.  -- All rights reserved
  */
-package ar.com.zauber.leviathan.common.async;
+package ar.com.zauber.leviathan.common.utils;
 
 import java.util.Collections;
 import java.util.List;

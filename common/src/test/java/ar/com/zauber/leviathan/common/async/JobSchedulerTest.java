@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import ar.com.zauber.leviathan.common.async.impl.AtomicIntegerJob;
 import ar.com.zauber.leviathan.common.async.impl.BlockingQueueJobQueue;
+import ar.com.zauber.leviathan.common.utils.DirectExecutorService;
 
 
 /**

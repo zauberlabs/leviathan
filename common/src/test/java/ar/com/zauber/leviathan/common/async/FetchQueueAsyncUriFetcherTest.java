@@ -27,6 +27,7 @@ import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.common.async.impl.BlockingQueueJobQueue;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
+import ar.com.zauber.leviathan.common.utils.DirectExecutorService;
 
 
 /**

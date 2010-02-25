@@ -39,9 +39,9 @@ import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
-import ar.com.zauber.leviathan.common.async.DirectExecutorService;
 import ar.com.zauber.leviathan.common.async.FetchQueueAsyncUriFetcher;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
+import ar.com.zauber.leviathan.common.utils.DirectExecutorService;
 
 
 
