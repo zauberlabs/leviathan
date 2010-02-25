@@ -69,6 +69,12 @@ public class BlockingQueueJobQueue implements JobQueue {
         // void
     }
     
+    /** template method usado para notificar que se obtuvo un Job; y que será 
+     * retornado al usuario */
+    public void onJobDelivered(final Job job) {
+        // void
+    }
+    
     /** @see JobQueue#poll() */
     public final Job poll() throws InterruptedException {
         Job job;
@@ -81,7 +87,8 @@ public class BlockingQueueJobQueue implements JobQueue {
                 throw new InterruptedException("Shutting down");
             }
         } while(job == null);
-        
+
+        onJobDelivered(job);
         return job;
     }
     
