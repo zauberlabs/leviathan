@@ -148,15 +148,38 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
         
         // esto puede bloquear, asi que es por eso que se hizo todo el lock en
         // en incrementActiveJobs.
+        final boolean isDebug = logger.isDebugEnabled(); 
         try {
             fetcherQueue.add(new Job() {
                 public void run() {
+                    if(isDebug) {
+                        logger.debug("Fetching " + uriAndCtx.getURI());
+                    }
+                    final long t1 = System.currentTimeMillis();
                     final URIFetcherResponse r = fetcher.fetch(uriAndCtx);
+                    final long t2 = System.currentTimeMillis();
+                    
+                    if(isDebug) {
+                        logger.debug("Elapsed " + (t2 - t1) + "ms fetching " 
+                                + uriAndCtx.getURI());
+                    }
+                    
                     try {
                         processingQueue.add(new Job() {
                             public void run() {
                                 try {
+                                    if(isDebug) {
+                                        logger.debug("Processing " 
+                                                + uriAndCtx.getURI());
+                                    }
+                                    final long t1 = System.currentTimeMillis();
                                     closure.execute(r);
+                                    final long t2 = System.currentTimeMillis();
+                                    if(isDebug) {
+                                        logger.debug("Elapsed " + (t2 - t1) 
+                                                + "ms on " 
+                                                + uriAndCtx.getURI());
+                                    }
                                 } catch(final Throwable t) {
                                     if(logger.isEnabledFor(Level.ERROR)) {
                                         logger.error("error while processing using "
