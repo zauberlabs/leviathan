@@ -82,7 +82,7 @@
   </dependencies>
 
   <properties>
-    <spring.version>3.0.0.RELEASE</spring.version>
+    <spring.version>3.0.1.RELEASE</spring.version>
     <commons.version>3.24</commons.version>
   </properties>
 
