@@ -20,13 +20,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import org.apache.http.HttpVersion;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -34,7 +28,6 @@ import org.apache.http.params.HttpProtocolParams;
 
 import ar.com.zauber.leviathan.api.BulkURIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
-import ar.com.zauber.leviathan.common.CharsetStrategy;
 import ar.com.zauber.leviathan.common.ExecutorServiceBulkURIFetcher;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 import ar.com.zauber.leviathan.impl.httpclient.HTTPClientURIFetcher;
@@ -73,41 +66,6 @@ public final class BulkURIFetchers {
 
         return new ExecutorServiceBulkURIFetcher(
                 Executors.newFixedThreadPool(nThreads), uriFetcher);
-    }
-
-    /** create a single threaded {@link BulkURIFetcher} */
-    public static BulkURIFetcher createHttpMultithreaded(final int nThreads) {
-        return createBulkURIFetcher(nThreads, createHttpURIFetcher());
-    }
-
-    /** @return un HTTP Fetcher */
-    public static URIFetcher createHttpURIFetcher() {
-        final SchemeRegistry schemeRegistry = new SchemeRegistry();
-        schemeRegistry.register(
-                new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        schemeRegistry.register(new Scheme("https",
-                SSLSocketFactory.getSocketFactory(), 443));
-
-        final ClientConnectionManager cm = new ThreadSafeClientConnManager(
-                PARAMS, schemeRegistry);
-        final URIFetcher fetcher = new HTTPClientURIFetcher(
-                new DefaultHttpClient(cm, PARAMS));
-        return fetcher;
-    }
-
-    /** @return un HTTP Fetcher */
-    public static URIFetcher createHttpURIFetcher(final CharsetStrategy strategy) {
-        final SchemeRegistry schemeRegistry = new SchemeRegistry();
-        schemeRegistry.register(
-                new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        schemeRegistry.register(new Scheme("https",
-                SSLSocketFactory.getSocketFactory(), 443));
-
-        final ClientConnectionManager cm = new ThreadSafeClientConnManager(
-                PARAMS, schemeRegistry);
-        final URIFetcher fetcher = new HTTPClientURIFetcher(
-                new DefaultHttpClient(cm, PARAMS), strategy);
-        return fetcher;
     }
 
     /** @return an offline {@link BulkURIFetcher} */
