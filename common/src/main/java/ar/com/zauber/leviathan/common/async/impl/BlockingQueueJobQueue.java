@@ -71,7 +71,7 @@ public class BlockingQueueJobQueue implements JobQueue {
     
     /** template method usado para notificar que se obtuvo un Job; y que será 
      * retornado al usuario */
-    public void onJobDelivered(final Job job) {
+    public void onJobDelivered(final Job job) throws InterruptedException {
         // void
     }
     

@@ -48,15 +48,11 @@ public class RateLimitBlockingQueueJobQueue extends BlockingQueueJobQueue {
     
     /** @see BlockingQueueJobQueue#onJobDelivered(Job) */
     @Override
-    public final void onJobDelivered(final Job job) {
+    public final void onJobDelivered(final Job job) throws InterruptedException {
         super.onJobDelivered(job);
         final long l = System.currentTimeMillis() - lastPool - queueTimeout;
         if(l < 0) {
-            try {
-                Thread.sleep(-l);
-            } catch (final InterruptedException e) {
-                throw new UnhandledException(e);
-            }
+            Thread.sleep(-l);
         }
         lastPool = System.currentTimeMillis();
     }
