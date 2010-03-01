@@ -3,9 +3,13 @@
  */
 package ar.com.zauber.leviathan.common.async;
 
+import java.io.PrintStream;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.Validate;
+import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -16,6 +20,7 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.AbstractAsyncUriFetcher;
 import ar.com.zauber.leviathan.common.InmutableURIFetcherResponse;
+import ar.com.zauber.leviathan.common.async.impl.DebugLoggerAsyncUriFetcherObserver;
 
 /**
  * {@link AsyncUriFetcher} que utiliza dos colas (de tipo  {@link JobQueue}
@@ -108,6 +113,10 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
     private final JobScheduler fetcherScheduler;
     private final JobScheduler processingScheduler;
     
+    private AsyncUriFetcherObserver observer =  
+        new DebugLoggerAsyncUriFetcherObserver(
+                Logger.getLogger(FetchQueueAsyncUriFetcher.class));
+    
     /** */
     public FetchQueueAsyncUriFetcher(
             final URIFetcher fetcher,
@@ -144,42 +153,27 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
     /** @see AsyncUriFetcher#fetch(URIAndCtx, Closure) */
     public void fetch(final URIAndCtx uriAndCtx, 
             final Closure<URIFetcherResponse> closure) {
+        observer.newFetch(uriAndCtx);
         incrementActiveJobs();
-        
-        // esto puede bloquear, asi que es por eso que se hizo todo el lock en
-        // en incrementActiveJobs.
-        final boolean isDebug = logger.isDebugEnabled(); 
+         
         try {
             fetcherQueue.add(new Job() {
                 public void run() {
-                    if(isDebug) {
-                        logger.debug("Fetching " + uriAndCtx.getURI());
-                    }
+                    observer.beginFetch(uriAndCtx);
                     final long t1 = System.currentTimeMillis();
                     final URIFetcherResponse r = fetcher.fetch(uriAndCtx);
                     final long t2 = System.currentTimeMillis();
                     
-                    if(isDebug) {
-                        logger.debug("Elapsed " + (t2 - t1) + "ms fetching " 
-                                + uriAndCtx.getURI());
-                    }
-                    
+                    observer.finishFetch(uriAndCtx, t2 - t1);
                     try {
                         processingQueue.add(new Job() {
                             public void run() {
                                 try {
-                                    if(isDebug) {
-                                        logger.debug("Processing " 
-                                                + uriAndCtx.getURI());
-                                    }
+                                    observer.beginProcessing(uriAndCtx);
                                     final long t1 = System.currentTimeMillis();
                                     closure.execute(r);
                                     final long t2 = System.currentTimeMillis();
-                                    if(isDebug) {
-                                        logger.debug("Elapsed " + (t2 - t1) 
-                                                + "ms on " 
-                                                + uriAndCtx.getURI());
-                                    }
+                                    observer.finishProcessing(uriAndCtx, t2 - t1);
                                 } catch(final Throwable t) {
                                     if(logger.isEnabledFor(Level.ERROR)) {
                                         logger.error("error while processing using "
@@ -247,5 +241,11 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
         
         inScheduler.interrupt();
         outScheduler.interrupt();
+    }
+    
+    /** Sets the observer. <code>null</code> sets a internal. s*/
+    public void setObserver(final AsyncUriFetcherObserver o) {
+        Validate.notNull(observer);
+        this.observer = o;
     }
 }
