@@ -4,7 +4,7 @@
     <parent>
         <groupId>ar.com.zauber.leviathan</groupId>
         <artifactId>leviathan-parent</artifactId>
-        <version>0.0-SNAPSHOT</version>
+        <version>0.1-SNAPSHOT</version>
     </parent>
     <artifactId>leviathan-api-common</artifactId>
     <packaging>bundle</packaging>
