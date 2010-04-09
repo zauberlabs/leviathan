@@ -21,6 +21,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -108,10 +109,30 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
         }
         if(entity.getContentEncoding() != null) {
             contentEncoding = entity.getContentEncoding().getValue();
+        } else {
+            contentEncoding = getCharsetFromContentType(contentType);
         }
         final int status = response.getStatusLine().getStatusCode();
         return new InmutableResponseMetadata(uri, contentType,
                 contentEncoding, status);
+    }
+
+    /**
+     * @param contentType
+     * @return el charset presente en el contentType, o null.
+     */
+    private String getCharsetFromContentType(final String contentType) {
+        if (!StringUtils.contains(contentType, "charset")) {
+            return null;
+        }
+        
+        String charset = contentType.substring(contentType
+                .indexOf("charset") + 7);
+        if (StringUtils.contains(charset, ';')) {
+            charset = charset.substring(0,
+                    charset.indexOf(';'));
+        }
+        return StringUtils.replace(charset, "=", "").trim();
     }
 
 
