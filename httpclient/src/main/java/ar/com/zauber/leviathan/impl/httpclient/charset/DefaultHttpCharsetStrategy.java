@@ -31,31 +31,12 @@ import ar.com.zauber.leviathan.common.ResponseMetadata;
  */
 public class DefaultHttpCharsetStrategy implements CharsetStrategy {
 
-    private final CharsetStrategy strategy;
-
-    /** Creates the DefaultHttpCharsetStrategy.
-     *  */
-    public DefaultHttpCharsetStrategy() {
-        this(new FixedCharsetStrategy(Charset.defaultCharset().displayName()));
-    }
-
-    /** Creates the DefaultHttpCharsetStrategy.
-     * @param st una estrategia de fallback
-     *  */
-    public DefaultHttpCharsetStrategy(final CharsetStrategy st) {
-        Validate.notNull(st);
-
-        this.strategy = st;
-    }
-
     /** @see CharsetStrategy#getCharset(ResponseMetadata, byte[]) */
     public final Charset getCharset(final ResponseMetadata meta,
             final InputStream documento) {
         Validate.notNull(meta);
-        Charset res;
-        if(meta.getEncoding() == null) {
-            res = this.strategy.getCharset(meta, documento);
-        } else {
+        Charset res = null;
+        if(meta.getEncoding() != null) {
             res = Charset.forName(meta.getEncoding());
         }
         return res;

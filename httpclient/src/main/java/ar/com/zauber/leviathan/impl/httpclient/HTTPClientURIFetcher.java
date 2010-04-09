@@ -15,6 +15,7 @@
  */
 package ar.com.zauber.leviathan.impl.httpclient;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -77,13 +78,15 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
                 content = response.getEntity().getContent();
                 meta = getMetaResponse(uri, response, entity);
             }
-            final Charset charset = charsetStrategy.getCharset(meta, content);
+            final byte[] data = IOUtils.toByteArray(content);
+            
+            final Charset charset = charsetStrategy.getCharset(meta, 
+                    new ByteArrayInputStream(data));
 
             final int status = response.getStatusLine().getStatusCode();
             return new InmutableURIFetcherResponse(uriAndCtx,
                 new InmutableURIFetcherHttpResponse(
-                                IOUtils.toString(content, charset.displayName()),
-                                status));
+                        new String(data, charset.displayName()), status));
         } catch (final Throwable e) {
             return new InmutableURIFetcherResponse(uriAndCtx, e);
         } finally {

@@ -26,7 +26,6 @@ import ar.com.zauber.leviathan.common.CharsetStrategy;
 import ar.com.zauber.leviathan.common.ResponseMetadata;
 import ar.com.zauber.leviathan.impl.httpclient.InmutableResponseMetadata;
 import ar.com.zauber.leviathan.impl.httpclient.charset.DefaultHttpCharsetStrategy;
-import ar.com.zauber.leviathan.impl.httpclient.charset.FixedCharsetStrategy;
 
 
 /**
@@ -36,13 +35,6 @@ import ar.com.zauber.leviathan.impl.httpclient.charset.FixedCharsetStrategy;
  * @since Dec 17, 2009
  */
 public class DefaultHttpCharsetStrategyTest {
-
-    /** */
-    @Test
-    public final void constructorTest() throws Exception {
-        final CharsetStrategy st = new FixedCharsetStrategy("utf-8");
-        new DefaultHttpCharsetStrategy(st);
-    }
 
     /** */
     @Test
@@ -56,8 +48,7 @@ public class DefaultHttpCharsetStrategyTest {
         final Charset cs1 = st.getCharset(meta, null);
         final Charset cs2 = st.getCharset(meta2, null);
         Assert.assertEquals(Charset.forName("utf-8"), cs1);
-        Assert.assertEquals(Charset.defaultCharset(), cs2);
-
+        Assert.assertEquals(null, cs2);
     }
 
 }
