@@ -3,7 +3,10 @@
  */
 package ar.com.zauber.leviathan.common.async;
 
+import java.io.InputStream;
 import java.io.PrintStream;
+import java.net.URI;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -19,7 +22,10 @@ import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.AbstractAsyncUriFetcher;
+import ar.com.zauber.leviathan.common.GetHttpMethodCommand;
+import ar.com.zauber.leviathan.common.HttpMethodCommand;
 import ar.com.zauber.leviathan.common.InmutableURIFetcherResponse;
+import ar.com.zauber.leviathan.common.PostHttpMethodCommand;
 import ar.com.zauber.leviathan.common.async.impl.DebugLoggerAsyncUriFetcherObserver;
 
 /**
@@ -149,9 +155,55 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
         inScheduler.start();
         outScheduler.start();
     }
+    
+    /**
+     * @see AsyncUriFetcher#fetch(URIAndCtx, Closure)
+     * @deprecated Use {@link #get(URIAndCtx, Closure)}. This method will be
+     *             deleted on next version.
+     */
+    @Deprecated
+    public void fetch(final URIAndCtx uriAndCtx,
+            final Closure<URIFetcherResponse> closure) {
+        get(uriAndCtx, closure);
+    }
+    
+    /**
+     * @see AsyncUriFetcher#fetch(URI, Closure)
+     * @deprecated Use {@link #get(URI, Closure)}. This method will be
+     *             deleted on next version.
+     */
+    @Deprecated
+    public void fetch(final URI uri, final Closure<URIFetcherResponse> closure) {
+        get(uri, closure);
+    }
 
     /** @see AsyncUriFetcher#fetch(URIAndCtx, Closure) */
-    public void fetch(final URIAndCtx uriAndCtx, 
+    public void get(final URIAndCtx uriAndCtx, 
+            final Closure<URIFetcherResponse> closure) {
+        fetchInternal(new GetHttpMethodCommand(fetcher, uriAndCtx), uriAndCtx,
+                closure);
+    }
+    
+    /**
+     * @see AsyncUriFetcher#post(URIFetcherResponse.URIAndCtx, InputStream,
+     *      Closure)
+     */
+    public void post(final URIAndCtx uriAndCtx, final InputStream body,
+            final Closure<URIFetcherResponse> closure) {
+        fetchInternal(new PostHttpMethodCommand(fetcher, uriAndCtx, body),
+                uriAndCtx, closure);
+    }
+    
+    /** @see AsyncUriFetcher#post(URIFetcherResponse.URIAndCtx, Map, Closure) */
+    public void post(final URIAndCtx uriAndCtx, final Map<String, String> body,
+            final Closure<URIFetcherResponse> closure) {
+        fetchInternal(new PostHttpMethodCommand(fetcher, uriAndCtx, body),
+                uriAndCtx, closure);
+    }
+    
+    /** Actual fetching */
+    private void fetchInternal(final HttpMethodCommand methodCommand,
+            final URIAndCtx uriAndCtx, 
             final Closure<URIFetcherResponse> closure) {
         observer.newFetch(uriAndCtx);
         incrementActiveJobs();
@@ -161,7 +213,7 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
                 public void run() {
                     observer.beginFetch(uriAndCtx);
                     final long t1 = System.currentTimeMillis();
-                    final URIFetcherResponse r = fetcher.fetch(uriAndCtx);
+                    final URIFetcherResponse r = methodCommand.execute();
                     final long t2 = System.currentTimeMillis();
                     
                     observer.finishFetch(uriAndCtx, t2 - t1);
@@ -190,7 +242,7 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
                         closure.execute(new InmutableURIFetcherResponse(
                                 uriAndCtx, e));
                     }
-                    // TODO: notificar a la fetcherQueue que ya se 
+                    // TODO notificar a la fetcherQueue que ya se 
                     // fetcheo el elemento. 
                 }
             });

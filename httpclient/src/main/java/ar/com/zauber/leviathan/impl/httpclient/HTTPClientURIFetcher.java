@@ -20,7 +20,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -28,6 +33,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.ByteArrayEntity;
 
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
@@ -63,16 +71,72 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
         this.charsetStrategy = defaultStrategy;
         this.httpClient = httpClient;
     }
+    
+    /**
+     * @see URIFetcher#fetch(URI)
+     * @deprecated Use {@link #get(URI)}
+     * */
+    @Deprecated
+    public final URIFetcherResponse fetch(final URI uri) {
+        return get(uri);
+    }
+
+    /**
+     * @see URIFetcher#fetch(URIFetcherResponse.URIAndCtx)
+     * @deprecated Use {@link #get(URIAndCtx)}
+     */
+    @Deprecated
+    public final URIFetcherResponse fetch(final URIAndCtx uri) {
+        return get(uri);
+    }
 
     /** @see URIFetcher#fetch(URIFetcherResponse.URIAndCtx) */
-    public final URIFetcherResponse fetch(final URIAndCtx uriAndCtx) {
+    public final URIFetcherResponse get(final URIAndCtx uriAndCtx) {
+        return fetchInternal(uriAndCtx, new HttpGet(uriAndCtx.getURI()));
+    }
+    
+    /** @see URIFetcher#post(URIFetcherResponse.URIAndCtx, InputStream) */
+    public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
+            final InputStream body) {
+        final HttpPost httpPost = new HttpPost(uriAndCtx.getURI());
+        try {
+            httpPost.setEntity(new ByteArrayEntity(IOUtils.toByteArray(body)));
+            return fetchInternal(uriAndCtx, httpPost);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    /** @see URIFetcher#post(URIFetcherResponse.URIAndCtx, java.util.Map) */
+    public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
+            final Map<String, String> body) {
+        final HttpPost httpPost = new HttpPost(uriAndCtx.getURI());
+        
+        final List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+        for (String key : body.keySet()) {
+            pairs.add(new NameValuePair(key, body.get(key)));
+        }
+        final String content = EncodingUtil.formUrlEncode(
+                (NameValuePair[]) pairs.toArray(), "UTF-8");
+        httpPost.setEntity(new ByteArrayEntity(content.getBytes()));
+        
+        return fetchInternal(uriAndCtx, httpPost);
+    }
+
+    /**
+     * Actual fetching.
+     * 
+     * @param httpMethod 
+     */
+    private URIFetcherResponse fetchInternal(final URIAndCtx uriAndCtx,
+            final HttpUriRequest httpMethod) {
         final URI uri = uriAndCtx.getURI();
         Validate.notNull(uri, "uri is null");
         HttpResponse response = null;
         try {
             ResponseMetadata meta = null;
             InputStream content = null;
-            response  = httpClient.execute(new HttpGet(uri));
+            response  = httpClient.execute(httpMethod);
             final HttpEntity entity = response.getEntity();
             if(entity != null) {
                 content = response.getEntity().getContent();
@@ -99,7 +163,6 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
             }
         }
     }
-
 
 
     /** obtiene el encoding */

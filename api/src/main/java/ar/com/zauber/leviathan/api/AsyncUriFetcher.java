@@ -15,7 +15,9 @@
  */
 package ar.com.zauber.leviathan.api;
 
+import java.io.InputStream;
 import java.net.URI;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import ar.com.zauber.commons.dao.Closure;
@@ -34,11 +36,41 @@ public interface AsyncUriFetcher {
      * Busca la página deda por la uri indicada y al terminar llama al closure
      * con la respuesta
      * 
+     * @param uri
+     *            URIs to retrieve
+     * @param closure
+     *            closure donde se publica el resultado (el contenido de la
+     *            pagina, los errores; etc).
+     * @deprecated Use {@link #get(URI, Closure)}. This method will be deleted
+     *             on next version.
+     */
+    @Deprecated
+    void fetch(URI uri, Closure<URIFetcherResponse> closure);
+
+    /**
+     * Busca la página deda por la uri indicada y al terminar llama al closure
+     * con la respuesta
+     * 
+     * @param uriAndCtx
+     *            URIs to retrieve
+     * @param closure
+     *            closure donde se publica el resultado (el contenido de la
+     *            pagina, los errores; etc).
+     * @deprecated Use {@link #get(URIAndCtx, Closure)}. This method will be
+     *             deleted on next version.
+     */
+    @Deprecated
+    void fetch(URIAndCtx uriAndCtx, Closure<URIFetcherResponse> closure);
+    
+    /**
+     * Busca la página deda por la uri indicada y al terminar llama al closure
+     * con la respuesta
+     * 
      * @param uri URIs to retrieve
      * @param closure closure donde se publica el resultado (el contenido de 
      *        la pagina, los errores; etc).
      */
-    void fetch(URI uri, Closure<URIFetcherResponse> closure);
+    void get(URI uri, Closure<URIFetcherResponse> closure);
     
     /**
      * Busca la página deda por la uri indicada y al terminar llama al closure
@@ -48,7 +80,39 @@ public interface AsyncUriFetcher {
      * @param closure closure donde se publica el resultado (el contenido de 
      *        la pagina, los errores; etc).
      */
-    void fetch(URIAndCtx uriAndCtx, Closure<URIFetcherResponse> closure);
+    void get(URIAndCtx uriAndCtx, Closure<URIFetcherResponse> closure);
+
+    /**
+     * Realiza un post a la uri indicada, enviando el contenido indicado en
+     * <em>body</em> y al terminar llama al closure con la respuesta
+     * 
+     * @param uriAndCtx
+     *            URIs to retrieve
+     * @param body
+     *            contenido a postear
+     * @param closure
+     *            closure donde se publica el resultado (el contenido de la
+     *            pagina, los errores; etc).
+     */
+    void post(URIAndCtx uriAndCtx, InputStream body,
+            Closure<URIFetcherResponse> closure);
+
+    /**
+     * Realiza un post a la uri indicada, enviando los pares clave/valor
+     * indicados en <em>body</em> en forma de
+     * "application/x-www-form-urlencoded", y al terminar llama al closure con
+     * la respuesta
+     * 
+     * @param uriAndCtx
+     *            URIs to retrieve
+     * @param body
+     *            contenido a postear
+     * @param closure
+     *            closure donde se publica el resultado (el contenido de la
+     *            pagina, los errores; etc).
+     */
+    void post(URIAndCtx uriAndCtx, Map<String, String> body,
+            Closure<URIFetcherResponse> closure);      
     
     /**
      * Initiates an orderly shutdown in which previously submitted

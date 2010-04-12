@@ -15,8 +15,10 @@
  */
 package ar.com.zauber.leviathan.impl.ehcache;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Formatter;
+import java.util.Map;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
@@ -59,12 +61,30 @@ public class EhcacheURIFetcher extends AbstractURIFetcher {
         this.cache = cache;
     }
 
-    /** @see URIFetcher#fetch(URI) */
-    public final URIFetcherResponse fetch(final URIAndCtx uriAndCtx) {
+    /**
+     * @see ar.com.zauber.leviathan.api.URIFetcher#fetch(java.net.URI)
+     * @deprecated Use {@link #get(URI)}
+     */
+    @Deprecated
+    public final URIFetcherResponse fetch(final URI uri) {
+        return get(uri);
+    }
+    
+    /**
+     * @see URIFetcher#fetch(URIFetcherResponse.URIAndCtx)
+     * @deprecated Use {@link #get(URIAndCtx)}
+     */
+    @Deprecated
+    public final URIFetcherResponse fetch(final URIAndCtx uri) {
+        return get(uri);
+    }
+    
+    /** @see URIFetcher#get(URI) */
+    public final URIFetcherResponse get(final URIAndCtx uriAndCtx) {
         final Element e = cache.get(uriAndCtx.getURI());
         URIFetcherResponse ret;
         if (e == null) {
-            ret = fetcher.fetch(uriAndCtx);
+            ret = fetcher.get(uriAndCtx);
             cache.put(new Element(uriAndCtx.getURI(), ret));
         } else {
             ret = new CtxDecorableURIFetcherResponse(
@@ -73,6 +93,26 @@ public class EhcacheURIFetcher extends AbstractURIFetcher {
         }
         total++;
         return ret;
+    }
+    
+    /**
+     * Doesn't cache.
+     * 
+     * @see URIFetcher#post(URIFetcherResponse.URIAndCtx, InputStream)
+     */
+    public final URIFetcherResponse post(final URIAndCtx uri,
+            final InputStream body) {
+        return fetcher.post(uri, body);
+    }
+    
+    /**
+     * Doesn't cache.
+     * 
+     * @see URIFetcher#post(URIFetcherResponse.URIAndCtx, Map)
+     */
+    public final URIFetcherResponse post(final URIAndCtx uri,
+            final Map<String, String> body) {
+        return fetcher.post(uri, body);
     }
     
     public final long getHits() {

@@ -15,6 +15,7 @@
  */
 package ar.com.zauber.leviathan.common;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.Assert;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -82,14 +84,32 @@ public class ExecutorServiceAsyncUriFetcherTest {
         final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(
             Executors.newScheduledThreadPool(2), 
             new AbstractURIFetcher() {
-                public URIFetcherResponse fetch(final URIAndCtx uri) {
+                public URIFetcherResponse get(final URIAndCtx uri) {
                     try {
                         available.await();
                         Thread.sleep(random.nextInt(500));
-                        return fixedUriFetcher.fetch(uri);
+                        return fixedUriFetcher.get(uri);
                     } catch (final InterruptedException e) {
                         throw new RuntimeException(e);
                     }
+                }
+                
+                public URIFetcherResponse fetch(final URI uri) {
+                    return get(uri);
+                }
+                
+                public URIFetcherResponse fetch(final URIAndCtx uri) {
+                    return get(uri);
+                }
+                
+                public URIFetcherResponse post(final URIAndCtx uri,
+                        final InputStream body) {
+                    throw new NotImplementedException();
+                }
+                
+                public URIFetcherResponse post(final URIAndCtx uri,
+                        final Map<String, String> body) {
+                    throw new NotImplementedException();
                 }
             });
         final List<URIFetcherResponse> responses = 
@@ -104,10 +124,10 @@ public class ExecutorServiceAsyncUriFetcherTest {
             }
         };
         
-        fetcher.fetch(foo, closure);
-        fetcher.fetch(foo1, closure);
-        fetcher.fetch(foo2, closure);
-        fetcher.fetch(foo3, closure);
+        fetcher.get(foo, closure);
+        fetcher.get(foo1, closure);
+        fetcher.get(foo2, closure);
+        fetcher.get(foo3, closure);
         
         available.countDown();
         done.await(2, TimeUnit.SECONDS);
@@ -130,10 +150,10 @@ public class ExecutorServiceAsyncUriFetcherTest {
         
         final int n = 10000; 
         
-        fetcher.fetch(uri, new Closure<URIFetcherResponse>() {
+        fetcher.get(uri, new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {
                 for(int j = 0; j < n; j++) {
-                    fetcher.fetch(uri, new Closure<URIFetcherResponse>() {
+                    fetcher.get(uri, new Closure<URIFetcherResponse>() {
                         /** @see Closure#execute(Object) */
                         public void execute(final URIFetcherResponse t) {
                             i.incrementAndGet();
@@ -169,10 +189,10 @@ public class ExecutorServiceAsyncUriFetcherTest {
         
         Logger.getLogger(ExecutorServiceAsyncUriFetcher.class).setLevel(Level.FATAL);
         
-        fetcher.fetch(uri, new Closure<URIFetcherResponse>() {
+        fetcher.get(uri, new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {
                 for(int j = 0; j < n; j++) {
-                    fetcher.fetch(uri, new Closure<URIFetcherResponse>() {
+                    fetcher.get(uri, new Closure<URIFetcherResponse>() {
                         /** @see Closure#execute(Object) */
                         public void execute(final URIFetcherResponse t) {
                             i.incrementAndGet();

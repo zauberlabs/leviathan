@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
 
@@ -58,8 +59,28 @@ public class FixedURIFetcher extends AbstractURIFetcher {
         this.charset = charset;
     }
 
-    /** @see URIFetcher#fetch(URIFetcherResponse.URIAndCtx) */
-    public final URIFetcherResponse fetch(final URIAndCtx uriAndCtx) {
+    /**
+     * @see URIFetcher#fetch(URI)
+     * @deprecated Use {@link #get(URI)} instead. Will be deprecated on
+     *             next version.
+     */
+    @Deprecated
+    public final URIFetcherResponse fetch(final URI uri) {
+        return get(uri);
+    }
+    
+    /**
+     * @see URIFetcher#fetch(URIAndCtx)
+     * @deprecated Use {@link #get(URIAndCtx)} instead. Will be deprecated on
+     *             next version.
+     */
+    @Deprecated
+    public final URIFetcherResponse fetch(final URIAndCtx uri) {
+        return get(uri);
+    }
+
+    /** @see URIFetcher#get(URIFetcherResponse.URIAndCtx) */
+    public final URIFetcherResponse get(final URIAndCtx uriAndCtx) {
         final URI uri = uriAndCtx.getURI();
         final String destURL = map.get(uri);
         final URIFetcherResponse ret;
@@ -90,4 +111,17 @@ public class FixedURIFetcher extends AbstractURIFetcher {
 
         return ret;
     }
+    
+    /** @see URIFetcher#post(URIFetcherResponse.URIAndCtx, InputStream) */
+    public final URIFetcherResponse post(final URIAndCtx uri,
+            final InputStream body) {
+        throw new NotImplementedException("Post to classpath not implemented");
+    }
+    
+    /** @see URIFetcher#post(URIFetcherResponse.URIAndCtx, Map) */
+    public final URIFetcherResponse post(final URIAndCtx uri,
+            final Map<String, String> body) {
+        throw new NotImplementedException("Post to classpath not implemented");
+    }
+
 }

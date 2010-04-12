@@ -43,11 +43,12 @@ public abstract class AbstractAsyncUriFetcher implements AsyncUriFetcher {
     private final Condition emptyCondition  = lock.newCondition(); 
     private final AtomicLong activeJobs = new AtomicLong(0);
     
-    /** @see AsyncUriFetcher#fetch(URI, Closure) */
-    public final void fetch(final URI uri, 
+    /** @see AsyncUriFetcher#get(URI, Closure) */
+    public final void get(final URI uri, 
             final Closure<URIFetcherResponse> closure) {
-        fetch(new InmutableURIAndCtx(uri), closure);
+        get(new InmutableURIAndCtx(uri), closure);
     }
+    
     
     
 

@@ -28,9 +28,9 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse;
  */
 public abstract class AbstractURIFetcher implements URIFetcher {
 
-    /** @see URIFetcher#fetch(URI) */
-    public final URIFetcherResponse fetch(final URI uri) {
-        return fetch(new InmutableURIAndCtx(uri));
+    /** @see URIFetcher#get(URI) */
+    public final URIFetcherResponse get(final URI uri) {
+        return get(new InmutableURIAndCtx(uri));
     }
 
 }

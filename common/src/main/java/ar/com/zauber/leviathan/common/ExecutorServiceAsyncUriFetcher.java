@@ -15,6 +15,9 @@
  */
 package ar.com.zauber.leviathan.common;
 
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -55,9 +58,33 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
     }
     
     /** @see AsyncUriFetcher#fetch(URIFetcherResponse.URIAndCtx, Closure) */
-    public final void fetch(final URIAndCtx uriAndCtx, 
+    public final void get(final URIAndCtx uriAndCtx, 
             final Closure<URIFetcherResponse> closure) {
-        Validate.notNull(uriAndCtx);
+        fetchInternal(new GetHttpMethodCommand(fetcher, uriAndCtx), closure);
+    }
+    
+    /**
+     * @see AsyncUriFetcher#post(URIFetcherResponse.URIAndCtx, InputStream,
+     *      Closure)
+     */
+    public final void post(final URIAndCtx uriAndCtx, final InputStream body,
+            final Closure<URIFetcherResponse> closure) {
+        fetchInternal(new PostHttpMethodCommand(fetcher, uriAndCtx, body),
+                closure);
+    }
+
+    /** @see AsyncUriFetcher#post(URIFetcherResponse.URIAndCtx, Map, Closure) */
+    public final void post(final URIAndCtx uriAndCtx,
+            final Map<String, String> body,
+            final Closure<URIFetcherResponse> closure) {
+        fetchInternal(new PostHttpMethodCommand(fetcher, uriAndCtx, body),
+                closure);
+    }
+    
+    /** Actual fetching */
+    private void fetchInternal(final HttpMethodCommand methodCommand,
+            final Closure<URIFetcherResponse> closure) {
+        Validate.notNull(methodCommand);
         Validate.notNull(closure);
         
         incrementActiveJobs();
@@ -65,13 +92,13 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
             executorService.submit(new Runnable() {
                 public void run() {
                     try {
-                        closure.execute(fetcher.fetch(uriAndCtx));
+                        closure.execute(methodCommand.execute());
                     } catch(final Throwable t) {
                         if(logger.isEnabledFor(Level.ERROR)) {
                             logger.error("error while processing using "
                                     + closure.toString() 
                                     + " with URI: "
-                                    + uriAndCtx.getURI(), t);
+                                    + methodCommand.getURI(), t);
                         }
                     } finally {
                         decrementActiveJobs();
@@ -81,6 +108,26 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
         } catch(final Throwable e) {
             decrementActiveJobs();   
         }
+    }
+    
+    /**
+     * @see AsyncUriFetcher#fetch(URI, Closure)
+     * @deprecated Use {@link #get(URI, Closure)}. *
+     */
+    @Deprecated
+    public final void fetch(final URI uri,
+            final Closure<URIFetcherResponse> closure) {
+        get(uri, closure);
+    }
+    
+    /**
+     * @see AsyncUriFetcher#fetch(URIAndCtx, Closure)
+     * @deprecated Use {@link #get(URIAndCtx, Closure)}. *
+     */
+    @Deprecated
+    public final void fetch(final URIAndCtx uriAndCtx,
+            final Closure<URIFetcherResponse> closure) {
+        get(uriAndCtx, closure);
     }
     
     /** @see AsyncUriFetcher#shutdown() */

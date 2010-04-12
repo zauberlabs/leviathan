@@ -15,7 +15,9 @@
  */
 package ar.com.zauber.leviathan.api;
 
+import java.io.InputStream;
 import java.net.URI;
+import java.util.Map;
 
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
@@ -27,9 +29,34 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
  */
 public interface URIFetcher {
 
-    /** fetch uri */
+    /**
+     * fetch uri
+     * 
+     * @deprecated Use {@link #get(URI)} instead. This method will be deleted on
+     *             next version.
+     */
+    @Deprecated
     URIFetcherResponse fetch(URI uri);
 
-    /** fetch uri */
+    /**
+     * fetch uri
+     * 
+     * @deprecated Use {@link #get(URIAndCtx)} instead. This method will be
+     *             deleted on next version.
+     */
+    @Deprecated
     URIFetcherResponse fetch(URIAndCtx uri);
+    
+    /** get from uri */
+    URIFetcherResponse get(URI uri);
+
+    /** get from uri */
+    URIFetcherResponse get(URIAndCtx uri);    
+    
+    /** post to uri */
+    URIFetcherResponse post(URIAndCtx uri, InputStream body);
+    
+    /** post to uri */
+    URIFetcherResponse post(URIAndCtx uri, Map<String, String> body);
+    
 }
