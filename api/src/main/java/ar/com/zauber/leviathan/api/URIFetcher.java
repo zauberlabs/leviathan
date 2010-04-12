@@ -56,7 +56,7 @@ public interface URIFetcher {
     /** post to uri */
     URIFetcherResponse post(URIAndCtx uri, InputStream body);
     
-    /** post to uri */
+    /** post to uri, body as "application/x-www-form-urlencoded" */
     URIFetcherResponse post(URIAndCtx uri, Map<String, String> body);
     
 }

@@ -118,7 +118,9 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
         }
         final String content = EncodingUtil.formUrlEncode(
                 (NameValuePair[]) pairs.toArray(), "UTF-8");
-        httpPost.setEntity(new ByteArrayEntity(content.getBytes()));
+        final ByteArrayEntity entity = new ByteArrayEntity(content.getBytes());
+        entity.setContentType("application/x-www-form-urlencoded");
+        httpPost.setEntity(entity);
         
         return fetchInternal(uriAndCtx, httpPost);
     }
