@@ -33,8 +33,9 @@ public class XMLCharsetStrategy implements CharsetStrategy {
     public final Charset getCharset(final ResponseMetadata meta,
             final InputStream content) {
         Validate.notNull(meta);
-        if (!meta.getContentType().startsWith("text/xml")) {
-            return null; 
+        final String contentType = meta.getContentType();
+        if (contentType == null || !contentType.startsWith("text/xml")) {
+            return null;
         }
         
         try {
