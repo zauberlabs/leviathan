@@ -213,7 +213,17 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
                 public void run() {
                     observer.beginFetch(uriAndCtx);
                     final long t1 = System.currentTimeMillis();
-                    final URIFetcherResponse r = methodCommand.execute();
+                    URIFetcherResponse rr = null;
+                    try {
+                        rr = methodCommand.execute();
+                    } catch(final Throwable t) {
+                        // esto jamas deberia pasar. fetch() nunca tira
+                        // excepciones
+                        logger.warn("fetcher " + fetcher 
+                          + " no respeta el contrato!. está tirando excepciones");
+                        rr = new InmutableURIFetcherResponse(uriAndCtx, t);
+                    }
+                    final URIFetcherResponse r = rr;    
                     final long t2 = System.currentTimeMillis();
                     
                     observer.finishFetch(uriAndCtx, t2 - t1);
