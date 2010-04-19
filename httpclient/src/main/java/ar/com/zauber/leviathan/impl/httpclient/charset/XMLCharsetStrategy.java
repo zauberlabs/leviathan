@@ -28,13 +28,23 @@ import ar.com.zauber.leviathan.common.ResponseMetadata;
  * @since Apr 9, 2010
  */
 public class XMLCharsetStrategy implements CharsetStrategy {
+    
+    /** Content types containing xml header */
+    private static final String[] XML_TYPES = {
+        "text/xml", 
+        "application/xml",
+        "application/xhtml+xml",
+        "application/rss+xml", 
+    };
 
     /** @see CharsetStrategy#getCharset(ResponseMetadata, InputStream) */
     public final Charset getCharset(final ResponseMetadata meta,
             final InputStream content) {
         Validate.notNull(meta);
-        if (!meta.getContentType().startsWith("text/xml")) {
-            return null; 
+        final String contentType = meta.getContentType();
+        if (contentType == null
+                || !StringUtils.startsWithAny(contentType, XML_TYPES)) {
+            return null;
         }
         
         try {

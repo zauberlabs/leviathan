@@ -18,6 +18,7 @@ package ar.com.zauber.leviathan.impl.httpclient.charset;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 
 import org.apache.commons.lang.Validate;
 
@@ -41,6 +42,8 @@ public class DefaultHttpCharsetStrategy implements CharsetStrategy {
             try {
                 res = Charset.forName(meta.getEncoding());
             } catch (IllegalCharsetNameException e) {
+                // return null;
+            } catch (UnsupportedCharsetException e) {
                 // return null;
             }
         }
