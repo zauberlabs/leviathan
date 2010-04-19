@@ -28,6 +28,7 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -98,31 +99,35 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
     /** @see URIFetcher#post(URIFetcherResponse.URIAndCtx, InputStream) */
     public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
             final InputStream body) {
-        final HttpPost httpPost = new HttpPost(uriAndCtx.getURI());
         try {
+            final HttpPost httpPost = new HttpPost(uriAndCtx.getURI());
             httpPost.setEntity(new ByteArrayEntity(IOUtils.toByteArray(body)));
             return fetchInternal(uriAndCtx, httpPost);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (final Throwable e) {
+            return new InmutableURIFetcherResponse(uriAndCtx, 
+                    new UnhandledException("reading post entity", e));
         }
     }
     
     /** @see URIFetcher#post(URIFetcherResponse.URIAndCtx, java.util.Map) */
     public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
             final Map<String, String> body) {
-        final HttpPost httpPost = new HttpPost(uriAndCtx.getURI());
-        
-        final List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-        for (String key : body.keySet()) {
-            pairs.add(new NameValuePair(key, body.get(key)));
+        try {
+            final HttpPost httpPost = new HttpPost(uriAndCtx.getURI());
+            
+            final List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+            for (String key : body.keySet()) {
+                pairs.add(new NameValuePair(key, body.get(key)));
+            }
+            final String content = EncodingUtil.formUrlEncode(pairs
+                    .toArray(new NameValuePair[0]), "UTF-8");
+            final ByteArrayEntity entity = new ByteArrayEntity(content.getBytes());
+            entity.setContentType("application/x-www-form-urlencoded");
+            httpPost.setEntity(entity);
+            return fetchInternal(uriAndCtx, httpPost);
+        } catch(Throwable t) {
+            return new InmutableURIFetcherResponse(uriAndCtx, t);
         }
-        final String content = EncodingUtil.formUrlEncode(pairs
-                .toArray(new NameValuePair[0]), "UTF-8");
-        final ByteArrayEntity entity = new ByteArrayEntity(content.getBytes());
-        entity.setContentType("application/x-www-form-urlencoded");
-        httpPost.setEntity(entity);
-        
-        return fetchInternal(uriAndCtx, httpPost);
     }
 
     /**
@@ -132,10 +137,11 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
      */
     private URIFetcherResponse fetchInternal(final URIAndCtx uriAndCtx,
             final HttpUriRequest httpMethod) {
-        final URI uri = uriAndCtx.getURI();
-        Validate.notNull(uri, "uri is null");
         HttpResponse response = null;
         try {
+            final URI uri = uriAndCtx.getURI();
+            Validate.notNull(uri, "uri is null");
+            
             ResponseMetadata meta = null;
             InputStream content = null;
             response  = httpClient.execute(httpMethod);

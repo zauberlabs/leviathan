@@ -33,6 +33,7 @@ public class PostHttpMethodCommand implements HttpMethodCommand {
         Validate.notNull(fetcher);
         Validate.notNull(uri);
         Validate.notNull(body);
+        
         this.fetcher = fetcher;
         this.uri = uri;
         this.body = body;
@@ -45,26 +46,30 @@ public class PostHttpMethodCommand implements HttpMethodCommand {
         Validate.notNull(fetcher);
         Validate.notNull(uri);
         Validate.notNull(formBody);
+        
         this.fetcher = fetcher;
         this.uri = uri;
         this.body = null;
         this.formBody = formBody;
     }    
 
-    /** @see ar.com.zauber.leviathan.common.HttpMethodCommand#execute() */
+    /** @see HttpMethodCommand#execute() */
     public final URIFetcherResponse execute() {
+        URIFetcherResponse ret;
+        
         if (formBody != null) {
-            return fetcher.post(uri, formBody);
+            ret = fetcher.post(uri, formBody);
+        } else if (body != null) {
+            ret = fetcher.post(uri, body);
+        } else {
+            ret = new InmutableURIFetcherResponse(uri, 
+                    new IllegalStateException("Nothing to post!"));
         }
         
-        if (body != null) {
-            return fetcher.post(uri, body);
-        } 
-        
-        throw new IllegalStateException("Nothing to post!");
+        return ret;
     }
     
-    /** @see ar.com.zauber.leviathan.common.HttpMethodCommand#getURI() */
+    /** @see HttpMethodCommand#getURI() */
     public final URI getURI() {
         return uri.getURI();
     }
