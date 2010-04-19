@@ -33,7 +33,8 @@ public class XMLCharsetStrategy implements CharsetStrategy {
     private static final String[] XML_TYPES = {
         "text/xml", 
         "application/xml",
-        "application/application/xhtml+xml", 
+        "application/xhtml+xml",
+        "application/rss+xml", 
     };
 
     /** @see CharsetStrategy#getCharset(ResponseMetadata, InputStream) */
