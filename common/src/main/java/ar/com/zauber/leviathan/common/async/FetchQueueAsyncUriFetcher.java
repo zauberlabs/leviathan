@@ -258,6 +258,10 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
             });
         } catch(final Throwable e) {
             decrementActiveJobs();   
+            logger.error("error adding job to the fetch queue "
+                    + closure.toString() 
+                    + " with URI: "
+                    + uriAndCtx.getURI(), e);
         }
     }
 
