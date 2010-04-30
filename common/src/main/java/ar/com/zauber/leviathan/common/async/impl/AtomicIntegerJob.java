@@ -5,8 +5,10 @@ package ar.com.zauber.leviathan.common.async.impl;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.Validate;
 
+import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.async.Job;
 
 /**
@@ -37,5 +39,10 @@ public class AtomicIntegerJob implements Job {
     /** @see Runnable#run() */
     public final void run() {
         atomic.addAndGet(delta);
+    }
+
+    /** @see Job#getUriAndCtx() */
+    public URIAndCtx getUriAndCtx() {
+        throw new NotImplementedException();
     }
 }

@@ -9,8 +9,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.Assert;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.junit.Test;
 
+import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.async.impl.AtomicIntegerJob;
 import ar.com.zauber.leviathan.common.async.impl.BlockingQueueJobQueue;
 import ar.com.zauber.leviathan.common.utils.DirectExecutorService;
@@ -41,6 +43,10 @@ public class JobSchedulerTest {
             public void run() {
                 queue.shutdown();
             }
+            /** @see Job#getUriAndCtx() */
+            public URIAndCtx getUriAndCtx() {
+                throw new NotImplementedException();
+            }            
         });
         
         Assert.assertEquals(0, i.get());

@@ -3,6 +3,9 @@
  */
 package ar.com.zauber.leviathan.common.async.impl;
 
+import org.apache.commons.lang.NotImplementedException;
+
+import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.async.Job;
 
 /**
@@ -18,4 +21,8 @@ public class NullJob implements Job {
         // void
     }
 
+    /** @see Job#getUriAndCtx() */
+    public URIAndCtx getUriAndCtx() {
+        throw new NotImplementedException();
+    }
 }

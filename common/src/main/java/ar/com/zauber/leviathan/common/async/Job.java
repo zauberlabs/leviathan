@@ -3,6 +3,8 @@
  */
 package ar.com.zauber.leviathan.common.async;
 
+import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
+
 
 /**
  * Contiene la informacion necesaria para obtener recursos. Estas tareas se 
@@ -13,4 +15,6 @@ package ar.com.zauber.leviathan.common.async;
  */
 public interface Job extends Runnable {
     
+    /** @return un UriAndCtx */
+    URIAndCtx getUriAndCtx();
 }

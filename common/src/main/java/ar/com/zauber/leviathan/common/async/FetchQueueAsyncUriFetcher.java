@@ -210,6 +210,11 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
          
         try {
             fetcherQueue.add(new Job() {
+                /** @see Job#getUriAndCtx() */
+                public URIAndCtx getUriAndCtx() {
+                    return uriAndCtx;
+                }
+                
                 public void run() {
                     observer.beginFetch(uriAndCtx);
                     final long t1 = System.currentTimeMillis();
@@ -246,6 +251,10 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
                                 } finally {
                                     decrementActiveJobs();
                                 }
+                            }
+                            /** @see ar.com.zauber.leviathan.common.async.Job#getUriAndCtx() */
+                            public URIAndCtx getUriAndCtx() {
+                                return uriAndCtx;
                             }
                         });
                     } catch (final Throwable e) {
