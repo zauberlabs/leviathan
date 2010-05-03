@@ -21,7 +21,8 @@ import ar.com.zauber.leviathan.common.ResponseMetadata;
 
 /**
  * {@link CharsetStrategy} para XMLs. Obtiene el charset a partir del header del
- * XML.
+ * XML. Por defecto soporta los tipos declarados en {@link #xmlTypes}. Esta 
+ * lista puede ser inyectada como property.
  * 
  * 
  * @author Francisco J. González Costanzó
@@ -30,11 +31,12 @@ import ar.com.zauber.leviathan.common.ResponseMetadata;
 public class XMLCharsetStrategy implements CharsetStrategy {
     
     /** Content types containing xml header */
-    private static final String[] XML_TYPES = {
+    private String[] xmlTypes = {
         "text/xml", 
         "application/xml",
         "application/xhtml+xml",
-        "application/rss+xml", 
+        "application/rss+xml",
+        "application/atom+xml", 
     };
 
     /** @see CharsetStrategy#getCharset(ResponseMetadata, InputStream) */
@@ -43,7 +45,7 @@ public class XMLCharsetStrategy implements CharsetStrategy {
         Validate.notNull(meta);
         final String contentType = meta.getContentType();
         if (contentType == null
-                || !StringUtils.startsWithAny(contentType, XML_TYPES)) {
+                || !StringUtils.startsWithAny(contentType, xmlTypes)) {
             return null;
         }
         
@@ -64,6 +66,10 @@ public class XMLCharsetStrategy implements CharsetStrategy {
         }
         
         return null;
+    }
+    
+    public final void setXmlTypes(final String[] xmlTypes) {
+        this.xmlTypes = xmlTypes;
     }
 
 }
