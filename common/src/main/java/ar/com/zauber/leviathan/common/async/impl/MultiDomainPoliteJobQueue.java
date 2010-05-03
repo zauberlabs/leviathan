@@ -29,7 +29,7 @@ import ar.com.zauber.leviathan.common.async.JobQueue;
  */
 public class MultiDomainPoliteJobQueue implements JobQueue {
 
-    private final static Logger LOGGER = 
+    private static final Logger LOGGER = 
         Logger.getLogger(MultiDomainPoliteJobQueue.class);
     
     private final AtomicBoolean shutdownFlag = new AtomicBoolean(false);
@@ -43,27 +43,41 @@ public class MultiDomainPoliteJobQueue implements JobQueue {
     private final Set<String> excludedDomains = new HashSet<String>();
     private final long domainDelay;
     
-    public MultiDomainPoliteJobQueue(Collection<String> excludedDomains, long domainDelay, TimeUnit unit) {
+    /**
+     * Creates the MultiDomainPoliteJobQueue.
+     *
+     * @param excludedDomains Dominios a excluir de la politica
+     * @param domainDelay tiempo a esperar entre requests a un mismo domain
+     * @param unit Unidad de tiempo del delay
+     */
+    public MultiDomainPoliteJobQueue(final Collection<String> excludedDomains, 
+            final long domainDelay, final TimeUnit unit) {
         this.domainDelay = unit.toNanos(domainDelay);
         this.excludedDomains.addAll(excludedDomains);
     }
 
-    public MultiDomainPoliteJobQueue(long domainDelay, TimeUnit unit) {
+    /**
+     * Creates the MultiDomainPoliteJobQueue sin dominios excluidos.
+     * 
+     * @see MultiDomainPoliteJobQueue#MultiDomainPoliteJobQueue(Collection, 
+     *        long, TimeUnit)
+     */
+    public MultiDomainPoliteJobQueue(final long domainDelay, final TimeUnit unit) {
         this(Collections.<String>emptyList(), domainDelay, unit);
     }
     
     /** @see JobQueue#isShutdown() */
-    public boolean isShutdown() {
+    public final boolean isShutdown() {
         return shutdownFlag.get();
     }
 
     /** @see JobQueue#shutdown() */
-    public void shutdown() {
+    public final void shutdown() {
         shutdownFlag.set(true);
     }
 
     /** @see JobQueue#add(Job) */
-    public void add(Job fetchJob) throws RejectedExecutionException,
+    public final void add(final Job fetchJob) throws RejectedExecutionException,
             InterruptedException {
         Validate.notNull(fetchJob, "null jobs are not accepted");
         if(shutdownFlag.get()) {
@@ -72,7 +86,8 @@ public class MultiDomainPoliteJobQueue implements JobQueue {
         } else {
             long nanoDelay = getCurrentDomainDelay(fetchJob);
             
-            this.queue.put(new FixedDelay<Job>(fetchJob, nanoDelay, TimeUnit.NANOSECONDS));            
+            this.queue.put(new FixedDelay<Job>(fetchJob, nanoDelay, 
+                    TimeUnit.NANOSECONDS));            
         }
     }
 
@@ -80,25 +95,26 @@ public class MultiDomainPoliteJobQueue implements JobQueue {
      * @param fetchJob
      * @return
      */
-    private long getCurrentDomainDelay(Job fetchJob) {
+    private long getCurrentDomainDelay(final Job fetchJob) {
         String domain = fetchJob.getUriAndCtx().getURI().getHost();
-        
         long nanoDelay;
-        if (this.excludedDomains.contains(domain) || !this.lastPolls.containsKey(domain)) {
+        if (this.excludedDomains.contains(domain) 
+                || !this.lastPolls.containsKey(domain)) {
             nanoDelay = 0;
         } else {
-            nanoDelay = this.domainDelay - (System.nanoTime() - this.lastPolls.get(domain));
+            nanoDelay = this.domainDelay 
+                - (System.nanoTime() - this.lastPolls.get(domain));
         }
         return nanoDelay;
     }
     
     /** @see JobQueue#isEmpty() */
-    public boolean isEmpty() {
+    public final boolean isEmpty() {
         return this.queue.isEmpty();
     }
 
     /** @see JobQueue#poll() */
-    public Job poll() throws InterruptedException {
+    public final Job poll() throws InterruptedException {
         boolean hasJob = false;
         Job fetchJob = null;
 
@@ -121,7 +137,8 @@ public class MultiDomainPoliteJobQueue implements JobQueue {
                     break;
                 } else {
                     minDelay = Math.min(minDelay, currentDelay);
-                    this.queue.put(new FixedDelay<Job>(fetchJob, currentDelay, TimeUnit.NANOSECONDS));
+                    this.queue.put(new FixedDelay<Job>(fetchJob, currentDelay, 
+                            TimeUnit.NANOSECONDS));
                 }
             }
             
@@ -143,7 +160,7 @@ public class MultiDomainPoliteJobQueue implements JobQueue {
         this.lastPolls.put(fetchJob.getUriAndCtx().getURI().getHost(), 
                 System.nanoTime());
         return fetchJob;
-    }    
+    }
 
 }
 
