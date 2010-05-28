@@ -12,7 +12,7 @@
   Liwyāṯān ; "twisted, coiled"), is a sea monster referred to in the Tanakh and
   the Bible.
 
-  It surf the web, and retrieve data :)
+  It surfs the web, and retrieves data :)
   </description>
   <groupId>ar.com.zauber.leviathan</groupId>
   <artifactId>leviathan-parent</artifactId>
@@ -77,6 +77,11 @@
      <dependency>
         <artifactId>junit</artifactId>
         <groupId>junit</groupId>
+        <scope>test</scope>
+     </dependency>
+     <dependency>
+        <artifactId>mockito-all</artifactId>
+        <groupId>org.mockito</groupId>
         <scope>test</scope>
      </dependency>
   </dependencies>
@@ -327,7 +332,11 @@
           <groupId>ar.com.zauber.commons</groupId>
           <version>${commons.version}</version>
         </dependency>
-
+        <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>1.8.1</version>
+            </dependency>
     </dependencies>
   </dependencyManagement>
 

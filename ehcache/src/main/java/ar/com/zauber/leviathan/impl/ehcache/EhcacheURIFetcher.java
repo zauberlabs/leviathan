@@ -48,19 +48,55 @@ public class EhcacheURIFetcher extends AbstractURIFetcher {
     private static final Logger LOGGER  = Logger.getLogger(EhcacheURIFetcher.class); 
     private final URIFetcher fetcher;
     private final Cache cache;
+    private final CACHING_BEHAVIOR cachingBehavior;
     private long hits;
     private long total;
+
+
+    /**
+     * 
+     * Define cuando se cachea un request.
+     * 
+     * <dl> 
+     *  <dt>ALL</dt> 
+     *      <dd>Todos los requests sin importar la respuesta se cachean</dd>
+     *  <dt>SUCCEDED</dt> 
+     *      <dd>Solo los requests que hayan sido completados se cachean 
+     *      ({@link URIFetcherResponse#isSucceeded()} es <code>true</code>) </dd>
+     *  <dt>OK</dt>
+     *      <dd>Solo los requests completados con status code 2xx se cachean</dd>      
+     * </dl>
+     */
+    public static enum CACHING_BEHAVIOR {ALL, SUCCEEDED, OK};
+    
     
     /**
      * Creates the EHCacheURIFetcher.
+     * 
+     * @param fetcher
+     * @param cache
+     * @param cachingBehavior define cuando se cachea un request.   
      */
-    public EhcacheURIFetcher(final URIFetcher fetcher, final Cache cache) {
+    public EhcacheURIFetcher(final URIFetcher fetcher, final Cache cache, 
+            final CACHING_BEHAVIOR cachingBehavior) {
         Validate.notNull(fetcher);
         Validate.notNull(cache);
+        Validate.notNull(cachingBehavior);
+        
         this.fetcher = fetcher;
         this.cache = cache;
+        this.cachingBehavior = cachingBehavior;
     }
 
+    
+    /**
+     * Crea el EHCacheURIFetcher.  
+     * Cachea todos los requests ({@link CACHING_BEHAVIOR#ALL})
+     */
+    public EhcacheURIFetcher(final URIFetcher fetcher, final Cache cache) {
+        this(fetcher, cache, CACHING_BEHAVIOR.ALL);
+    }
+    
     /**
      * @see ar.com.zauber.leviathan.api.URIFetcher#fetch(java.net.URI)
      * @deprecated Use {@link #get(URI)}
@@ -85,7 +121,25 @@ public class EhcacheURIFetcher extends AbstractURIFetcher {
         URIFetcherResponse ret;
         if (e == null) {
             ret = fetcher.get(uriAndCtx);
-            cache.put(new Element(uriAndCtx.getURI(), ret));
+
+            switch (cachingBehavior) {
+                case OK:
+                    if(ret.isSucceeded() && ret.getHttpResponse().getStatusCode() >= 200 
+                            && ret.getHttpResponse().getStatusCode() < 300) {
+                        cache.put(new Element(uriAndCtx.getURI(), ret));
+                    }
+                    break;
+                case SUCCEEDED:
+                    if(ret.isSucceeded()) {
+                        cache.put(new Element(uriAndCtx.getURI(), ret));
+                    }
+                    break;
+                case ALL:
+                    cache.put(new Element(uriAndCtx.getURI(), ret));
+                    break;
+                default:
+                    throw new IllegalStateException("CachingBehavior no manejado");
+            }
         } else {
             ret = new CtxDecorableURIFetcherResponse(
                     (URIFetcherResponse) e.getValue(), uriAndCtx);
