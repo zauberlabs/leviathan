@@ -27,7 +27,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang.Validate;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ar.com.zauber.leviathan.common.async.Job;
 import ar.com.zauber.leviathan.common.async.JobQueue;
@@ -42,7 +43,7 @@ import ar.com.zauber.leviathan.common.async.JobQueue;
 public class MultiDomainPoliteJobQueue implements JobQueue {
 
     private static final Logger LOGGER = 
-        Logger.getLogger(MultiDomainPoliteJobQueue.class);
+        LoggerFactory.getLogger(MultiDomainPoliteJobQueue.class);
     
     private final AtomicBoolean shutdownFlag = new AtomicBoolean(false);
     

@@ -16,17 +16,13 @@
 package ar.com.zauber.leviathan.common.async;
 
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.Validate;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
@@ -127,13 +123,14 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
     private final JobQueue processingQueue;
     private final Thread outScheduler;
         
-    private final Logger logger = Logger.getLogger(FetchQueueAsyncUriFetcher.class);
+    private final Logger logger = LoggerFactory.getLogger(
+            FetchQueueAsyncUriFetcher.class);
     private final JobScheduler fetcherScheduler;
     private final JobScheduler processingScheduler;
     
     private AsyncUriFetcherObserver observer =  
         new DebugLoggerAsyncUriFetcherObserver(
-                Logger.getLogger(FetchQueueAsyncUriFetcher.class));
+                LoggerFactory.getLogger(FetchQueueAsyncUriFetcher.class));
     
     /** */
     public FetchQueueAsyncUriFetcher(
@@ -254,7 +251,7 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
                                     final long t2 = System.currentTimeMillis();
                                     observer.finishProcessing(uriAndCtx, t2 - t1);
                                 } catch(final Throwable t) {
-                                    if(logger.isEnabledFor(Level.ERROR)) {
+                                    if(logger.isErrorEnabled()) {
                                         logger.error("error while processing using "
                                                 + closure.toString() 
                                                 + " with URI: "
@@ -264,7 +261,7 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
                                     decrementActiveJobs();
                                 }
                             }
-                            /** @see ar.com.zauber.leviathan.common.async.Job#getUriAndCtx() */
+                            /** @see Job#getUriAndCtx() */
                             public URIAndCtx getUriAndCtx() {
                                 return uriAndCtx;
                             }
@@ -307,7 +304,7 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
                 thread.join();
                 wait = false;
             } catch (InterruptedException e) {
-                logger.log(Level.WARN, "interrupted while shutting down");
+                logger.warn("interrupted while shutting down");
                 try {
                     // si justo tenemos un bug, evitamos comermos  todo el cpu
                     Thread.sleep(200);

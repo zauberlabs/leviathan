@@ -15,8 +15,6 @@
  */
 package ar.com.zauber.leviathan.common.utils;
 
-import static org.junit.Assert.*;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;

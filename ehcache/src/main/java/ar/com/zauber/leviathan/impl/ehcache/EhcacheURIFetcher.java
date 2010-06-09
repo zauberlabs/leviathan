@@ -24,7 +24,8 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 import org.apache.commons.lang.Validate;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
@@ -45,7 +46,8 @@ import ar.com.zauber.leviathan.common.CtxDecorableURIFetcherResponse;
  * @since Nov 19, 2009
  */
 public class EhcacheURIFetcher extends AbstractURIFetcher {
-    private static final Logger LOGGER  = Logger.getLogger(EhcacheURIFetcher.class); 
+    private static final Logger LOGGER  = LoggerFactory.getLogger(
+            EhcacheURIFetcher.class); 
     private final URIFetcher fetcher;
     private final Cache cache;
     private final CACHING_BEHAVIOR cachingBehavior;

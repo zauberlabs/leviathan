@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang.Validate;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -45,7 +45,7 @@ import org.apache.log4j.Logger;
 public class JobScheduler implements Runnable {
     private final JobQueue queue;
     private final ExecutorService executorService;
-    private final Logger logger = Logger.getLogger(JobScheduler.class);
+    private final Logger logger = LoggerFactory.getLogger(JobScheduler.class);
     private Timer timer;
     private long timeout = 0;
     private final AtomicBoolean shutdownNowFlag = new AtomicBoolean(false);
@@ -98,8 +98,8 @@ public class JobScheduler implements Runnable {
                 if(queue.isShutdown()) {
                     logger.info("Interrupted poll(). Queue is shutting down");
                 } else {
-                    logger.log(Level.WARN, 
-                            "Interrupted poll() but we are not shutting down!", e);
+                    logger.warn("Interrupted poll() but we are not shutting down!",
+                            e);
                 }
                 break;
             }
@@ -115,7 +115,7 @@ public class JobScheduler implements Runnable {
                 try {
                     executorService.awaitTermination(1000, TimeUnit.MILLISECONDS);
                 } catch (final InterruptedException e) {
-                    logger.log(Level.WARN, 
+                    logger.warn(
                       "Interrupted awaitTermination on FetcherScheduler shutdown",
                       e);
                 }

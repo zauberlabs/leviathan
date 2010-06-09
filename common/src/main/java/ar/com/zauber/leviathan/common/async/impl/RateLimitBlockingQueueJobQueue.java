@@ -16,9 +16,7 @@
 package ar.com.zauber.leviathan.common.async.impl;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
 
 import ar.com.zauber.leviathan.common.async.Job;

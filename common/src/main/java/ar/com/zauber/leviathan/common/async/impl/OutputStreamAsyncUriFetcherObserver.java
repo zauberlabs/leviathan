@@ -23,7 +23,6 @@ import org.apache.commons.lang.Validate;
 
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.common.async.AsyncUriFetcherObserver;
-import ar.com.zauber.leviathan.common.async.FetchQueueAsyncUriFetcher;
 
 /**
  * Muestra el estado de la cola

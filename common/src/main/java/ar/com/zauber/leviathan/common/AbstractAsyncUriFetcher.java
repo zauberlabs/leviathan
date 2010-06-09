@@ -22,12 +22,12 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
-import ar.com.zauber.leviathan.common.async.FetchQueueAsyncUriFetcher;
 
 /**
  * Clase base para los {@link AsyncUriFetcher}.
@@ -45,7 +45,7 @@ public abstract class AbstractAsyncUriFetcher implements AsyncUriFetcher {
     private final Lock lock = new ReentrantLock();
     private final Condition emptyCondition  = lock.newCondition(); 
     private final AtomicLong activeJobs = new AtomicLong(0);
-    private final Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     
     /** @see AsyncUriFetcher#get(URI, Closure) */
     public final void get(final URI uri, 

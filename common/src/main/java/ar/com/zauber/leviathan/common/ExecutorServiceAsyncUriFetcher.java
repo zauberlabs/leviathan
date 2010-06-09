@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.Validate;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
@@ -44,7 +44,7 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
     private final ExecutorService executorService;
     private final URIFetcher fetcher;
     
-    private final Logger logger = Logger.getLogger(
+    private final Logger logger = LoggerFactory.getLogger(
             ExecutorServiceAsyncUriFetcher.class);
     
     /** Creates the ExecutorServiceAsyncUriFetcher. */
@@ -94,7 +94,7 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
                     try {
                         closure.execute(methodCommand.execute());
                     } catch(final Throwable t) {
-                        if(logger.isEnabledFor(Level.ERROR)) {
+                        if(logger.isErrorEnabled()) {
                             logger.error("error while processing using "
                                     + closure.toString() 
                                     + " with URI: "

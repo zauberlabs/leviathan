@@ -32,8 +32,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import junit.framework.Assert;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import ar.com.zauber.commons.dao.Closure;
@@ -187,7 +185,8 @@ public class ExecutorServiceAsyncUriFetcherTest {
         
         final int n = 10000; 
         
-        Logger.getLogger(ExecutorServiceAsyncUriFetcher.class).setLevel(Level.FATAL);
+        org.apache.log4j.Logger.getLogger(ExecutorServiceAsyncUriFetcher.class
+                ).setLevel(org.apache.log4j.Level.FATAL);
         
         fetcher.get(uri, new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {

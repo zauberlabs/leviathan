@@ -84,11 +84,24 @@
         <groupId>org.mockito</groupId>
         <scope>test</scope>
      </dependency>
+     <dependency>
+        <artifactId>slf4j-log4j12</artifactId>
+        <groupId>org.slf4j</groupId>
+        <scope>test</scope>
+     </dependency>
+
+     <dependency>
+        <artifactId>log4j</artifactId>
+        <groupId>log4j</groupId>
+        <scope>test</scope>
+     </dependency>
+
   </dependencies>
 
   <properties>
-    <spring.version>3.0.1.RELEASE</spring.version>
-    <commons.version>3.24</commons.version>
+    <spring.version>3.0.2.RELEASE</spring.version>
+    <commons.version>3.32</commons.version>
+    <slf4j.version>1.5.8</slf4j.version>
   </properties>
 
   <dependencyManagement>
@@ -135,7 +148,7 @@
      <dependency>
         <artifactId>junit</artifactId>
         <groupId>junit</groupId>
-        <version>4.6</version>
+        <version>4.7</version>
         <scope>test</scope>
      </dependency>
       <dependency>
@@ -186,13 +199,12 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
-        <version>1.5.0</version>
-        <exclusions>
-          <exclusion>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
       </dependency>
       <dependency>
          <groupId>commons-cli</groupId>
