@@ -99,8 +99,8 @@
   </dependencies>
 
   <properties>
-    <spring.version>3.0.2.RELEASE</spring.version>
-    <commons.version>3.32</commons.version>
+    <spring.version>3.0.3.RELEASE</spring.version>
+    <commons.version>3.36-SNAPSHOT</commons.version>
     <slf4j.version>1.5.8</slf4j.version>
   </properties>
 
@@ -341,6 +341,11 @@
         </dependency>
         <dependency>
           <artifactId>commons-dao</artifactId>
+          <groupId>ar.com.zauber.commons</groupId>
+          <version>${commons.version}</version>
+        </dependency>
+        <dependency>
+          <artifactId>commons-base</artifactId>
           <groupId>ar.com.zauber.commons</groupId>
           <version>${commons.version}</version>
         </dependency>

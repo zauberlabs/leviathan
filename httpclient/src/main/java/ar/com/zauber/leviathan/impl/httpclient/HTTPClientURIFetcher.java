@@ -24,19 +24,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.message.BasicNameValuePair;
 
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
@@ -117,10 +118,9 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
             
             final List<NameValuePair> pairs = new ArrayList<NameValuePair>();
             for (String key : body.keySet()) {
-                pairs.add(new NameValuePair(key, body.get(key)));
+                pairs.add(new BasicNameValuePair(key, body.get(key)));
             }
-            final String content = EncodingUtil.formUrlEncode(pairs
-                    .toArray(new NameValuePair[0]), "UTF-8");
+            final String content = URLEncodedUtils.format(pairs, "UTF-8");
             final ByteArrayEntity entity = new ByteArrayEntity(content.getBytes());
             entity.setContentType("application/x-www-form-urlencoded");
             httpPost.setEntity(entity);

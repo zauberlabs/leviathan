@@ -21,12 +21,27 @@
            <groupId>commons-lang</groupId>
            <artifactId>commons-lang</artifactId>
         </dependency>
-        
         <dependency>
            <groupId>ar.com.zauber.commons.web</groupId>
            <artifactId>commons-web-proxy</artifactId>
+           <exclusions>
+             <!-- queremos a commons-web-proxy por unas interfaces 
+                  no interesa que funcione
+               -->
+             <exclusion>
+               <groupId>commons-httpclient</groupId>
+               <artifactId>commons-httpclient</artifactId>
+             </exclusion>
+             <exclusion>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+             </exclusion>
+             <exclusion>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+             </exclusion>
+           </exclusions>
         </dependency>
-        
         <!-- TEST -->
         <dependency>
             <groupId>commons-io</groupId>
