@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
@@ -80,6 +82,7 @@ public class FixedURIFetcher extends AbstractURIFetcher {
     }
 
     /** @see URIFetcher#get(URIFetcherResponse.URIAndCtx) */
+    @SuppressWarnings("unchecked")
     public final URIFetcherResponse get(final URIAndCtx uriAndCtx) {
         final URI uri = uriAndCtx.getURI();
         final String destURL = map.get(uri);
@@ -98,9 +101,10 @@ public class FixedURIFetcher extends AbstractURIFetcher {
             } else {
                 try {
                     ret = new InmutableURIFetcherResponse(uriAndCtx,
-                            new InmutableURIFetcherHttpResponse(
-                                new String(IOUtils.toByteArray(is), 
-                                        charset.displayName()), 200));
+                            new InmutableURIFetcherHttpResponse(new String(
+                                    IOUtils.toByteArray(is), charset
+                                            .displayName()), 200,
+                                    Collections.EMPTY_MAP));
                 } catch (IOException e) {
                     throw new UnhandledException(e);
                 } finally {

@@ -135,7 +135,7 @@ public class MultiDomainPoliteJobQueue implements JobQueue {
             long minDelay = this.domainDelay;
             final int queueSize = this.queue.size();
             
-            for (int i=0; i < queueSize; i++) {
+            for (int i = 0; i < queueSize; i++) {
                 FixedDelay<Job> delayedJob = this.queue.poll();
                 
                 // only possible with concurrency

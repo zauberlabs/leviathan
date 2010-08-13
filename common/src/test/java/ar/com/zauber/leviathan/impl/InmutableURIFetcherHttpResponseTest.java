@@ -18,6 +18,12 @@ package ar.com.zauber.leviathan.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.junit.Test;
 
 import ar.com.zauber.leviathan.common.InmutableURIFetcherHttpResponse;
@@ -33,18 +39,40 @@ public class InmutableURIFetcherHttpResponseTest {
 
     /** test */
     @Test
+    public final void testHeaders() throws Exception {
+        Map<String, List<String>> headers = new TreeMap<String, List<String>>();
+        headers.put("Accept", Arrays.asList("application/json"));
+        headers.put("Header1", Arrays.asList("value1", "value2"));
+        InmutableURIFetcherHttpResponse response = 
+            new InmutableURIFetcherHttpResponse("foo", 200, headers);
+        
+        assertEquals("application/json", response.getHeader("Accept"));
+        assertEquals(null, response.getHeader("Content-Type"));
+        assertEquals("value1", response.getHeader("Header1"));
+        
+        List<String> headers2 = response.getHeaders("Header1");
+        assertEquals(2, headers2.size());
+        assertEquals("value1", headers2.get(0));
+        assertEquals("value2", headers2.get(1));
+    }
+
+    /** test */
+    @SuppressWarnings("unchecked")
+    @Test
     public final void testEquals()  {
         assertEquals(
-            new InmutableURIFetcherHttpResponse("foo", 200),
-                            
-            new InmutableURIFetcherHttpResponse("foo", 200));
+            new InmutableURIFetcherHttpResponse("foo", 200, Collections.EMPTY_MAP),
+            new InmutableURIFetcherHttpResponse("foo", 200, Collections.EMPTY_MAP));
     }
     
     /** test */
+    @SuppressWarnings("unchecked")
     @Test
     public final void testNotEquals()  {
         assertFalse(
-            new InmutableURIFetcherHttpResponse("foo", 404).equals(
-            new InmutableURIFetcherHttpResponse("foo", 200)));
+            new InmutableURIFetcherHttpResponse("foo", 404, 
+                    Collections.EMPTY_MAP).equals(
+            new InmutableURIFetcherHttpResponse("foo", 200, 
+                    Collections.EMPTY_MAP)));
     }
 }

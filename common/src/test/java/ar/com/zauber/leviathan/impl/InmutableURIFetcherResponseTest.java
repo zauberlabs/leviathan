@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.net.URI;
+import java.util.Collections;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -57,11 +58,13 @@ public class InmutableURIFetcherResponseTest {
     }
 
     /** test failed */
+    @SuppressWarnings("unchecked")
     @Test
     public final void success() throws Exception {
         final URIFetcherResponse r = new InmutableURIFetcherResponse(
                 new URI("http://bar"),
-                new InmutableURIFetcherHttpResponse("foo", 200));
+                new InmutableURIFetcherHttpResponse("foo", 200, 
+                        Collections.EMPTY_MAP));
         assertTrue(r.isSucceeded());
         assertEquals(200, r.getHttpResponse().getStatusCode());
         assertEquals("foo", IOUtils.toString(r.getHttpResponse().getContent()));
@@ -76,13 +79,16 @@ public class InmutableURIFetcherResponseTest {
     }
 
     /** test failed */
+    @SuppressWarnings("unchecked")
     @Test
     public final void equalsHttp() throws Exception {
         assertEquals(
             new InmutableURIFetcherResponse(new URI("http://bar"),
-                new InmutableURIFetcherHttpResponse("foo", 200)),
+                new InmutableURIFetcherHttpResponse("foo", 200, 
+                        Collections.EMPTY_MAP)),
             new InmutableURIFetcherResponse(new URI("http://bar"),
-                new InmutableURIFetcherHttpResponse("foo", 200)));
+                new InmutableURIFetcherHttpResponse("foo", 200, 
+                        Collections.EMPTY_MAP)));
     }
     /** test failed */
     @Test

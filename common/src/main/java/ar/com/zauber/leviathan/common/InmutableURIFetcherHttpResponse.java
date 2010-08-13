@@ -18,6 +18,8 @@ package ar.com.zauber.leviathan.common;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -37,23 +39,50 @@ public class InmutableURIFetcherHttpResponse implements URIFetcherHttpResponse,
 
     private final String content;
     private final int statusCode;
+    private final Map<String, List<String>> headers;
 
     /** Creates the InmutableURIFetcherResponse. */
     public InmutableURIFetcherHttpResponse(final String  content,
-            final int statusCode) {
+            final int statusCode, final Map<String, List<String>> headers) {
         Validate.notNull(content, "content is null");
-
+        Validate.notNull(headers);
         this.content = content;
         this.statusCode = statusCode;
+        this.headers = headers;
     }
 
     /** @see URIFetcherResponse#getContent() */
     public final Reader getContent() {
         return new StringReader(content);
     }
+    
     /** @see URIFetcherResponse#getStatusCode() */
     public final int getStatusCode() {
         return statusCode;
+    }
+    
+    /** @see URIFetcherHttpResponse#getHeader(String) */
+    public String getHeader(String name) {
+        if (headers != null && name != null) {
+            List<String> auxHeaders = headers.get(name);
+            if (auxHeaders != null && auxHeaders.size() > 0) {
+                return auxHeaders.get(0);
+            }
+        }
+        
+        return null;
+    }
+    
+    /** @see URIFetcherHttpResponse#getHeaders(java.lang.String) */
+    public List<String> getHeaders(String name) {
+        if (headers != null && name != null) {
+            List<String> auxHeaders = headers.get(name);
+            if (auxHeaders != null && auxHeaders.size() > 0) {
+                return auxHeaders;
+            }
+        }
+        
+        return null;
     }
 
     /** @see Object#toString() */

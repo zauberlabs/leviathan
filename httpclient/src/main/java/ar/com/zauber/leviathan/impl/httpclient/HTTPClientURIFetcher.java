@@ -23,11 +23,13 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -145,6 +147,7 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
             ResponseMetadata meta = null;
             InputStream content = null;
             response  = httpClient.execute(httpMethod);
+            
             final HttpEntity entity = response.getEntity();
             if(entity != null) {
                 content = response.getEntity().getContent();
@@ -156,9 +159,10 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
                     new ByteArrayInputStream(data));
 
             final int status = response.getStatusLine().getStatusCode();
+            Map<String, List<String>> headers = extractHeaders(response);
             return new InmutableURIFetcherResponse(uriAndCtx,
-                new InmutableURIFetcherHttpResponse(
-                        new String(data, charset.displayName()), status));
+                    new InmutableURIFetcherHttpResponse(new String(data,
+                            charset.displayName()), status, headers));
         } catch (final Throwable e) {
             return new InmutableURIFetcherResponse(uriAndCtx, e);
         } finally {
@@ -172,6 +176,30 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
         }
     }
 
+
+    /**
+     * Extracts de headers of the {@link HttpResponse}.
+     * 
+     * @param response
+     * @return the headers map 
+     */
+    private Map<String, List<String>> extractHeaders(final HttpResponse response) {
+        Map<String, List<String>> out = new TreeMap<String, List<String>>();
+        
+        final Header[] allHeaders = response.getAllHeaders();
+        for (Header header : allHeaders) {
+            List<String> headers = out.get(header.getName());
+            if (headers == null) {
+                headers = new ArrayList<String>();
+                headers.add(header.getValue());
+                out.put(header.getName(), headers);
+            } else {
+                headers.add(header.getValue());
+            }
+        }
+        
+        return out;
+    }
 
     /** obtiene el encoding */
     private ResponseMetadata getMetaResponse(final URI uri,
