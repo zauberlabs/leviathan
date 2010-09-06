@@ -51,4 +51,7 @@ public interface JobQueue {
      * No se aceptaran nuevas tareas
      */
     boolean isShutdown();
+    
+    /** @return cantidad actual de trabajos en espera */
+    int size();
 }

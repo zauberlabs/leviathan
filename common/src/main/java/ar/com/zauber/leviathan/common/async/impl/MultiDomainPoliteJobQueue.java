@@ -175,5 +175,9 @@ public class MultiDomainPoliteJobQueue implements JobQueue {
         return fetchJob;
     }
 
+    public int size() {
+        return this.queue.size();
+    }
+
 }
 

@@ -113,4 +113,8 @@ public class BlockingQueueJobQueue implements JobQueue {
     public final boolean isShutdown() {
         return shutdownFlag.get();
     }
+
+    public int size() {
+        return this.target.size();
+    }
 }
