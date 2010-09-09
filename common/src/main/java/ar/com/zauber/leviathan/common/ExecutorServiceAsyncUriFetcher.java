@@ -148,8 +148,8 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
     }
 
     /** @see AsyncUriFetcher#post(URIAndCtx, UrlEncodedPostBody, Closure) */
-    public void post(final URIAndCtx uriAndCtx, final UrlEncodedPostBody body,
+    public final void post(final URIAndCtx uriAndCtx, final UrlEncodedPostBody body,
             final Closure<URIFetcherResponse> closure) {
-        
+        throw new NotImplementedException("TODO");
     }
 }
