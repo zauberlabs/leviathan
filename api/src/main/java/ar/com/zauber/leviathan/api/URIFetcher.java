@@ -56,7 +56,14 @@ public interface URIFetcher {
     /** post to uri */
     URIFetcherResponse post(URIAndCtx uri, InputStream body);
     
-    /** post to uri, body as "application/x-www-form-urlencoded" */
+    /** post to uri, body as "application/x-www-form-urlencoded"
+     * Now is deprecated: 
+     * @deprecated to use post with {@link UrlEncodedPostBody} as parameter
+     * @use post(URIAndCtx uriAndCtx, UrlEncodedPostBody body)*/
+    @Deprecated
     URIFetcherResponse post(URIAndCtx uri, Map<String, String> body);
-    
+
+    /** post to uri, body (with collections also as parameters)
+     * as "application/x-www-form-urlencoded "*/
+    URIFetcherResponse post(URIAndCtx uriAndCtx, UrlEncodedPostBody body);
 }

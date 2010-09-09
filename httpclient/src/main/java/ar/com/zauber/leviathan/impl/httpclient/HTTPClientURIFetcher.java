@@ -43,6 +43,7 @@ import org.apache.http.message.BasicNameValuePair;
 
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.AbstractURIFetcher;
 import ar.com.zauber.leviathan.common.CharsetStrategy;
@@ -122,6 +123,35 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
             for (String key : body.keySet()) {
                 pairs.add(new BasicNameValuePair(key, body.get(key)));
             }
+            final String content = URLEncodedUtils.format(pairs, "UTF-8");
+            final ByteArrayEntity entity = new ByteArrayEntity(content.getBytes());
+            entity.setContentType("application/x-www-form-urlencoded");
+            httpPost.setEntity(entity);
+            return fetchInternal(uriAndCtx, httpPost);
+        } catch(Throwable t) {
+            return new InmutableURIFetcherResponse(uriAndCtx, t);
+        }
+    }
+
+    /** Post with List parameters also */
+    public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
+            final UrlEncodedPostBody body) {
+        try {
+            final HttpPost httpPost = new HttpPost(uriAndCtx.getURI());
+
+            final List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+            
+            for (String simpleParam : body.getSimpleParameters()) {
+                pairs.add(new BasicNameValuePair(simpleParam,
+                          body.getSimpleParameter(simpleParam)));
+            }
+            
+            for (String collectionParam : body.getCollectionParameters()) {
+                for (String value : body.getCollectionParameter(collectionParam)) {
+                    pairs.add(new BasicNameValuePair(collectionParam, value));
+                }
+            }
+            
             final String content = URLEncodedUtils.format(pairs, "UTF-8");
             final ByteArrayEntity entity = new ByteArrayEntity(content.getBytes());
             entity.setContentType("application/x-www-form-urlencoded");

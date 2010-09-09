@@ -21,7 +21,6 @@ import java.net.URI;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
@@ -31,6 +30,7 @@ import org.apache.commons.lang.Validate;
 
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.AbstractURIFetcher;
 import ar.com.zauber.leviathan.common.InmutableURIFetcherHttpResponse;
@@ -126,6 +126,13 @@ public class FixedURIFetcher extends AbstractURIFetcher {
     public final URIFetcherResponse post(final URIAndCtx uri,
             final Map<String, String> body) {
         throw new NotImplementedException("Post to classpath not implemented");
+    }
+
+    /** @see URIFetcher#post(URIAndCtx, UrlEncodedPostBody) */
+    public final URIFetcherResponse post(final URIAndCtx uriAndCtx, 
+            final UrlEncodedPostBody body) {
+        throw new NotImplementedException("Post to classpath not implemented");
+
     }
 
 }

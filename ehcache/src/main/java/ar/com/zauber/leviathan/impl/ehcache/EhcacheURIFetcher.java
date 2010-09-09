@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.AbstractURIFetcher;
 import ar.com.zauber.leviathan.common.CtxDecorableURIFetcherResponse;
@@ -187,5 +188,12 @@ public class EhcacheURIFetcher extends AbstractURIFetcher {
                     "Fetcher cache hit ratio: %2.2f%% (%d/%d).",
                     100.0 * hits / total, hits, total).toString());
         }
+    }
+
+
+    /** @see URIFetcher#post(URIAndCtx, UrlEncodedPostBody) */
+    public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
+                final UrlEncodedPostBody body) {
+        return fetcher.post(uriAndCtx, body);
     }
 }

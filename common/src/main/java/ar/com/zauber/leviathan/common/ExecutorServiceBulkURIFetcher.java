@@ -38,6 +38,7 @@ import ar.com.zauber.leviathan.api.BulkURIFetcher;
 import ar.com.zauber.leviathan.api.BulkURIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 /**
@@ -177,6 +178,13 @@ public class ExecutorServiceBulkURIFetcher implements BulkURIFetcher {
     /** @see URIFetcher#post(URIFetcherResponse.URIAndCtx, java.util.Map) */
     public final URIFetcherResponse post(final URIAndCtx uri,
             final Map<String, String> body) {
+        // TODO
+        throw new NotImplementedException("Bulk POST not implemented.");
+    }
+
+    /** @see URIFetcher#post(URIAndCtx, UrlEncodedPostBody) */
+    public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
+           final UrlEncodedPostBody body) {
         // TODO
         throw new NotImplementedException("Bulk POST not implemented.");
     }

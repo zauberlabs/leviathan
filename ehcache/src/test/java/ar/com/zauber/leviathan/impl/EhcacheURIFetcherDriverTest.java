@@ -15,6 +15,11 @@
  */
 package ar.com.zauber.leviathan.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,8 +33,6 @@ import org.apache.commons.lang.Validate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherHttpResponse;
