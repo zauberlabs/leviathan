@@ -30,6 +30,7 @@ import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 /**
@@ -144,5 +145,11 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
     /** @see AsyncUriFetcher#shutdownNow() */
     public final void shutdownNow() {
         throw new NotImplementedException("TODO");
+    }
+
+    /** @see AsyncUriFetcher#post(URIAndCtx, UrlEncodedPostBody, Closure) */
+    public void post(final URIAndCtx uriAndCtx, final UrlEncodedPostBody body,
+            final Closure<URIFetcherResponse> closure) {
+        
     }
 }

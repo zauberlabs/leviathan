@@ -18,6 +18,7 @@ package ar.com.zauber.leviathan.common;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.Validate;
 
@@ -25,6 +26,7 @@ import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 /**
@@ -85,11 +87,25 @@ public class NotsoAsyncUriFetcher extends AbstractAsyncUriFetcher {
             final Closure<URIFetcherResponse> closure) {
         incrementActiveJobs();
         try {
-            closure.execute(uriFetcher.post(uriAndCtx, body));
+            final UrlEncodedPostBody encodedBody = addToBody(body);
+            closure.execute(uriFetcher.post(uriAndCtx, encodedBody));
         } finally {
             decrementActiveJobs();
         }
     }
+
+    /** Create a UrlEncodedPostBody for a Map<String, String>
+     * @param body
+     * @return
+     */
+    private UrlEncodedPostBody addToBody(final Map<String, String> body) {
+        final UrlEncodedPostBody encodedBody = new UrlEncodedPostBody();
+        for (Entry<String, String> entry : body.entrySet()) {
+            encodedBody.addSimpleParameter(entry.getKey(), entry.getValue());
+        }
+        return encodedBody;
+    }
+    
 
     /** @see AsyncUriFetcher#shutdown() */
     public final void shutdown() {
@@ -99,5 +115,16 @@ public class NotsoAsyncUriFetcher extends AbstractAsyncUriFetcher {
     /** @see AsyncUriFetcher#shutdownNow() */
     public final void shutdownNow() {
         // nothing to do
+    }
+
+    /** @see AsyncUriFetcher#post(URIAndCtx, UrlEncodedPostBody, Closure) */
+    public final void post(final URIAndCtx uriAndCtx, final UrlEncodedPostBody body,
+            final Closure<URIFetcherResponse> closure) {
+        incrementActiveJobs();
+        try {
+            closure.execute(uriFetcher.post(uriAndCtx, body));
+        } finally {
+            decrementActiveJobs();
+        }
     }
 }

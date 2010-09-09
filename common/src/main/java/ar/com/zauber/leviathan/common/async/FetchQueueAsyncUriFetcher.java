@@ -28,6 +28,7 @@ import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.AbstractAsyncUriFetcher;
 import ar.com.zauber.leviathan.common.GetHttpMethodCommand;
@@ -331,5 +332,12 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
     public void setObserver(final AsyncUriFetcherObserver o) {
         Validate.notNull(observer);
         this.observer = o;
+    }
+
+    /** @see AsyncUriFetcher#post(URIAndCtx, UrlEncodedPostBody, Closure) */
+    public void post(final URIAndCtx uriAndCtx, final UrlEncodedPostBody body,
+            final Closure<URIFetcherResponse> closure) {
+        fetchInternal(new PostHttpMethodCommand(fetcher, uriAndCtx, body),
+                uriAndCtx, closure);        
     }
 }

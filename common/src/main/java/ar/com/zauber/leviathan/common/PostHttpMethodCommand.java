@@ -18,11 +18,13 @@ package ar.com.zauber.leviathan.common;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.Validate;
 
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 /**
@@ -37,7 +39,7 @@ public class PostHttpMethodCommand implements HttpMethodCommand {
     private final URIFetcher fetcher;
     private final URIFetcherResponse.URIAndCtx uri;
     private final InputStream body;
-    private final Map<String, String> formBody;
+    private final UrlEncodedPostBody encodedBody;
 
     /** Creates the PostHttpMethodCommand. */
     public PostHttpMethodCommand(final URIFetcher fetcher, final URIAndCtx uri,
@@ -49,7 +51,7 @@ public class PostHttpMethodCommand implements HttpMethodCommand {
         this.fetcher = fetcher;
         this.uri = uri;
         this.body = body;
-        this.formBody = null;
+        this.encodedBody = null;
     }
     
     /** Creates the PostHttpMethodCommand. */
@@ -62,15 +64,51 @@ public class PostHttpMethodCommand implements HttpMethodCommand {
         this.fetcher = fetcher;
         this.uri = uri;
         this.body = null;
-        this.formBody = formBody;
+        this.encodedBody = createEncodedBody(formBody);
     }    
+
+    
+    /** Creates an UrlEncodedPostBody using a Map<String, String>
+     * @param formBody
+     * @return
+     */
+    private UrlEncodedPostBody createEncodedBody
+                        (final Map<String, String> formBody) {
+        final UrlEncodedPostBody result = new UrlEncodedPostBody();
+        for (Entry<String, String> entry : formBody.entrySet()) {
+            result.addSimpleParameter(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
+
+    /**
+     * Creates the PostHttpMethodCommand.
+     *
+     * @param fetcher
+     * @param uri
+     * @param body
+     */
+    
+    public PostHttpMethodCommand(final URIFetcher fetcher, 
+            final URIAndCtx uri,
+            final UrlEncodedPostBody body) {
+        
+        Validate.notNull(fetcher);
+        Validate.notNull(uri);
+        Validate.notNull(body);
+        
+        this.fetcher = fetcher;
+        this.uri = uri;
+        this.body = null;
+        this.encodedBody = body;
+    }
 
     /** @see HttpMethodCommand#execute() */
     public final URIFetcherResponse execute() {
         URIFetcherResponse ret;
         
-        if (formBody != null) {
-            ret = fetcher.post(uri, formBody);
+        if (encodedBody != null) {
+            ret = fetcher.post(uri, encodedBody);
         } else if (body != null) {
             ret = fetcher.post(uri, body);
         } else {

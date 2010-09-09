@@ -110,9 +110,32 @@ public interface AsyncUriFetcher {
      * @param closure
      *            closure donde se publica el resultado (el contenido de la
      *            pagina, los errores; etc).
+     * 
+     * @deprecated 
+     * now @use post(URIAndCtx uriAndCtx, UrlEncodedPostBody body,
+     *                Closure<URIFetcherResponse> closure);
      */
+    @Deprecated
     void post(URIAndCtx uriAndCtx, Map<String, String> body,
+            Closure<URIFetcherResponse> closure); 
+    
+    /**
+     * Realiza un post a la uri indicada, enviando los pares clave/valor
+     * indicados en <em>body</em> en forma de
+     * "application/x-www-form-urlencoded", y al terminar llama al closure con
+     * la respuesta
+     * 
+     * @param uriAndCtx
+     *            URIs to retrieve
+     * @param body
+     *            contenido a postear (parametros simples y colecciones)
+     * @param closure
+     *            closure donde se publica el resultado (el contenido de la
+     *            pagina, los errores; etc).
+     */
+    void post(URIAndCtx uriAndCtx, UrlEncodedPostBody body,
             Closure<URIFetcherResponse> closure);      
+    
     
     /**
      * Initiates an orderly shutdown in which previously submitted
