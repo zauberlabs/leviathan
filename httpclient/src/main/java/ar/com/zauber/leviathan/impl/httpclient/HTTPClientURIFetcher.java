@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
 import org.apache.http.Header;
@@ -40,11 +39,12 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
-import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
+import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.common.AbstractURIFetcher;
 import ar.com.zauber.leviathan.common.CharsetStrategy;
 import ar.com.zauber.leviathan.common.InmutableURIFetcherHttpResponse;
@@ -174,25 +174,28 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
             final URI uri = uriAndCtx.getURI();
             Validate.notNull(uri, "uri is null");
             
-            ResponseMetadata meta = null;
-            InputStream content = null;
             response  = httpClient.execute(httpMethod);
+            Validate.notNull(response);
             
             final HttpEntity entity = response.getEntity();
-            if(entity != null) {
-                content = response.getEntity().getContent();
-                meta = getMetaResponse(uri, response, entity);
-            }
-            final byte[] data = IOUtils.toByteArray(content);
+            Validate.notNull(entity);
             
-            final Charset charset = charsetStrategy.getCharset(meta, 
-                    new ByteArrayInputStream(data));
+            InputStream content = entity.getContent();
+            Validate.notNull(content);
+            
+            final byte[] data = IOUtils.toByteArray(content);
 
-            final int status = response.getStatusLine().getStatusCode();
-            Map<String, List<String>> headers = extractHeaders(response);
-            return new InmutableURIFetcherResponse(uriAndCtx,
-                    new InmutableURIFetcherHttpResponse(new String(data,
-                            charset.displayName()), status, headers));
+            final ResponseMetadata meta = getMetaResponse(uri, response, entity);
+            final Charset charset 
+                = charsetStrategy.getCharset(meta, new ByteArrayInputStream(data));
+
+            return new InmutableURIFetcherResponse(
+                uriAndCtx,
+                new InmutableURIFetcherHttpResponse(
+                    new String(data, charset.displayName()), 
+                    meta.getStatusCode(), 
+                    extractHeaders(response)));
+            
         } catch (final Throwable e) {
             return new InmutableURIFetcherResponse(uriAndCtx, e);
         } finally {
@@ -234,39 +237,27 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
     /** obtiene el encoding */
     private ResponseMetadata getMetaResponse(final URI uri,
             final HttpResponse response, final HttpEntity entity) {
-        String contentType = null;
-        String contentEncoding = null;
-        if(entity.getContentType() != null) {
-            contentType = entity.getContentType().getValue();
-        }
-        if(entity.getContentEncoding() != null) {
-            contentEncoding = entity.getContentEncoding().getValue();
-        } else {
-            contentEncoding = getCharsetFromContentType(contentType);
-        }
-        final int status = response.getStatusLine().getStatusCode();
-        return new InmutableResponseMetadata(uri, contentType,
-                contentEncoding, status);
-    }
 
-    /**
-     * @param contentType
-     * @return el charset presente en el contentType, o null.
-     */
-    private String getCharsetFromContentType(final String contentType) {
-        if (!StringUtils.contains(contentType, "charset")) {
-            return null;
-        }
+        final String contentType = (entity.getContentType() != null)
+                                ? entity.getContentType().getValue()
+                                : null;
         
-        String charset = contentType.substring(contentType
-                .indexOf("charset") + 7);
-        if (StringUtils.contains(charset, ';')) {
-            charset = charset.substring(0,
-                    charset.indexOf(';'));
-        }
-        return StringUtils.replace(charset, "=", "").trim();
-    }
+        
+        final String contentEncoding = (entity.getContentEncoding() != null)
+                                    ? entity.getContentEncoding().getValue()
+                                    : null;
+        
+        final int status = (response.getStatusLine() != null) 
+                                ? response.getStatusLine().getStatusCode() 
+                                : 0;
 
+        return new InmutableResponseMetadata(
+                uri, 
+                contentType, 
+                contentEncoding,
+                status, 
+                EntityUtils.getContentCharSet(entity));
+    }
 
 
     /**

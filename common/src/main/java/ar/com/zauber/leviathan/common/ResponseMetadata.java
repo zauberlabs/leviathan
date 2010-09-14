@@ -32,6 +32,9 @@ public interface ResponseMetadata extends ContentMetadata {
 
     /** @return el encoding de este response (puede ser nulo)*/
     String getEncoding();
+    
+    /** @return el charset del contenido (o nulo si no existe()*/
+    String getCharset();
 
     /** @return el URI al que de donde provino este response (no nulo) */
     URI getURI();

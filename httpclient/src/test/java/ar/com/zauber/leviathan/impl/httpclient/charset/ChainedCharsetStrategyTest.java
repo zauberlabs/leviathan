@@ -57,7 +57,7 @@ public class ChainedCharsetStrategyTest {
                 .getResourceAsStream(
                         "ar/com/zauber/leviathan/impl/mock/utf8.xml");
         final InmutableResponseMetadata meta = new InmutableResponseMetadata(
-                uri, "text/xml", "ISO-8859-1", 200);
+                uri, "text/xml", "gzip", 200, "ISO-8859-1");
         final Charset cs1 = st.getCharset(meta, is);
         Assert.assertEquals(Charset.forName("utf-8"), cs1);
 
@@ -70,7 +70,7 @@ public class ChainedCharsetStrategyTest {
         
         // no XML
         final InmutableResponseMetadata meta2 = new InmutableResponseMetadata(
-                uri, "text/html", null, 200);
+                uri, "text/html", null, 200, null);
         final Charset cs3 = st.getCharset(meta2, null);
         Assert.assertEquals(Charset.forName("utf-8"), cs3);
     }

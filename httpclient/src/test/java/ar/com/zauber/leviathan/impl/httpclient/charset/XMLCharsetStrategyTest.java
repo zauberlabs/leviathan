@@ -23,30 +23,29 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import ar.com.zauber.leviathan.common.CharsetStrategy;
 import ar.com.zauber.leviathan.impl.httpclient.InmutableResponseMetadata;
 
 /**
  * Tests para {@link XMLCharsetStrategy}
- * 
  * 
  * @author Francisco J. González Costanzó
  * @since Apr 9, 2010
  */
 public class XMLCharsetStrategyTest {
     
-    /** */
+    /** prueba del {@link XMLCharsetStrategy} */
     @Test
     public final void aplicarEstrategiaTest() throws Exception {
-        final CharsetStrategy st = new XMLCharsetStrategy();
-        final URI uri = new URI("http://example.com");
-        final InputStream is = XMLCharsetStrategy.class.getClassLoader()
-                .getResourceAsStream(
-                        "ar/com/zauber/leviathan/impl/mock/utf8.xml");
+        final InputStream is = getClass().getClassLoader()
+            .getResourceAsStream("ar/com/zauber/leviathan/impl/mock/utf8.xml");
+        
         final InmutableResponseMetadata meta =
-            new InmutableResponseMetadata(uri, "text/xml", null, 200);
-        final Charset cs1 = st.getCharset(meta, is);
-        Assert.assertEquals(Charset.forName("utf-8"), cs1);
+            new InmutableResponseMetadata(
+                new URI("http://example.com"), "text/xml", null, 200, "iso-9851");
+        
+        Assert.assertEquals(
+            Charset.forName("utf-8"), 
+            new XMLCharsetStrategy().getCharset(meta, is));
     }    
 
 }

@@ -25,7 +25,6 @@ import org.junit.Test;
 import ar.com.zauber.leviathan.common.CharsetStrategy;
 import ar.com.zauber.leviathan.common.ResponseMetadata;
 import ar.com.zauber.leviathan.impl.httpclient.InmutableResponseMetadata;
-import ar.com.zauber.leviathan.impl.httpclient.charset.DefaultHttpCharsetStrategy;
 
 
 /**
@@ -42,9 +41,9 @@ public class DefaultHttpCharsetStrategyTest {
         final CharsetStrategy st = new DefaultHttpCharsetStrategy();
         final URI uri = new URI("http://example.com");
         final ResponseMetadata meta =
-            new InmutableResponseMetadata(uri , null, "utf-8", 200);
+            new InmutableResponseMetadata(uri , null, "gzip", 200, "utf-8");
         final InmutableResponseMetadata meta2 =
-            new InmutableResponseMetadata(uri, null, null, 200);
+            new InmutableResponseMetadata(uri, null, null, 200, null);
         final Charset cs1 = st.getCharset(meta, null);
         final Charset cs2 = st.getCharset(meta2, null);
         Assert.assertEquals(Charset.forName("utf-8"), cs1);

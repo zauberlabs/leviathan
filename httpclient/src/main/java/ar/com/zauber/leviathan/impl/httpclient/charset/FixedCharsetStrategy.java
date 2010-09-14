@@ -25,14 +25,12 @@ import ar.com.zauber.leviathan.common.CharsetStrategy;
 import ar.com.zauber.leviathan.common.ResponseMetadata;
 
 /**
- * TODO Descripcion de la clase. Los comentarios van en castellano.
- *
+ * {@link CharsetStrategy} que siempre retorna el mismo {@link Charset}
  *
  * @author Mariano Semelman
  * @since Dec 15, 2009
  */
 public class FixedCharsetStrategy implements CharsetStrategy {
-
 
     private final Charset charset;
 

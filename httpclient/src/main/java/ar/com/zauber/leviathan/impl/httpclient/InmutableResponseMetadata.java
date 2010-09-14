@@ -34,17 +34,19 @@ public class InmutableResponseMetadata implements ResponseMetadata {
     private final int statusCode;
     private final String encoding;
     private final URI uri;
+    private final String charset;
 
 
 
-    /** Creates the InmutableResponseMetadata.*/
+    /** Creates the InmutableResponseMetadata. */
     public InmutableResponseMetadata(final URI uri, final String contentType,
-            final String contentEncoding, final int status) {
+            final String contentEncoding, final int status, final String charset) {
         Validate.notNull(uri);
         this.contentType = contentType;
         this.uri = uri;
         this.statusCode = status;
         this.encoding = contentEncoding;
+        this.charset = charset;
     }
 
     /** @see ContentTransformer.ContentMetadata#getContentType() */
@@ -70,6 +72,11 @@ public class InmutableResponseMetadata implements ResponseMetadata {
     /** @see ResponseMetadata#getURI() */
     public final URI getURI() {
         return this.uri;
+    }
+
+    /** @see ResponseMetadata#getCharset() */
+    public final String getCharset() {
+        return charset;
     }
 
 }

@@ -38,9 +38,9 @@ public class DefaultHttpCharsetStrategy implements CharsetStrategy {
             final InputStream documento) {
         Validate.notNull(meta);
         Charset res = null;
-        if(meta.getEncoding() != null) {
+        if(meta.getCharset() != null) {
             try {
-                res = Charset.forName(meta.getEncoding());
+                res = Charset.forName(meta.getCharset());
             } catch (IllegalCharsetNameException e) {
                 // return null;
             } catch (UnsupportedCharsetException e) {

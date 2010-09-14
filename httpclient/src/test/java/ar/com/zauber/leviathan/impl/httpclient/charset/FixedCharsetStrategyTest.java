@@ -15,7 +15,6 @@
  */
 package ar.com.zauber.leviathan.impl.httpclient.charset;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
@@ -24,10 +23,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import ar.com.zauber.leviathan.common.CharsetStrategy;
 import ar.com.zauber.leviathan.impl.httpclient.InmutableResponseMetadata;
-import ar.com.zauber.leviathan.impl.httpclient.charset.FixedCharsetStrategy;
-
 
 /**
  * Test de FixedCharsetStrategy
@@ -37,32 +33,20 @@ import ar.com.zauber.leviathan.impl.httpclient.charset.FixedCharsetStrategy;
  */
 public class FixedCharsetStrategyTest {
 
-    /** */
-    @Test
+    /** invalid charset */
+    @Test(expected = UnsupportedCharsetException.class)
     public final void wrongConstructor() throws Exception {
-        try {
-            CharsetStrategy strategy = new FixedCharsetStrategy("mimamamemima");
-            Assert.fail("no fallo cuando tiene un charset desconocido");
-        } catch (UnsupportedCharsetException e) {
-            // must be empty.
-        }
-
+        new FixedCharsetStrategy("mimamamemima");
     }
 
     /** test del fixed strategy */
     @Test
     public final void fixedTest() throws Exception {
-        CharsetStrategy strategy = new FixedCharsetStrategy("utf-8");
-        URI uri = new URI("htt://foo.bar");
-        InputStream content = null;
-        Charset cs =
-            strategy.getCharset(new InmutableResponseMetadata(uri, null, null, 200),
-                content);
-        Assert.assertEquals(Charset.forName("utf-8"), cs);
+        Assert.assertEquals(
+            Charset.forName("utf-8"), 
+            new FixedCharsetStrategy("utf-8").getCharset(
+                new InmutableResponseMetadata(
+                    new URI("htt://foo.bar"), null, "gzip", 200, "bla"), null));
     }
-
-
-
-
 
 }
