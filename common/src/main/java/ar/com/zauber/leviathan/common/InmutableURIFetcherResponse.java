@@ -90,7 +90,7 @@ public class InmutableURIFetcherResponse implements URIFetcherResponse,
             throws IllegalStateException {
         if(httpResponse == null) {
             throw new IllegalStateException(
-                    "Only call getError() if isSucceeded returned true");
+                    "Only call getHttpResponse() if isSucceeded returned true");
         }
 
         return httpResponse;
