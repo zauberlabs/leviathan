@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:syn="http://purl.org/rss/1.0/modules/syndication/"
+ xmlns:admin="http://webns.net/mvcb/"
+>
+
+<channel rdf:about="http://www.terra.com.ar/">
+<title>Terra Internacionales</title>
+<link>http://www.terra.com.ar/</link>
+<description>Informaci&#243;n actualizada del canal Internacionales de Terra Argentina</description>
+<dc:language>es</dc:language>
+<items>
+ <rdf:Seq>
+  <rdf:li rdf:resource="http://www.terra.com.ar/canales/internacionales/216/216304.html" />
+  <rdf:li rdf:resource="http://www.terra.com.ar/canales/internacionales/216/216234.html" />
+  <rdf:li rdf:resource="http://www.terra.com.ar/canales/internacionales/216/216230.html" />
+  <rdf:li rdf:resource="http://www.terra.com.ar/canales/internacionales/216/216209.html" />
+  <rdf:li rdf:resource="http://www.terra.com.ar/canales/internacionales/216/216208.html" />
+  <rdf:li rdf:resource="http://www.terra.com.ar/canales/internacionales/216/216207.html" />
+ </rdf:Seq>
+</items>
+<image rdf:resource="http://www.terra.com.ar/xml/rss/logo.jpg" />
+</channel>
+
+<image rdf:about="http://www.terra.com.ar/xml/rss/logo.jpg">
+<title>Terra Networks Argentina</title>
+<url>http://www.terra.com.ar/xml/rss/logo.jpg</url>
+<link>http://www.terra.com.ar/</link>
+</image>
+
+<item rdf:about="http://www.terra.com.ar/canales/internacionales/216/216304.html">
+<title>Polémica en Barcelona por una clínica que "cura" a los homosexuales</title>
+<link>http://www.terra.com.ar/canales/internacionales/216/216304.html</link>
+<description>El departamento de Salud de la Generalitat ha abierto un expediente informativo a la Policlínica Tibidabo para esclarecer si en ella se trata la homosexualidad como una enfermedad, con fármacos y psicoterapia.</description>
+</item>
+
+<item rdf:about="http://www.terra.com.ar/canales/internacionales/216/216234.html">
+<title>Talibanes acusan de espía a un nene de siete años y lo ejecutan</title>
+<link>http://www.terra.com.ar/canales/internacionales/216/216234.html</link>
+<description>Milicianos talibanes ejecutaron a un niño de 7 años acusado de espiar para el gobierno, según informaron este miércoles las autoridades locales.</description>
+</item>
+
+<item rdf:about="http://www.terra.com.ar/canales/internacionales/216/216230.html">
+<title>Un Fritzl brasileño abusa de su hija por 17 años y tienen 7 hijos</title>
+<link>http://www.terra.com.ar/canales/internacionales/216/216230.html</link>
+<description>Un campesino de 54 años fue detenido tras ser denunciado por abusar de su hija desde que esta tenía 12 años. Ahora tiene 29 y siete hijos de entre 2 y 12 años. </description>
+</item>
+
+<item rdf:about="http://www.terra.com.ar/canales/internacionales/216/216209.html">
+<title>Policías de EE.UU. matan a niño mexicano que jugaba en la frontera</title>
+<link>http://www.terra.com.ar/canales/internacionales/216/216209.html</link>
+<description>Autoridades mexicanas investigan el fallecimiento de un niño de 14 años que murió por una herida de bala, supuestamente por el disparo de un agente de la Patrulla Fronteriza de Estados Unidos que vigilaba el cruce entre Ciudad Juárez y El Paso.</description>
+</item>
+
+<item rdf:about="http://www.terra.com.ar/canales/internacionales/216/216208.html">
+<title>Mató al médico que le había diagnósticado cáncer por error y se suicida</title>
+<link>http://www.terra.com.ar/canales/internacionales/216/216208.html</link>
+<description>El hecho ocurrió en el Centro Médico de la Academia de Ciencias de Rusia, en la ciudad de Púshkino, a unos 30 kilómetros al noroeste de la capital rusa. </description>
+</item>
+
+<item rdf:about="http://www.terra.com.ar/canales/internacionales/216/216207.html">
+<title>Mirá el rap en el que supuestamente aparece Barack Obama cantando</title>
+<link>http://www.terra.com.ar/canales/internacionales/216/216207.html</link>
+<description>En un video grabado en 1993 de los raperos Tag Team que circula en Internet se ve aparentemente al presidente de EEUU bailando junto a un grupo de personas. Aunque los músicos lo niegan, en la web aseguran que es el mismísimo jefe de Estado norteamericano.</description>
+</item>
+
+</rdf:RDF>

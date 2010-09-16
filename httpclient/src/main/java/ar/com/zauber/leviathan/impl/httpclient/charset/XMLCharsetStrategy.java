@@ -51,6 +51,19 @@ public class XMLCharsetStrategy implements CharsetStrategy {
         "application/atom+xml", 
     };
 
+    private boolean validate;
+    
+    /** * Creates the XMLCharsetStrategy. */
+    public XMLCharsetStrategy() { 
+        this.setValidate(false);
+    }
+    
+    /** Creates the XMLCharsetStrategy.
+     * @param validate */
+    public XMLCharsetStrategy(final boolean validate) {
+        this.setValidate(validate);
+    }
+    
     /** @see CharsetStrategy#getCharset(ResponseMetadata, InputStream) */
     public final Charset getCharset(final ResponseMetadata meta,
             final InputStream content) {
@@ -62,8 +75,18 @@ public class XMLCharsetStrategy implements CharsetStrategy {
         }
         
         try {
-            final DocumentBuilder documentBuilder = DocumentBuilderFactory
-                    .newInstance().newDocumentBuilder();
+            final DocumentBuilderFactory builderFactory = 
+                        DocumentBuilderFactory.newInstance();
+            
+            if (!validate) {
+                builderFactory.setValidating(false);
+                // To disable DOM DTD Validation 
+                builderFactory.setFeature(
+                  "http://apache.org/xml/features/nonvalidating/load-external-dtd",
+                   false);
+            }
+            final DocumentBuilder documentBuilder = builderFactory
+                                                       .newDocumentBuilder();
             final Document dom = documentBuilder.parse(content);
             final String xmlEncoding = dom.getXmlEncoding();
             if (!StringUtils.isBlank(xmlEncoding)) {
@@ -82,6 +105,14 @@ public class XMLCharsetStrategy implements CharsetStrategy {
     
     public final void setXmlTypes(final String[] xmlTypes) {
         this.xmlTypes = xmlTypes;
+    }
+
+    public final void setValidate(final boolean validate) {
+        this.validate = validate;
+    }
+
+    public final boolean isValidate() {
+        return validate;
     }
 
 }
