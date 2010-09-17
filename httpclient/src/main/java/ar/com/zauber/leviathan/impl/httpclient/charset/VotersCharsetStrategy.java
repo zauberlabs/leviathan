@@ -18,7 +18,6 @@ package ar.com.zauber.leviathan.impl.httpclient.charset;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -74,9 +73,15 @@ public class VotersCharsetStrategy implements CharsetStrategy {
     /** @see CharsetStrategy#getCharset(ResponseMetadata, InputStream) */
     public final Charset getCharset(final ResponseMetadata meta, 
                                    final InputStream content) {
+        if (voters ==  null || voters.isEmpty()) {
+            return defaultCharset;
+        }
         final List<Charset> votes = new ArrayList<Charset>(); 
         for (CharsetStrategy voter : voters) {
-            votes.add(voter.getCharset(meta, content));
+            final Charset charset = voter.getCharset(meta, content);
+            if (charset != null) {
+                votes.add(charset);
+            }
         }
         if (votes.isEmpty()) {
             return defaultCharset;
@@ -113,6 +118,7 @@ public class VotersCharsetStrategy implements CharsetStrategy {
             for (final Charset charset : votes) {
                 if (winners.contains(charset)) {
                     winner = charset;
+                    break;
                 }
             }
         } else {
