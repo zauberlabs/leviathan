@@ -1,0 +1,52 @@
+/*
+ * Copyright (c) 2010 Zauber S.A.  -- All rights reserved
+ */
+package ar.com.zauber.leviathan.scrapper.utils;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.springframework.web.util.UriTemplate;
+
+import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
+
+/**
+ * 
+ * 
+ * @author Marcelo Turrin
+ * @since Sep 10, 2010
+ */
+public class MatchesURIFetcherResponsePredicateTest {
+
+    /**
+     * Chequea que el matcheo para url exacta
+     * @throws URISyntaxException
+     */
+    @Test
+    public final void testExactMatch() throws URISyntaxException {
+        final String uriTemplate = "http://www.zaubersoftware.com";
+
+        UriTemplate template = new UriTemplate(uriTemplate);
+        
+        MatchesURIFetcherResponsePredicate predicate 
+                = new MatchesURIFetcherResponsePredicate(template);
+        
+        final URIAndCtx ctx = Mockito.mock(URIAndCtx.class);
+        Mockito.when(ctx.getURI()).thenReturn(new URI(uriTemplate));
+        
+        final URIFetcherResponse response = Mockito.mock(URIFetcherResponse.class);
+        Mockito.when(response.getURIAndCtx()).thenReturn(ctx);
+
+        Assert.assertFalse(predicate.evaluate(null));
+        Assert.assertTrue(predicate.evaluate(response));
+        
+        Mockito.when(ctx.getURI()).thenReturn(new URI("http://www.zauber.com.ar"));
+
+        Assert.assertFalse(predicate.evaluate(response));
+    }
+     
+}

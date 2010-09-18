@@ -24,6 +24,11 @@
           <groupId>org.springframework</groupId>
           <artifactId>spring-beans</artifactId>
        </dependency>
+       <dependency>  <!-- para realizar las transformaciones xslt -->
+            <groupId>ar.com.zauber.commons.web</groupId>
+            <artifactId>commons-web-transformation</artifactId>
+            <version>${commons.version}</version>
+        </dependency>
             <dependency>
                 <!--
                     para tener soporte solo de uri-template (no nos
