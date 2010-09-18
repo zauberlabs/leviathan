@@ -1,0 +1,48 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ar.com.zauber.leviathan</groupId>
+        <artifactId>leviathan-parent</artifactId>
+        <version>0.4-SNAPSHOT</version>
+    </parent>
+    <artifactId>leviathan-scrapper</artifactId>
+    <packaging>jar</packaging>
+    <name>Leviathan::scrapper</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>ar.com.zauber.commons</groupId>
+            <artifactId>commons-base</artifactId>
+        </dependency>
+        <dependency>
+            <artifactId>leviathan-api</artifactId>
+            <groupId>${pom.groupId}</groupId>
+            <version>${pom.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-beans</artifactId>
+       </dependency>
+            <dependency>
+                <!--
+                    para tener soporte solo de uri-template (no nos
+                    interesa el resto)
+                -->
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-beans</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>aopalliance</groupId>
+                        <artifactId>aopalliance</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+    </dependencies>
+</project>

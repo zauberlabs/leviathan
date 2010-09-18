@@ -426,6 +426,7 @@
      <module>common</module>
      <module>httpclient</module>
      <module>ehcache</module>
+     <module>scrapper</module>
   </modules>
 
 </project>
