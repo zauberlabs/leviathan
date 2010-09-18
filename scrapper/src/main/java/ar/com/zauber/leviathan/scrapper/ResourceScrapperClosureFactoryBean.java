@@ -17,6 +17,7 @@ package ar.com.zauber.leviathan.scrapper;
 
 import java.io.Reader;
 
+import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.FactoryBean;
 
 import ar.com.zauber.commons.dao.Closure;
@@ -48,6 +49,12 @@ public class ResourceScrapperClosureFactoryBean implements
     private final SchemaProvider schemaProvider;
     private final Closure<?> closure;
 
+    /** vers constructor */
+    public ResourceScrapperClosureFactoryBean(final TidyScrapper scrapper,
+            final Closure<?> closure) {
+        this(scrapper, null, closure);
+    }
+    
     /**
      * Creates the ResourceScrapperClosureFactoryBean.
      * 
@@ -62,6 +69,9 @@ public class ResourceScrapperClosureFactoryBean implements
     public ResourceScrapperClosureFactoryBean(final TidyScrapper scrapper,
             final SchemaProvider schemaProvider, final Closure<?> closure) {
         super();
+        Validate.notNull(scrapper);
+        Validate.notNull(closure);
+        
         this.scrapper = scrapper;
         this.schemaProvider = schemaProvider;
         this.closure = closure;
