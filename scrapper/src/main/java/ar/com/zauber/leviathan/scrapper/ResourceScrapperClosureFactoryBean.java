@@ -1,17 +1,17 @@
 /**
  * Copyright (c) 2009-2010 Zauber S.A. <http://www.zaubersoftware.com/>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package ar.com.zauber.leviathan.scrapper;
 
@@ -36,7 +36,7 @@ import ar.com.zauber.leviathan.scrapper.utils.ContextualResponse;
  * funcionalidad normal del sistema, armando la cadena de {@link Transformer} y
  * {@link Closure} mediante a {@link TargetTransformerClosure} Arma la cadena
  * mediante a la transformacion XSLT (por el {@link TidyScrapper}) si es
- * necesario  agrega la Transformacion {@link XMLUnmarshallTransformer}
+ * necesario agrega la Transformacion {@link XMLUnmarshallTransformer}
  * 
  * @author Marcelo Turrin
  * @since Feb 1, 2010
@@ -70,20 +70,23 @@ public class ResourceScrapperClosureFactoryBean implements
     /** @see FactoryBean#getObject() */
     @SuppressWarnings("unchecked")
     public final Closure<URIFetcherResponse> getObject() {
-        
+
         Closure<?> finalClosure = closure;
 
         if (schemaProvider != null) {
-            finalClosure = new TargetTransformerClosure<ContextualResponse<URIAndCtx, Reader>, ContextualResponse<URIAndCtx, Object>>(
-                                        new XMLUnmarshallTransformer<URIAndCtx, Object>(schemaProvider), 
-                                        (Closure<ContextualResponse<URIAndCtx, Object>>)finalClosure);
+            finalClosure = new TargetTransformerClosure<
+                                        ContextualResponse<URIAndCtx, Reader>, 
+                                        ContextualResponse<URIAndCtx, Object>>(
+                    new XMLUnmarshallTransformer<URIAndCtx, Object>(
+                            schemaProvider),
+                    (Closure<ContextualResponse<URIAndCtx, Object>>) finalClosure);
         }
-        
-        return  new URIFetcherResponseWrapperClosure(
-                new TargetTransformerClosure<ContextualResponse<URIAndCtx, Reader>, 
-                                             ContextualResponse<URIAndCtx, Reader>>(
-                        new XSLTTransformer(scrapper),
-                        (Closure<ContextualResponse<URIAndCtx, Reader>>) finalClosure));
+
+        return new URIFetcherResponseWrapperClosure(new TargetTransformerClosure<
+                                            ContextualResponse<URIAndCtx, Reader>, 
+                                            ContextualResponse<URIAndCtx, Reader>>
+                (new XSLTTransformer(scrapper),
+                (Closure<ContextualResponse<URIAndCtx, Reader>>) finalClosure));
     }
 
     /** @see FactoryBean#getObjectType() */
