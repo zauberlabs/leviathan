@@ -100,7 +100,7 @@
 
   <properties>
     <spring.version>3.0.4.RELEASE</spring.version>
-    <commons.version>3.36</commons.version>
+    <commons.version>3.37-SNAPSHOT</commons.version>
     <slf4j.version>1.5.8</slf4j.version>
   </properties>
 
@@ -361,9 +361,20 @@
  <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <encoding>ISO-8859-1</encoding>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+        <inherited>true</inherited>
+      </plugin>
+
+      <plugin>
          <groupId>com.google.code.maven-license-plugin</groupId>
          <artifactId>maven-license-plugin</artifactId>
-         <inherited>true</inherited>
+         <inherited>false</inherited>
          <configuration>
              <quiet>false</quiet>
              <header>src/HEADER.txt</header>
