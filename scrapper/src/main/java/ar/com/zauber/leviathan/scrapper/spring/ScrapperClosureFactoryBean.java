@@ -45,7 +45,6 @@ public class ScrapperClosureFactoryBean implements
      *            {@link Closure} se aplica
      */
     public ScrapperClosureFactoryBean(
-            final boolean dryrun,
             final Map<String, Closure<URIFetcherResponse>> caseblocks) {
         
         Validate.notNull(caseblocks);
