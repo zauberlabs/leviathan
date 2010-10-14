@@ -245,12 +245,11 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
                     try {
                         processingQueue.add(new Job() {
                             public void run() {
+                                Long t1 = null;
                                 try {
                                     observer.beginProcessing(uriAndCtx);
-                                    final long t1 = System.currentTimeMillis();
+                                    t1 = System.currentTimeMillis();
                                     closure.execute(r);
-                                    final long t2 = System.currentTimeMillis();
-                                    observer.finishProcessing(uriAndCtx, t2 - t1);
                                 } catch(final Throwable t) {
                                     if(logger.isErrorEnabled()) {
                                         logger.error("error while processing using "
@@ -259,6 +258,16 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
                                                 + uriAndCtx.getURI(), t);
                                     }
                                 } finally {
+                                    if(null == t1){
+				                    //Shouldn't enter here, its very rare.
+				                    //This is because if it fails before the line
+				                    //t1 = System.currentTimeMillis() at the try, 
+				                    //this will be null and then will fail calculating
+				                    //the time elapsed. Plus, will show trash data
+                                        t1 = System.currentTimeMillis();
+                                    }
+                                    long t2 = System.currentTimeMillis();
+                                    observer.finishProcessing(uriAndCtx, t2 - t1);
                                     decrementActiveJobs();
                                 }
                             }
