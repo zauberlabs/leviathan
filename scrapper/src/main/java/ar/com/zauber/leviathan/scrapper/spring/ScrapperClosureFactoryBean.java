@@ -34,8 +34,7 @@ import ar.com.zauber.leviathan.scrapper.utils.MatchesURIFetcherResponsePredicate
 public class ScrapperClosureFactoryBean implements
         FactoryBean<Closure<URIFetcherResponse>> {
     private final Closure<URIFetcherResponse> closure;
-    private ClosureWrapperFactory<URIFetcherResponse> wrapperFactory = 
-        new NullClosureWrapperFactory<URIFetcherResponse>();
+    private final ClosureWrapperFactory<URIFetcherResponse> wrapperFactory;
     
     /**
      * Creates the ScrapperClosureFactoryBean.
@@ -43,12 +42,16 @@ public class ScrapperClosureFactoryBean implements
      * @param caseblocks
      *            los caseblocks que indican para cada {@link UriTemplate} que
      *            {@link Closure} se aplica
+     * @param aWrapperFactory: creates the closure decorator closure
      */
     public ScrapperClosureFactoryBean(
-            final Map<String, Closure<URIFetcherResponse>> caseblocks) {
+            final Map<String, Closure<URIFetcherResponse>> caseblocks,
+            final ClosureWrapperFactory<URIFetcherResponse> aWrapperFactory) {
         
         Validate.notNull(caseblocks);
-
+        Validate.notNull(aWrapperFactory);
+        
+        this.wrapperFactory = aWrapperFactory;
         final List<Entry<Predicate<URIFetcherResponse>, 
                          Closure<URIFetcherResponse>>> blocks = 
                     new LinkedList<Entry<Predicate<URIFetcherResponse>, 
@@ -80,6 +83,16 @@ public class ScrapperClosureFactoryBean implements
                 wrapperFactory.decorate(new SwitchClosure<URIFetcherResponse>(
                         blocks)));
     }
+    
+    /**
+     * Creates the ScrapperClosureFactoryBean. Uses as wrapper a {@link NullClosureWrapperFactory}
+     *@param caseblocks
+     *            los caseblocks que indican para cada {@link UriTemplate} que
+     *            {@link Closure} se aplica
+     */
+    public ScrapperClosureFactoryBean(final Map<String, Closure<URIFetcherResponse>> caseblocks) {
+        this(caseblocks,new NullClosureWrapperFactory<URIFetcherResponse>());
+    }
 
     /** @see FactoryBean#getObject() */
     public final Closure<URIFetcherResponse> getObject() throws Exception {
@@ -96,16 +109,5 @@ public class ScrapperClosureFactoryBean implements
     /** @see FactoryBean#isSingleton() */
     public final boolean isSingleton() {
         return true;
-    }
-    
-    public final ClosureWrapperFactory<URIFetcherResponse> getWrapperFactory() {
-        return wrapperFactory;
-    }
-    
-    /** setea el wrapper factory */
-    public final void setWrapperFactory(
-           final ClosureWrapperFactory<URIFetcherResponse> wrapperFactory) {
-        Validate.notNull(wrapperFactory);
-        this.wrapperFactory = wrapperFactory;
     }
 }
