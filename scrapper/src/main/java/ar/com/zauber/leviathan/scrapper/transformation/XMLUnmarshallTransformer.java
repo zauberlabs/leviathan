@@ -18,12 +18,13 @@ package ar.com.zauber.leviathan.scrapper.transformation;
 import java.io.IOException;
 import java.io.Reader;
 
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.sax.SAXSource;
 
 import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.XmlMappingException;
+import org.xml.sax.InputSource;
 
 import ar.com.zauber.commons.dao.Transformer;
 import ar.com.zauber.leviathan.scrapper.utils.ContextualResponse;
@@ -59,7 +60,8 @@ public class XMLUnmarshallTransformer<C, T>
         try {
             return new ContextualResponse<C, T>(
                     input.getContext(),
-                    (T) provider.unmarshal(new StreamSource(reader)));
+                    (T) provider.unmarshal(new SAXSource(new InputSource(
+                            input.getResponse()))));
         } catch (final XmlMappingException e) {
             throw new UnhandledException("Tranforming " + input.getContext(), e);
         } catch (final IOException e) {
