@@ -42,7 +42,6 @@ public class ScrapperClosureFactoryBean implements
      * @param caseblocks
      *            los caseblocks que indican para cada {@link UriTemplate} que
      *            {@link Closure} se aplica
-     * @param aWrapperFactory: creates the closure decorator closure
      */
     public ScrapperClosureFactoryBean(
             final Map<String, Closure<URIFetcherResponse>> caseblocks,
@@ -85,13 +84,15 @@ public class ScrapperClosureFactoryBean implements
     }
     
     /**
-     * Creates the ScrapperClosureFactoryBean. Uses as wrapper a {@link NullClosureWrapperFactory}
+     * Creates the ScrapperClosureFactoryBean. Uses as wrapper a 
+     * {@link NullClosureWrapperFactory}
      *@param caseblocks
      *            los caseblocks que indican para cada {@link UriTemplate} que
      *            {@link Closure} se aplica
      */
-    public ScrapperClosureFactoryBean(final Map<String, Closure<URIFetcherResponse>> caseblocks) {
-        this(caseblocks,new NullClosureWrapperFactory<URIFetcherResponse>());
+    public ScrapperClosureFactoryBean(
+            final Map<String, Closure<URIFetcherResponse>> caseblocks) {
+        this(caseblocks, new NullClosureWrapperFactory<URIFetcherResponse>());
     }
 
     /** @see FactoryBean#getObject() */
