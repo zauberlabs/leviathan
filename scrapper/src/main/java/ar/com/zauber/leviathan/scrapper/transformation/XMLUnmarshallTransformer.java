@@ -15,15 +15,17 @@
  */
 package ar.com.zauber.leviathan.scrapper.transformation;
 
+import java.io.IOException;
 import java.io.Reader;
 
-import javax.xml.bind.JAXBException;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
+import org.springframework.oxm.Unmarshaller;
+import org.springframework.oxm.XmlMappingException;
 
 import ar.com.zauber.commons.dao.Transformer;
-import ar.com.zauber.commons.web.transformation.schema.SchemaProvider;
 import ar.com.zauber.leviathan.scrapper.utils.ContextualResponse;
 
 /**
@@ -40,10 +42,10 @@ public class XMLUnmarshallTransformer<C, T>
         implements Transformer<ContextualResponse<C, Reader>, 
                                 ContextualResponse<C, T>> {
 
-    private final SchemaProvider provider;
+    private final Unmarshaller provider;
 
     /** a partir de un provider crea el transformador */
-    public XMLUnmarshallTransformer(final SchemaProvider provider) {
+    public XMLUnmarshallTransformer(final Unmarshaller provider) {
         super();
         Validate.notNull(provider);
         this.provider = provider;
@@ -53,12 +55,24 @@ public class XMLUnmarshallTransformer<C, T>
     @Override
     public final ContextualResponse<C, T> transform(
             final ContextualResponse<C, Reader> input) {
+        Reader reader = null;
         try {
             return new ContextualResponse<C, T>(
                     input.getContext(),
-                    (T) provider.getUnmarshaller().unmarshal(input.getResponse()));
-        } catch (JAXBException e) {
-            throw new UnhandledException(e);
+                    (T) provider.unmarshal(new StreamSource(reader)));
+        } catch (final XmlMappingException e) {
+            throw new UnhandledException("Tranforming " + input.getContext(), e);
+        } catch (final IOException e) {
+            throw new UnhandledException("Tranforming " + input.getContext(), e);
+        } finally {
+            if(reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    throw new UnhandledException("Closing reader for" 
+                            + input.getContext(), e);
+                }
+            }
         }
     }
 

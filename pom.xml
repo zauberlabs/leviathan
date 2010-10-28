@@ -100,8 +100,9 @@
 
   <properties>
     <spring.version>3.0.4.RELEASE</spring.version>
-    <commons.version>3.38</commons.version>
+    <commons.version>3.40-SNAPSHOT</commons.version>
     <slf4j.version>1.5.8</slf4j.version>
+    <spring.oxm.version>1.5.9</spring.oxm.version>
   </properties>
 
   <dependencyManagement>
@@ -160,11 +161,23 @@
         <groupId>org.springframework</groupId>
         <artifactId>spring-web</artifactId>
         <version>${spring.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context-support</artifactId>
         <version>${spring.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
@@ -175,11 +188,24 @@
         <groupId>org.springframework</groupId>
         <artifactId>spring-core</artifactId>
         <version>${spring.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-beans</artifactId>
         <version>${spring.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.springframework.osgi</groupId>
@@ -354,6 +380,30 @@
                 <artifactId>mockito-all</artifactId>
                 <version>1.8.1</version>
             </dependency>
+
+    <dependency>
+        <groupId>org.springframework.ws</groupId>
+        <artifactId>spring-oxm</artifactId>
+        <version>${spring.oxm.version}</version>
+        <exclusions>
+            <exclusion>
+               <groupId>commons-logging</groupId>
+               <artifactId>commons-logging</artifactId>
+             </exclusion>
+         </exclusions>
+     </dependency>
+     <dependency>
+        <groupId>org.springframework.ws</groupId>
+        <artifactId>spring-oxm-tiger</artifactId>
+        <version>${spring.oxm.version}</version>
+        <exclusions>
+            <exclusion>
+               <groupId>commons-logging</groupId>
+               <artifactId>commons-logging</artifactId>
+             </exclusion>
+         </exclusions>
+     </dependency>
+
     </dependencies>
   </dependencyManagement>
 

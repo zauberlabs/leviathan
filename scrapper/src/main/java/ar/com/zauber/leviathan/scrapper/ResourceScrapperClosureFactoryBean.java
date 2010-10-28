@@ -19,12 +19,12 @@ import java.io.Reader;
 
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.oxm.Unmarshaller;
 
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.commons.dao.Transformer;
 import ar.com.zauber.commons.dao.closure.TargetTransformerClosure;
 import ar.com.zauber.commons.web.transformation.processors.impl.TidyScrapper;
-import ar.com.zauber.commons.web.transformation.schema.SchemaProvider;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.scrapper.closure.URIFetcherResponseWrapperClosure;
@@ -46,7 +46,7 @@ public class ResourceScrapperClosureFactoryBean implements
         FactoryBean<Closure<URIFetcherResponse>> {
 
     private final TidyScrapper scrapper;
-    private final SchemaProvider schemaProvider;
+    private final Unmarshaller unmarshaller;
     private final Closure<?> closure;
 
     /** vers constructor */
@@ -60,35 +60,35 @@ public class ResourceScrapperClosureFactoryBean implements
      * 
      * @param scrapper
      *            el scrapper a aplicar para la transformación xslt
-     * @param schemaProvider
-     *            esquema para indicar si debe "unmarshalizar" si esta se hace
+     * @param unmarshaller
      *            si no se llama directo al closure, post transformación
      * @param closure
      *            el closure final que se aplica en el scrapper
      */
     public ResourceScrapperClosureFactoryBean(final TidyScrapper scrapper,
-            final SchemaProvider schemaProvider, final Closure<?> closure) {
+            final Unmarshaller unmarshaller, final Closure<?> closure) {
         super();
         Validate.notNull(scrapper);
         Validate.notNull(closure);
-        
+
         this.scrapper = scrapper;
-        this.schemaProvider = schemaProvider;
+        this.unmarshaller = unmarshaller;
         this.closure = closure;
     }
 
+    
     /** @see FactoryBean#getObject() */
     @SuppressWarnings("unchecked")
     public final Closure<URIFetcherResponse> getObject() {
 
         Closure<?> finalClosure = closure;
 
-        if (schemaProvider != null) {
+        if (unmarshaller != null) {
             finalClosure = new TargetTransformerClosure<
                                         ContextualResponse<URIAndCtx, Reader>, 
                                         ContextualResponse<URIAndCtx, Object>>(
                     new XMLUnmarshallTransformer<URIAndCtx, Object>(
-                            schemaProvider),
+                            unmarshaller),
                     (Closure<ContextualResponse<URIAndCtx, Object>>) finalClosure);
         }
 
