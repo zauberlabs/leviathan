@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 
 import ar.com.zauber.leviathan.api.BulkURIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
@@ -61,5 +63,11 @@ public class InmutableURIAndCtx implements URIFetcherResponse.URIAndCtx,
     /** @see BulkURIFetcher.URIAndCtx#getURI() */
     public final URI getURI() {
         return uri;
+    }
+    
+    @Override
+    public final String toString() {
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                                  .append(uri).append(ctx).toString();
     }
 }
