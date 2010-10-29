@@ -78,9 +78,8 @@ public class ScrapperClosureFactoryBean implements
                     }
                 }));
         
-        closure = new ErrorLoggerWrapperClosure<URIFetcherResponse>(
-                wrapperFactory.decorate(new SwitchClosure<URIFetcherResponse>(
-                        blocks)));
+        closure = wrapperFactory.decorate(new SwitchClosure<URIFetcherResponse>(
+                        blocks));
     }
     
     /**
