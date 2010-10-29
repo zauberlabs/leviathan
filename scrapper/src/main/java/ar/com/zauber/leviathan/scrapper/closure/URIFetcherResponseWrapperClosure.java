@@ -17,6 +17,7 @@ package ar.com.zauber.leviathan.scrapper.closure;
 
 import java.io.Reader;
 import java.util.Formatter;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
@@ -35,7 +36,18 @@ import ar.com.zauber.leviathan.scrapper.utils.ContextualResponse;
 public class URIFetcherResponseWrapperClosure implements
         Closure<URIFetcherResponse> {
     private final Closure<ContextualResponse<URIAndCtx, Reader>> target;
-
+    private Closure<Entry<URIFetcherResponse, Throwable>> errorClosure = 
+        new Closure<Entry<URIFetcherResponse, Throwable>>() {
+        @Override
+        public void execute(final Entry<URIFetcherResponse, Throwable> entry) {
+            final Formatter formatter = new Formatter();
+            formatter.format(
+                "Error procesando %s", entry.getKey().getURIAndCtx().getURI());
+            throw new UnhandledException(formatter.toString(), entry.getValue());
+            
+        }
+    };
+    
     /** Crea el closure con target el closure pasado */
     public URIFetcherResponseWrapperClosure(
             final Closure<ContextualResponse<URIAndCtx, Reader>> target) {
@@ -53,12 +65,31 @@ public class URIFetcherResponseWrapperClosure implements
             } else {
                 throw response.getError();
             }
-        } catch (Throwable e) {
-            Formatter formatter = new Formatter();
-            formatter.format(
-                "Error procesando %s", response.getURIAndCtx().getURI());
-            throw new UnhandledException(formatter.toString(), e);
+        } catch (final Throwable e) {
+            errorClosure.execute(new Entry<URIFetcherResponse, Throwable>() {
+                @Override
+                public Throwable setValue(final Throwable value) {
+                    return null;
+                }
+                
+                @Override
+                public Throwable getValue() {
+                    return e;
+                }
+                
+                @Override
+                public URIFetcherResponse getKey() {
+                    return response;
+                }
+            });
         }
     }
 
+    
+    /** Sets the errorClosure. */
+    public final void setErrorClosure(
+            final Closure<Entry<URIFetcherResponse, Throwable>> errorClosure) {
+        Validate.notNull(errorClosure);
+        this.errorClosure = errorClosure;
+    }
 }
