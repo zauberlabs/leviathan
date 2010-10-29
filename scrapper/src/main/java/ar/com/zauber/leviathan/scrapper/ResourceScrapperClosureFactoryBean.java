@@ -16,6 +16,8 @@
 package ar.com.zauber.leviathan.scrapper;
 
 import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.FactoryBean;
@@ -48,13 +50,18 @@ public class ResourceScrapperClosureFactoryBean implements
     private final TidyScrapper scrapper;
     private final Unmarshaller unmarshaller;
     private final Closure<?> closure;
-
+    private final Map<String, Object> extraModel = new HashMap<String, Object>();
+    
     /** vers constructor */
     public ResourceScrapperClosureFactoryBean(final TidyScrapper scrapper,
             final Closure<?> closure) {
         this(scrapper, null, closure);
     }
     
+    public ResourceScrapperClosureFactoryBean(final TidyScrapper scrapper,
+            final Unmarshaller unmarshaller, final Closure<?> closure) {
+        this(scrapper, unmarshaller, closure, null);
+    }
     /**
      * Creates the ResourceScrapperClosureFactoryBean.
      * 
@@ -66,7 +73,8 @@ public class ResourceScrapperClosureFactoryBean implements
      *            el closure final que se aplica en el scrapper
      */
     public ResourceScrapperClosureFactoryBean(final TidyScrapper scrapper,
-            final Unmarshaller unmarshaller, final Closure<?> closure) {
+            final Unmarshaller unmarshaller, final Closure<?> closure,
+            final Map<String, Object> extraModel) {
         super();
         Validate.notNull(scrapper);
         Validate.notNull(closure);
@@ -74,6 +82,10 @@ public class ResourceScrapperClosureFactoryBean implements
         this.scrapper = scrapper;
         this.unmarshaller = unmarshaller;
         this.closure = closure;
+        
+        if(extraModel != null) {
+            this.extraModel.putAll(extraModel);
+        }
     }
 
     
@@ -95,7 +107,7 @@ public class ResourceScrapperClosureFactoryBean implements
         return new URIFetcherResponseWrapperClosure(new TargetTransformerClosure<
                                             ContextualResponse<URIAndCtx, Reader>, 
                                             ContextualResponse<URIAndCtx, Reader>>
-                (new XSLTTransformer(scrapper),
+                (new XSLTTransformer(scrapper, extraModel),
                 (Closure<ContextualResponse<URIAndCtx, Reader>>) finalClosure));
     }
 

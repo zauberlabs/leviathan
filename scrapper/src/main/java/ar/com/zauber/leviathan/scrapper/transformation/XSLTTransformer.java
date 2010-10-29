@@ -18,6 +18,8 @@ package ar.com.zauber.leviathan.scrapper.transformation;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 
@@ -40,17 +42,23 @@ public class XSLTTransformer
                             ContextualResponse<URIAndCtx, Reader>> {
 
     private final TidyScrapper tidyScrapper;
+    private final Map<String, Object> extraModel = new HashMap<String, Object>();
+    
 
-    /**
-     * Creates the XSLTTransformer.
-     * 
-     * @param tidyScrapper
-     */
+    /** Creates the XSLTTransformer. */
     public XSLTTransformer(final TidyScrapper tidyScrapper) {
+        this(tidyScrapper, null);
+    }
+    /** Creates the XSLTTransformer. */
+    public XSLTTransformer(final TidyScrapper tidyScrapper, 
+            final Map<String, Object> extraModel) {
         super();
         Validate.notNull(tidyScrapper);
-
+        
         this.tidyScrapper = tidyScrapper;
+        if(extraModel != null) {
+            this.extraModel.putAll(extraModel);
+        }
     }
 
     /** @see Transformer#transform(java.lang.Object) */
@@ -58,10 +66,12 @@ public class XSLTTransformer
             final ContextualResponse<URIAndCtx, Reader> input) {
         Validate.notNull(input);
         final StringWriter sw = new StringWriter();
-            tidyScrapper.scrap(input.getResponse(), sw, input
-                    .getContext().getCtx());
+        final Map<String, Object> model = new HashMap<String, Object>();
+        model.putAll(extraModel);
+        model.putAll(input.getContext().getCtx());
+        tidyScrapper.scrap(input.getResponse(), sw, model);
         
         return new ContextualResponse<URIAndCtx, Reader>(input.getContext(),
-                new StringReader(sw.toString()));
+                                               new  StringReader(sw.toString()));
     }
 }
