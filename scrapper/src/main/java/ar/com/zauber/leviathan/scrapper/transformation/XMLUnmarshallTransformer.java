@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.Reader;
 
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
@@ -60,8 +61,7 @@ public class XMLUnmarshallTransformer<C, T>
         try {
             return new ContextualResponse<C, T>(
                     input.getContext(),
-                    (T) provider.unmarshal(new SAXSource(new InputSource(
-                            input.getResponse()))));
+                    (T) provider.unmarshal(new StreamSource(input.getResponse())));
         } catch (final XmlMappingException e) {
             throw new UnhandledException("Tranforming " + input.getContext(), e);
         } catch (final IOException e) {
