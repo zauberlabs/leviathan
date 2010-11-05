@@ -230,7 +230,8 @@ public class EhcacheURIFetcherDriverTest {
     }
 
     private URIFetcherResponse mockFetcherResponse(final int status) {
-        URIFetcherHttpResponse httpResponse = mock(URIFetcherHttpResponse.class);
+        URIFetcherHttpResponse httpResponse = mock(URIFetcherHttpResponse.class, 
+                withSettings().serializable());
         when(httpResponse.getStatusCode()).thenReturn(status);
         URIFetcherResponse response = mock(URIFetcherResponse.class, 
                 withSettings().serializable());
