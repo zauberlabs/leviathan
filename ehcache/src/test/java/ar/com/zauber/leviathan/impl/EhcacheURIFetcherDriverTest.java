@@ -232,7 +232,8 @@ public class EhcacheURIFetcherDriverTest {
     private URIFetcherResponse mockFetcherResponse(final int status) {
         URIFetcherHttpResponse httpResponse = mock(URIFetcherHttpResponse.class);
         when(httpResponse.getStatusCode()).thenReturn(status);
-        URIFetcherResponse response = mock(URIFetcherResponse.class, withSettings().serializable());
+        URIFetcherResponse response = mock(URIFetcherResponse.class, 
+                withSettings().serializable());
         when(response.isSucceeded()).thenReturn(true);
         when(response.getHttpResponse()).thenReturn(httpResponse);
 
@@ -240,7 +241,8 @@ public class EhcacheURIFetcherDriverTest {
     }
 
     private URIFetcherResponse mockNotSuccededResponse() {
-        URIFetcherResponse response = mock(URIFetcherResponse.class, withSettings().serializable());
+        URIFetcherResponse response = mock(URIFetcherResponse.class, 
+                withSettings().serializable());
         when(response.isSucceeded()).thenReturn(false);
         when(response.getHttpResponse()).thenThrow(new IllegalStateException());
 
