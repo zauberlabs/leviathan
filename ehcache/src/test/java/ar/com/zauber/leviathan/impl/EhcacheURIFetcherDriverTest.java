@@ -54,7 +54,8 @@ public class EhcacheURIFetcherDriverTest {
 
     @Before
     public final void setUp() {
-        final InputStream is = EhcacheURIFetcherDriverTest.class.getResourceAsStream("ehcache.xml");
+        final InputStream is = 
+            EhcacheURIFetcherDriverTest.class.getResourceAsStream("ehcache.xml");
         Validate.notNull(is, "cant find ehcache.xml");
         final CacheManager m = CacheManager.create(is);
         cache = m.getCache("fetcher");
@@ -80,17 +81,20 @@ public class EhcacheURIFetcherDriverTest {
         URIFetcher mockedFetcher = mock(URIFetcher.class);
 
         // 200 para www.club.lanacion.com.ar
-        final URIAndCtx uri = new InmutableURIAndCtx(new URI("http://www.club.lanacion.com.ar"));
+        final URIAndCtx uri = new InmutableURIAndCtx(
+                new URI("http://www.club.lanacion.com.ar"));
         URIFetcherResponse mocked200Response = mockFetcherResponse(200);
 
         // 404 para www.google.com/pepe
-        final URIAndCtx uri2 = new InmutableURIAndCtx(new URI("http://www.google.com/pepe"));
+        final URIAndCtx uri2 = new InmutableURIAndCtx(
+                new URI("http://www.google.com/pepe"));
         URIFetcherResponse mocked404Response = mockFetcherResponse(404);
 
         when(mockedFetcher.get(uri)).thenReturn(mocked200Response);
         when(mockedFetcher.get(uri2)).thenReturn(mocked404Response);
 
-        EhcacheURIFetcher fetcher = new EhcacheURIFetcher(mockedFetcher, cache, CACHING_BEHAVIOR.OK);
+        EhcacheURIFetcher fetcher = new EhcacheURIFetcher(mockedFetcher, cache,
+                CACHING_BEHAVIOR.OK);
 
         assertEquals(0, fetcher.getTotal());
         assertEquals(0, fetcher.getHits());
@@ -122,15 +126,18 @@ public class EhcacheURIFetcherDriverTest {
         URIFetcher mockedFetcher = mock(URIFetcher.class);
 
         // 200 para www.club.lanacion.com.ar
-        final URIAndCtx uri = new InmutableURIAndCtx(new URI("http://www.club.lanacion.com.ar"));
+        final URIAndCtx uri = new InmutableURIAndCtx(
+                new URI("http://www.club.lanacion.com.ar"));
         URIFetcherResponse mocked200Response = mockFetcherResponse(200);
 
         // 404 para www.google.com/pepe
-        final URIAndCtx uri2 = new InmutableURIAndCtx(new URI("http://www.google.com/pepe"));
+        final URIAndCtx uri2 = new InmutableURIAndCtx(
+                new URI("http://www.google.com/pepe"));
         URIFetcherResponse mocked404Response = mockFetcherResponse(404);
 
         // Error para noexiste.com
-        final URIAndCtx uri3 = new InmutableURIAndCtx(new URI("http://noexiste.com"));
+        final URIAndCtx uri3 = new InmutableURIAndCtx(
+                new URI("http://noexiste.com"));
         URIFetcherResponse mockedErrorResponse = mockNotSuccededResponse();
 
         when(mockedFetcher.get(uri)).thenReturn(mocked200Response);
@@ -173,15 +180,18 @@ public class EhcacheURIFetcherDriverTest {
         URIFetcher mockedFetcher = mock(URIFetcher.class);
 
         // 200 para www.club.lanacion.com.ar
-        final URIAndCtx uri = new InmutableURIAndCtx(new URI("http://www.club.lanacion.com.ar"));
+        final URIAndCtx uri = new InmutableURIAndCtx(
+                new URI("http://www.club.lanacion.com.ar"));
         URIFetcherResponse mocked200Response = mockFetcherResponse(200);
 
         // 404 para www.google.com/pepe
-        final URIAndCtx uri2 = new InmutableURIAndCtx(new URI("http://www.google.com/pepe"));
+        final URIAndCtx uri2 = new InmutableURIAndCtx(
+                new URI("http://www.google.com/pepe"));
         URIFetcherResponse mocked404Response = mockFetcherResponse(404);
 
         // Error para noexiste.com
-        final URIAndCtx uri3 = new InmutableURIAndCtx(new URI("http://noexiste.com"));
+        final URIAndCtx uri3 = new InmutableURIAndCtx(
+                new URI("http://noexiste.com"));
         URIFetcherResponse mockedErrorResponse = mockNotSuccededResponse();
 
         when(mockedFetcher.get(uri)).thenReturn(mocked200Response);
