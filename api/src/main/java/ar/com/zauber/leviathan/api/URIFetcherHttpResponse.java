@@ -15,6 +15,7 @@
  */
 package ar.com.zauber.leviathan.api;
 
+import java.io.InputStream;
 import java.io.Reader;
 import java.util.List;
 
@@ -32,6 +33,11 @@ public interface URIFetcherHttpResponse {
     /** content */
     Reader getContent();
 
+    /** @return the raw content
+     * @throw IllegalStateException: If raw content not supplied
+     * */
+    InputStream getRawContent();
+    
     /**
      * Returns the first response header with the specified name, or null if it
      * is not present
@@ -43,4 +49,5 @@ public interface URIFetcherHttpResponse {
      * is not present
      */
     List<String> getHeaders(String name);
+    
 }

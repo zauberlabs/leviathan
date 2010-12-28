@@ -15,6 +15,8 @@
  */
 package ar.com.zauber.leviathan.common;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
@@ -40,15 +42,23 @@ public class InmutableURIFetcherHttpResponse implements URIFetcherHttpResponse,
     private final String content;
     private final int statusCode;
     private final Map<String, List<String>> headers;
+    private final byte[] rawContent;
 
     /** Creates the InmutableURIFetcherResponse. */
     public InmutableURIFetcherHttpResponse(final String  content,
-            final int statusCode, final Map<String, List<String>> headers) {
+            final int statusCode, final Map<String, List<String>> headers,
+            final byte[] rawContent) {
         Validate.notNull(content, "content is null");
         Validate.notNull(headers);
         this.content = content;
         this.statusCode = statusCode;
         this.headers = headers;
+        this.rawContent = rawContent;
+    }
+    /**Creates the InmutableURIFetcherHttpResponse.*/
+    public InmutableURIFetcherHttpResponse(final String  content,
+            final int statusCode, final Map<String, List<String>> headers) {
+        this(content, statusCode, headers, null);
     }
 
     /** @see URIFetcherResponse#getContent() */
@@ -118,5 +128,14 @@ public class InmutableURIFetcherHttpResponse implements URIFetcherHttpResponse,
         ret = ret * 39 + statusCode;
 
         return ret;
+    }
+
+    /** @see URIFetcherHttpResponse#getRawContent() */
+    @Override
+    public final InputStream getRawContent() {
+        if(null == rawContent) {
+            throw new IllegalStateException("Raw content not setted");
+        }
+        return new ByteArrayInputStream(rawContent);
     }
 }

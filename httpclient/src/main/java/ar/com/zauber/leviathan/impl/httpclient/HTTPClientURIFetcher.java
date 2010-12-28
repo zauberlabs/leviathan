@@ -194,7 +194,7 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
                 new InmutableURIFetcherHttpResponse(
                     new String(data, charset.displayName()), 
                     meta.getStatusCode(), 
-                    extractHeaders(response)));
+                    extractHeaders(response), data));
             
         } catch (final Throwable e) {
             return new InmutableURIFetcherResponse(uriAndCtx, e);
