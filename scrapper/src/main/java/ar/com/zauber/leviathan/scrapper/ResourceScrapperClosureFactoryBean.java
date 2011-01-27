@@ -18,6 +18,7 @@ package ar.com.zauber.leviathan.scrapper;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.FactoryBean;
@@ -51,6 +52,7 @@ public class ResourceScrapperClosureFactoryBean implements
     private final Unmarshaller unmarshaller;
     private final Closure<?> closure;
     private final Map<String, Object> extraModel = new HashMap<String, Object>();
+    private Closure<Entry<URIFetcherResponse, Throwable>> errorClosure = null;
     
     /** vers constructor */
     public ResourceScrapperClosureFactoryBean(final TidyScrapper scrapper,
@@ -66,9 +68,9 @@ public class ResourceScrapperClosureFactoryBean implements
      * Creates the ResourceScrapperClosureFactoryBean.
      * 
      * @param scrapper
-     *            el scrapper a aplicar para la transformación xslt
+     *            el scrapper a aplicar para la transformaciï¿½n xslt
      * @param unmarshaller
-     *            si no se llama directo al closure, post transformación
+     *            si no se llama directo al closure, post transformaciï¿½n
      * @param closure
      *            el closure final que se aplica en el scrapper
      */
@@ -104,11 +106,16 @@ public class ResourceScrapperClosureFactoryBean implements
                     (Closure<ContextualResponse<URIAndCtx, Object>>) finalClosure);
         }
 
-        return new URIFetcherResponseWrapperClosure(new TargetTransformerClosure<
+         URIFetcherResponseWrapperClosure c 
+         	= new URIFetcherResponseWrapperClosure(new TargetTransformerClosure<
                                             ContextualResponse<URIAndCtx, Reader>, 
                                             ContextualResponse<URIAndCtx, Reader>>
                 (new XSLTTransformer(scrapper, extraModel),
                 (Closure<ContextualResponse<URIAndCtx, Reader>>) finalClosure));
+         if(errorClosure != null){
+        	 c.setErrorClosure(errorClosure);
+         }
+         return c;
     }
 
     /** @see FactoryBean#getObjectType() */
@@ -117,7 +124,12 @@ public class ResourceScrapperClosureFactoryBean implements
         return (Class<? extends Closure<URIFetcherResponse>>) closure
                 .getClass();
     }
-
+    
+    public final void setErrorClosure(
+			Closure<Entry<URIFetcherResponse, Throwable>> errorClosure) {
+		this.errorClosure = errorClosure;
+	}
+    
     /** @see FactoryBean#isSingleton() */
     public final boolean isSingleton() {
         return true;
