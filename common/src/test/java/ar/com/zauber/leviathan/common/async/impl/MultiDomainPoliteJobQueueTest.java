@@ -105,6 +105,35 @@ public class MultiDomainPoliteJobQueueTest {
     
     /** test */
     @Test(timeout = 1000)
+    public final void testJobsWithNoHostDomains() throws InterruptedException {
+        String[] uris = new String[] {
+                "http://www.first.com/2",
+                "http://www.second.com/1",
+                "http://...",
+                "http://www.first.com/3",
+        };
+        
+        MultiDomainPoliteJobQueue q = new MultiDomainPoliteJobQueue(
+                Collections.singleton("www.first.com"), 10, TimeUnit.SECONDS);
+        
+        for (int i = 0; i < uris.length; i++) {
+            q.add(new EnqueuingJob(uris[i], finishedUris));
+        }
+        
+        q.shutdown();
+        try {
+            while(true) {
+                q.poll().run();
+            }
+        } catch(InterruptedException e) {
+            // ok
+        }
+        
+        assertEquals(Arrays.asList(uris), finishedUris);
+    }
+    
+    /** test */
+    @Test(timeout = 1000)
     public final void testJobsWithSameDomain() throws InterruptedException {
         String[] uris = new String[] {
                 "http://www.first.com/1",
