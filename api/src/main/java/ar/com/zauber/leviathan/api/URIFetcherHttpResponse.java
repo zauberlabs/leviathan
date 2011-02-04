@@ -33,9 +33,18 @@ public interface URIFetcherHttpResponse {
     /** content */
     Reader getContent();
 
-    /** @return the raw content
-     * @throw IllegalStateException: If raw content not supplied
-     * */
+    /**
+     * <p><strong>
+     *  WARNING:
+     *  It is highly possible you should be using 
+     *  {@link URIFetcherHttpResponse#getContent()}
+     * </strong></p>
+     * 
+     * <p>The caller is responsible for closing the stream after use.</p>
+     * 
+     * @return a new {@link InputStream} with the raw content
+     * @throws IllegalStateException if raw content was not supplied
+     */
     InputStream getRawContent();
     
     /**
