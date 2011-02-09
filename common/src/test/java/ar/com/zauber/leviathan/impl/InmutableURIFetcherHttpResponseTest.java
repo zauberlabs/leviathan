@@ -15,11 +15,11 @@
  */
 package ar.com.zauber.leviathan.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -74,5 +74,15 @@ public class InmutableURIFetcherHttpResponseTest {
                     Collections.EMPTY_MAP).equals(
             new InmutableURIFetcherHttpResponse("foo", 200, 
                     Collections.EMPTY_MAP)));
+    }
+    
+    @Test
+    public final void testGetHeaderInsensitiveCase() throws Exception {
+        final Map<String, List<String>> headers = 
+            new HashMap<String, List<String>>();
+        headers.put("Content-Type", Arrays.asList("text/html; charset=utf8"));
+        
+        assertNotNull(new InmutableURIFetcherHttpResponse("", 200, headers)
+        .getHeader("content-type"));
     }
 }

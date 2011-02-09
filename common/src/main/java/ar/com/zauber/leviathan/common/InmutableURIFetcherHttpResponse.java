@@ -20,11 +20,13 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
+
 
 import ar.com.zauber.leviathan.api.URIFetcherHttpResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
@@ -50,10 +52,16 @@ public class InmutableURIFetcherHttpResponse implements URIFetcherHttpResponse,
             final byte[] rawContent) {
         Validate.notNull(content, "content is null");
         Validate.notNull(headers);
+        
         this.content = content;
         this.statusCode = statusCode;
-        this.headers = headers;
+        this.headers = new HashMap<String, List<String>>();
         this.rawContent = rawContent;
+        
+        //All the headers will be treated in lower case. Transparent for the user
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            this.headers.put(entry.getKey().toLowerCase(), entry.getValue());
+        }
     }
     /**Creates the InmutableURIFetcherHttpResponse.*/
     public InmutableURIFetcherHttpResponse(final String  content,
@@ -72,9 +80,9 @@ public class InmutableURIFetcherHttpResponse implements URIFetcherHttpResponse,
     }
     
     /** @see URIFetcherHttpResponse#getHeader(String) */
-    public String getHeader(String name) {
+    public final String getHeader(final String name) {
         if (headers != null && name != null) {
-            List<String> auxHeaders = headers.get(name);
+            List<String> auxHeaders = headers.get(name.toLowerCase());
             if (auxHeaders != null && auxHeaders.size() > 0) {
                 return auxHeaders.get(0);
             }
@@ -84,9 +92,9 @@ public class InmutableURIFetcherHttpResponse implements URIFetcherHttpResponse,
     }
     
     /** @see URIFetcherHttpResponse#getHeaders(java.lang.String) */
-    public List<String> getHeaders(String name) {
+    public final List<String> getHeaders(final String name) {
         if (headers != null && name != null) {
-            List<String> auxHeaders = headers.get(name);
+            List<String> auxHeaders = headers.get(name.toLowerCase());
             if (auxHeaders != null && auxHeaders.size() > 0) {
                 return auxHeaders;
             }
