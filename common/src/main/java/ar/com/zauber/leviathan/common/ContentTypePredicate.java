@@ -5,8 +5,6 @@ package ar.com.zauber.leviathan.common;
 
 import java.util.List;
 
-import com.sun.istack.internal.NotNull;
-
 import ar.com.zauber.commons.dao.Predicate;
 import ar.com.zauber.commons.validate.Validate;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
@@ -31,7 +29,7 @@ public class ContentTypePredicate implements Predicate<URIFetcherResponse> {
      * @param acceptNoContentType flag to check whether to accept responses 
      * that have no content type.
      */
-    public ContentTypePredicate(@NotNull final List<String> acceptedMediaTypes, 
+    public ContentTypePredicate(final List<String> acceptedMediaTypes, 
                                 final boolean acceptNoContentType) {
         Validate.notNull(acceptedMediaTypes);
         
