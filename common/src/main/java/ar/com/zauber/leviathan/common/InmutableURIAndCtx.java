@@ -52,7 +52,7 @@ public class InmutableURIAndCtx implements URIFetcherResponse.URIAndCtx,
         Validate.notNull(ctx);
 
         this.uri = uri;
-        this.ctx = ctx;
+        this.ctx = Collections.unmodifiableMap(ctx);
     }
 
     /** @see BulkURIFetcher.URIAndCtx#getCtx() */
