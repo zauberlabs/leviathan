@@ -26,13 +26,14 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse;
 public final class RedirectClosure implements Closure<URIFetcherResponse> {
 
     /**
-     * Key for the context map to store the number of hops in the redirection.
+     * Key for the context map to store the number of hops in the redirection as
+     * an Integer.
      */
     public static final String KEY_HOPS = 
         RedirectClosure.class.getCanonicalName() +  "-redirect-hops";
     
     /**
-     * Key for the context map to store the original URL.
+     * Key for the context map to store the original URL as a String.
      */
     public static final String KEY_ORIGINAL_URL  = 
         RedirectClosure.class.getCanonicalName() +  "-redirect-original-url";
@@ -107,7 +108,10 @@ public final class RedirectClosure implements Closure<URIFetcherResponse> {
                 }
                 
                 try {
-                    final URI uri = new URI(fowardAddress);
+                    URI uri = new URI(fowardAddress);
+                    if(!uri.isAbsolute()) {
+                        uri = t.getURIAndCtx().getURI().resolve(uri);
+                    }
                     Integer hops = (Integer) ctx.get(KEY_HOPS);
                     
                     if (hops == null) {
