@@ -16,13 +16,13 @@
   </description>
   <groupId>ar.com.zauber.leviathan</groupId>
   <artifactId>leviathan-parent</artifactId>
-  <version>0.5-SNAPSHOT</version>
+  <version>0.5</version>
   <packaging>pom</packaging>
 
   <scm>
-     <connection>scm:svn:https://code.zaubersoftware.com/repos/sandbox/components/leviathan/code/trunk/</connection>
-     <developerConnection>scm:svn:https://code.zaubersoftware.com/repos/sandbox/components/leviathan/code/trunk/</developerConnection>
-     <url>https://code.zaubersoftware.com/repos/sandbox/components/leviathan/code/trunk/</url>
+     <connection>scm:svn:https://code.zaubersoftware.com/repos/sandbox/components/leviathan/code/releases/0.5/</connection>
+     <developerConnection>scm:svn:https://code.zaubersoftware.com/repos/sandbox/components/leviathan/code/releases/0.5/</developerConnection>
+     <url>https://code.zaubersoftware.com/repos/sandbox/components/leviathan/code/releases/0.5/</url>
   </scm>
   <licenses>
      <license>
