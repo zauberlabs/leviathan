@@ -16,14 +16,6 @@
 package ar.com.zauber.leviathan.common;
 
 import java.net.URI;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
@@ -40,78 +32,12 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse;
  * @author Juan F. Codagnone
  * @since Jan 21, 2010
  */
-public abstract class AbstractAsyncUriFetcher implements AsyncUriFetcher {
-    // para implementar el awaitIdleness
-    private final Lock lock = new ReentrantLock();
-    private final Condition emptyCondition  = lock.newCondition(); 
-    private final AtomicLong activeJobs = new AtomicLong(0);
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+public abstract class AbstractAsyncUriFetcher extends AbstractAsyncTaskExecutor
+                                           implements AsyncUriFetcher {
     
     /** @see AsyncUriFetcher#get(URI, Closure) */
     public final void get(final URI uri, 
             final Closure<URIFetcherResponse> closure) {
         get(new InmutableURIAndCtx(uri), closure);
-    }
-    
-    
-    
-
-    /** @see AsyncUriFetcher#awaitIdleness() */
-    public final void awaitIdleness() throws InterruptedException {
-        lock.lock();
-        try {
-            while(activeJobs.get() != 0) {
-                emptyCondition.await();
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
-    /** @see AsyncUriFetcher#awaitIdleness(long, TimeUnit) */
-    public final boolean awaitIdleness(final long timeout, final TimeUnit unit) 
-        throws InterruptedException {
-        boolean timedOut = false;
-        lock.lock();
-        try {
-            // no hago esto desde un while ya que un spurious wakeup puede ser
-            // interpretado como un wakeup.
-            timedOut = emptyCondition.await(timeout, unit);
-        } finally {
-            lock.unlock();
-        }
-        
-        return timedOut;
-    }
-    
-
-    /** 
-     *  decrementa la cantidad de trabajos activos y notifica a quien 
-     *  este esperando por idleness si se llegó a 0.
-     */
-    protected final void decrementActiveJobs() {
-        lock.lock();
-        try {
-            if(activeJobs.decrementAndGet() == 0) {
-                emptyCondition.signalAll();
-            }
-        } catch(final Throwable t) {
-            logger.error("decrementing active jobs. should not happen ", t);
-            // nada que relanzar no queremos molestar upstream.
-        } finally {
-            lock.unlock();
-        }
-    }
-    
-    /** incrementa la cantidad de trabajos activos */
-    protected final void incrementActiveJobs() {
-        lock.lock();
-        try {
-            activeJobs.incrementAndGet();
-        } catch(final Throwable t) {
-            logger.error("incrementing  active jobs. should not happen ", t);
-            // nada que relanzar no queremos molestar upstream.
-        } finally {
-            lock.unlock();
-        }
     }
 }
