@@ -24,8 +24,8 @@
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient-osgi</artifactId>
-            <version>4.0</version>
+            <artifactId>httpclient</artifactId>
+            <version>4.1</version>
             <exclusions>
                 <!--  no son osgi -->
                 <exclusion>
@@ -40,8 +40,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore-osgi</artifactId>
-            <version>4.0.1</version>
+            <artifactId>httpcore</artifactId>
+            <version>4.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
