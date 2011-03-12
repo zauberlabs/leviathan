@@ -17,6 +17,7 @@ package ar.com.zauber.leviathan.common;
 
 import java.net.URI;
 
+import ar.com.zauber.commons.async.AbstractAsyncTaskExecutor;
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
