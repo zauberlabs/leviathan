@@ -13,8 +13,8 @@
     <dependencies>
         <dependency>
             <artifactId>leviathan-api</artifactId>
-            <groupId>${pom.groupId}</groupId>
-            <version>${pom.version}</version>
+            <groupId>${project.groupId}</groupId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -55,10 +55,11 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.3.4</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${pom.groupId}.api.common</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.api.common</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>
