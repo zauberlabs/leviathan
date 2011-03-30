@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009-2010 Zauber S.A. <http://www.zaubersoftware.com/>
+ * Copyright (c) 2009-2011 Zauber S.A. <http://www.zaubersoftware.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package ar.com.zauber.leviathan.impl.httpclient.charset;
 
 import java.io.IOException;
