@@ -49,16 +49,6 @@
       <url>https://repo1.zaubersoftware.com/zauber/code/snapshots</url>
     </repository>
   </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>mc-release</id>
-      <name>Local Maven repository of releases</name>
-      <url>http://mc-repo.googlecode.com/svn/maven2/releases</url>
-      <snapshots><enabled>false</enabled></snapshots>
-      <releases><enabled>true</enabled></releases>
-    </pluginRepository>
-  </pluginRepositories>
-
   <distributionManagement>
     <repository>
       <id>zauber-code-releases</id>
@@ -371,52 +361,31 @@
         </configuration>
         <inherited>true</inherited>
       </plugin>
-
-      <plugin>
-         <groupId>com.google.code.maven-license-plugin</groupId>
-         <artifactId>maven-license-plugin</artifactId>
-         <version>1.4.0</version>
-         <inherited>false</inherited>
-         <configuration>
-             <quiet>false</quiet>
-             <header>src/HEADER.txt</header>
-             <failIfMissing>true</failIfMissing>
-             <aggregate>false</aggregate>
-             <includes>
-                 <include>**/src/**</include>
-                 <include>**/test/**</include>
-             </includes>
-             <excludes>
-                 <exclude>**/target/**</exclude>
-                 <exclude>**/.clover/**</exclude>
-                 <exclude>**/README.txt</exclude>
-                 <exclude>**/.keep</exclude>
-                 <exclude>**/*.xml</exclude>
-                 <exclude>**/*.properties</exclude>
-                 <exclude>**/*.css</exclude>
-                 <exclude>**/*.js</exclude>
-                 <exclude>**/*.txt</exclude>
-                 <exclude>**/*.jsp</exclude>
-                 <exclude>**/*.html</exclude>
-                 <exclude>**/*.xsl</exclude>
-                 <exclude>frontend/longwell/**</exclude>
-             </excludes>
-             <useDefaultExcludes>true</useDefaultExcludes>
-             <useDefaultMapping>true</useDefaultMapping>
-             <properties>
-                <email>http://www.zaubersoftware.com/</email>
-             </properties>
-             <encoding>iso-8859-1</encoding>
-         </configuration>
-         <executions>
-             <execution>
-                 <phase>test</phase>
-                 <goals>
-                     <goal>check</goal>
-                 </goals>
-             </execution>
-         </executions>
-      </plugin>
+        <plugin>
+            <groupId>com.mycila.maven-license-plugin</groupId>
+            <artifactId>maven-license-plugin</artifactId>
+            <version>1.9.0</version>
+            <configuration>
+                <header>src/HEADER.txt</header>
+                <includes>
+                <include>**/*.java</include>
+                </includes>
+                <excludes>
+                    <exclude>target/**</exclude>
+                    <exclude>.gitignore</exclude>
+                    <exclude>**/*.txt</exclude>
+                </excludes>
+                <encoding>iso-8859-1</encoding>
+                <strictCheck>true</strictCheck>
+            </configuration>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>check</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
       <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
