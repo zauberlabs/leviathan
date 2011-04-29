@@ -15,6 +15,7 @@
  */
 package ar.com.zauber.leviathan.common.async;
 
+import static ar.com.zauber.leviathan.common.async.ThreadUtils.*;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
@@ -304,28 +305,6 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
         
     }
 
-    /** espera que termine un thread */
-    private boolean waitForTermination(final Thread thread) {
-        boolean wait = true;
-        
-        // esperamos que el scheduler consuma todos los trabajos
-        while(wait && thread.isAlive()) {
-            try {
-                thread.join();
-                wait = false;
-            } catch (InterruptedException e) {
-                logger.warn("interrupted while shutting down");
-                try {
-                    // si justo tenemos un bug, evitamos comermos  todo el cpu
-                    Thread.sleep(200);
-                } catch (InterruptedException e1) {
-                    // nada que  hacer
-                }
-            }
-        }
-        return wait;
-    }
-    
     /** @see AsyncUriFetcher#shutdownNow() */
     public void shutdownNow() {
         fetcherQueue.shutdown();
