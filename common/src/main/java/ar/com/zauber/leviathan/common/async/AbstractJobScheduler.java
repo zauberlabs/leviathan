@@ -61,7 +61,7 @@ public abstract class AbstractJobScheduler<T> implements Runnable {
     /**
      * Process the job
      */
-    protected abstract void doJob(T job);
+    protected abstract void doJob(T job) throws InterruptedException;
     
     /**
      * Shutdown properly
