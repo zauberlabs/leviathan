@@ -26,13 +26,13 @@ import org.slf4j.LoggerFactory;
  * @author Guido Marucci Blas
  * @since Apr 29, 2011
  */
-public abstract class AbstractJobScheduler implements Runnable {
-    private final JobQueue queue;
+public abstract class AbstractJobScheduler<T> implements Runnable {
+    private final JobQueue<T> queue;
     private final Logger logger = LoggerFactory.getLogger(JobScheduler.class);
     
     
     /** Creates the FetcherScheduler. */
-    public AbstractJobScheduler(final JobQueue queue) {
+    public AbstractJobScheduler(final JobQueue<T> queue) {
         Validate.notNull(queue);
 
         this.queue = queue;
@@ -43,8 +43,7 @@ public abstract class AbstractJobScheduler implements Runnable {
     public final void run() {
         while(true) {
             try {
-                final Job job = queue.poll();
-                doJob(job);
+                doJob(queue.poll());
             } catch (final InterruptedException e) {
                 if(queue.isShutdown()) {
                     logger.info("Interrupted poll(). Queue is shutting down");
@@ -62,7 +61,7 @@ public abstract class AbstractJobScheduler implements Runnable {
     /**
      * Process the job
      */
-    protected abstract void doJob(Job job);
+    protected abstract void doJob(T job);
     
     /**
      * Shutdown properly
@@ -71,7 +70,7 @@ public abstract class AbstractJobScheduler implements Runnable {
 
 
     /** Returns the queue. */
-    public final JobQueue getQueue() {
+    public final JobQueue<T> getQueue() {
         return queue;
     }
     

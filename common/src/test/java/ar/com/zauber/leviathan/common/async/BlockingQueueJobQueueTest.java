@@ -37,8 +37,8 @@ import ar.com.zauber.leviathan.common.async.impl.NullJob;
 public class BlockingQueueJobQueueTest {
 
     /** crea una queue */
-    private JobQueue create() {
-        return new BlockingQueueJobQueue(new LinkedBlockingQueue<Job>());
+    private JobQueue<Job> create() {
+        return new BlockingQueueJobQueue<Job>(new LinkedBlockingQueue<Job>());
     }
     
     /**
@@ -48,7 +48,7 @@ public class BlockingQueueJobQueueTest {
     @Test
     public final void testShutdownRejectNewTasksNotEmptyQueue() 
         throws InterruptedException {
-        final JobQueue fetchQueue = create(); 
+        final JobQueue<Job> fetchQueue = create(); 
         
         fetchQueue.add(new NullJob());
         fetchQueue.shutdown();
@@ -67,7 +67,7 @@ public class BlockingQueueJobQueueTest {
     @Test
     public final void testShutdownRejectNewTasksEmptyQueue() 
       throws InterruptedException {
-        final JobQueue fetchQueue = create();
+        final JobQueue<Job> fetchQueue = create();
         
         fetchQueue.shutdown();
         try {
@@ -83,7 +83,7 @@ public class BlockingQueueJobQueueTest {
      */
     @Test
     public final void testValidateNullJobs() throws InterruptedException {
-        final JobQueue fetchQueue = create();
+        final JobQueue<Job> fetchQueue = create();
         try {
             fetchQueue.add(null);
             Assert.fail("No debe aceptar tareas nulas");
@@ -109,7 +109,7 @@ public class BlockingQueueJobQueueTest {
         final CountDownLatch latch = new CountDownLatch(1);
         
         // Uso una cola que no se bloquea (capacidad infinita) es importante...
-        final JobQueue fetchQueue = new BlockingQueueJobQueue(
+        final JobQueue<Job> fetchQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>()) {
             public void onPoll() {
                 // disparamos el otro thread.
@@ -153,7 +153,7 @@ public class BlockingQueueJobQueueTest {
         final CountDownLatch latch = new CountDownLatch(1);
         
         // Uso una cola que no se bloquea (capacidad infinita) es importante...
-        final JobQueue fetchQueue = new BlockingQueueJobQueue(
+        final JobQueue<Job> fetchQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>()) {
             public void onPoll() {
                 // cuando se hace un poll() se espera un poco para verificar

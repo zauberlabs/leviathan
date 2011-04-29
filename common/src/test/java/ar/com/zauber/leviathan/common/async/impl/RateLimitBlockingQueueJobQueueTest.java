@@ -47,7 +47,7 @@ public class RateLimitBlockingQueueJobQueueTest {
             queue.add(new AtomicIntegerJob(counter));
         }
         final long t1 = System.currentTimeMillis();
-        final JobQueue q = new RateLimitBlockingQueueJobQueue(queue, 500, timeout);
+        final JobQueue<Job> q = new RateLimitBlockingQueueJobQueue<Job>(queue, 500, timeout);
         q.shutdown();
         try {
             while(true) {

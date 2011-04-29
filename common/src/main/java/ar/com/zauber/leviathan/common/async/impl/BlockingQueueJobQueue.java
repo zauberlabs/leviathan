@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang.Validate;
 
-import ar.com.zauber.leviathan.common.async.Job;
 import ar.com.zauber.leviathan.common.async.JobQueue;
 
 /**
@@ -31,13 +30,13 @@ import ar.com.zauber.leviathan.common.async.JobQueue;
  * @author Juan F. Codagnone
  * @since Feb 16, 2010
  */
-public class BlockingQueueJobQueue implements JobQueue {
-    private final BlockingQueue<Job> target;
+public class BlockingQueueJobQueue<T> implements JobQueue<T> {
+    private final BlockingQueue<T> target;
     private AtomicBoolean shutdownFlag = new AtomicBoolean(false);
     private final long timeout;
     
     /** @see BlockingQueueJobQueue */
-    public BlockingQueueJobQueue(final BlockingQueue<Job> target) {
+    public BlockingQueueJobQueue(final BlockingQueue<T> target) {
         this(target, 500);
     }
     
@@ -49,7 +48,7 @@ public class BlockingQueueJobQueue implements JobQueue {
      *                 volver a ver si hay elementos (y de esta forma "blockear").
      *                 Está dicho en milisegundos.  
      */
-    public BlockingQueueJobQueue(final BlockingQueue<Job> target,
+    public BlockingQueueJobQueue(final BlockingQueue<T> target,
             final long timeout) {
         Validate.notNull(target, "target is null");
         Validate.isTrue(timeout > 0, "timeout must be positive");
@@ -60,7 +59,7 @@ public class BlockingQueueJobQueue implements JobQueue {
     
     
     /**  @see JobQueue#add(Job) */
-    public final void add(final  Job fetchJob) throws InterruptedException {
+    public final void add(final  T fetchJob) throws InterruptedException {
         Validate.notNull(fetchJob, "null jobs are not accepted");
         if(shutdownFlag.get()) {
             throw new RejectedExecutionException(
@@ -83,13 +82,13 @@ public class BlockingQueueJobQueue implements JobQueue {
     
     /** template method usado para notificar que se obtuvo un Job; y que será 
      * retornado al usuario */
-    public void onJobDelivered(final Job job) throws InterruptedException {
+    public void onJobDelivered(final T job) throws InterruptedException {
         // void
     }
     
     /** @see JobQueue#poll() */
-    public final Job poll() throws InterruptedException {
-        Job job;
+    public final T poll() throws InterruptedException {
+        T job;
         onPoll();
         do {
             job = target.poll(timeout, TimeUnit.MILLISECONDS);

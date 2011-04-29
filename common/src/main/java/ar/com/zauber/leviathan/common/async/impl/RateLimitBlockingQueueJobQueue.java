@@ -19,8 +19,6 @@ import java.util.concurrent.BlockingQueue;
 
 import org.apache.commons.lang.Validate;
 
-import ar.com.zauber.leviathan.common.async.Job;
-
 /**
  * {@link BlockingQueueJobQueue} que no entrega 
  * 
@@ -28,12 +26,12 @@ import ar.com.zauber.leviathan.common.async.Job;
  * @author Juan F. Codagnone
  * @since Feb 25, 2010
  */
-public class RateLimitBlockingQueueJobQueue extends BlockingQueueJobQueue {
+public class RateLimitBlockingQueueJobQueue<T> extends BlockingQueueJobQueue<T> {
     private final long queueTimeout;
     private long lastPool = 0;
     
     /** @see BlockingQueueJobQueue */
-    public RateLimitBlockingQueueJobQueue(final BlockingQueue<Job> target, 
+    public RateLimitBlockingQueueJobQueue(final BlockingQueue<T> target, 
             final long queueTimeOut) {
         this(target, 500, queueTimeOut);
     }
@@ -48,7 +46,7 @@ public class RateLimitBlockingQueueJobQueue extends BlockingQueueJobQueue {
      * @param queueTimeout milisegundos minimos entre que se entregan dos requests
      * @param unit
      */
-    public RateLimitBlockingQueueJobQueue(final BlockingQueue<Job> target,
+    public RateLimitBlockingQueueJobQueue(final BlockingQueue<T> target,
             final long timeout, final long queueTimeout) {
         super(target, timeout);
         Validate.isTrue(queueTimeout >= 0);
@@ -58,7 +56,7 @@ public class RateLimitBlockingQueueJobQueue extends BlockingQueueJobQueue {
     
     /** @see BlockingQueueJobQueue#onJobDelivered(Job) */
     @Override
-    public final void onJobDelivered(final Job job) throws InterruptedException {
+    public final void onJobDelivered(final T job) throws InterruptedException {
         super.onJobDelivered(job);
         final long l = System.currentTimeMillis() - lastPool - queueTimeout;
         if(l < 0) {

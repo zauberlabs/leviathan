@@ -40,7 +40,7 @@ import ar.com.zauber.leviathan.common.async.JobQueue;
  * @author Mariano Cortesi
  * @since Apr 30, 2010
  */
-public class MultiDomainPoliteJobQueue implements JobQueue {
+public class MultiDomainPoliteJobQueue implements JobQueue<Job> {
 
     private static final Logger LOGGER = 
         LoggerFactory.getLogger(MultiDomainPoliteJobQueue.class);

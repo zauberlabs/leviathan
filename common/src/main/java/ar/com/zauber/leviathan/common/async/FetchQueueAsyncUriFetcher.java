@@ -119,9 +119,9 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
     // el objeto...no nos afectaria, pero asi somo correctos 
     
     private final URIFetcher fetcher;
-    private final JobQueue fetcherQueue;
+    private final JobQueue<Job> fetcherQueue;
     private final Thread inScheduler;
-    private final JobQueue processingQueue;
+    private final JobQueue<Job> processingQueue;
     private final Thread outScheduler;
         
     private final Logger logger = LoggerFactory.getLogger(

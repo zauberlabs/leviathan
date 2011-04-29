@@ -42,8 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author Juan F. Codagnone
  * @since Feb 16, 2010
  */
-public class JobScheduler implements Runnable {
-    private final JobQueue queue;
+public class JobScheduler extends AbstractJobScheduler<Job> {
     private final ExecutorService executorService;
     private final Logger logger = LoggerFactory.getLogger(JobScheduler.class);
     private Timer timer;
@@ -51,60 +50,50 @@ public class JobScheduler implements Runnable {
     private final AtomicBoolean shutdownNowFlag = new AtomicBoolean(false);
     
     /** Creates the FetcherScheduler. */
-    public JobScheduler(final JobQueue queue, 
+    public JobScheduler(final JobQueue<Job> queue, 
             final ExecutorService executorService) {
         this(queue, executorService, null, 0);
     }
     
     /** Creates the FetcherScheduler. */
-    public JobScheduler(final JobQueue queue, 
+    public JobScheduler(final JobQueue<Job> queue, 
             final ExecutorService executorService,
             final Timer timer, final long timeout) {
+        super(queue);
         Validate.notNull(queue);
         Validate.notNull(executorService);
         if(timer != null) {
             Validate.isTrue(timeout > 0);
         }
         
-        this.queue = queue;
         this.executorService = executorService;
         this.timer = timer;
         this.timeout = timeout;
         
     }
     
-
-    /** @see Runnable#run() */
-    public final void run() {
-        while(true) {
-            try {
-                final Job job = queue.poll();
-                final Future<?> future = executorService.submit(job);
-                if(timer != null && !future.isDone()) {
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            if(!future.isDone()) {
-                                future.cancel(true);
-                                if(logger.isDebugEnabled()) {
-                                    logger.debug("Timeout while processing job "
-                                            + job);
-                                }
-                            }
+    @Override
+    protected void doJob(final Job job) {
+        final Future<?> future = executorService.submit(job);
+        if(timer != null && !future.isDone()) {
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if(!future.isDone()) {
+                        future.cancel(true);
+                        if(logger.isDebugEnabled()) {
+                            logger.debug("Timeout while processing job "
+                                    + job);
                         }
-                    }, timeout);
+                    }
                 }
-            } catch (final InterruptedException e) {
-                if(queue.isShutdown()) {
-                    logger.info("Interrupted poll(). Queue is shutting down");
-                } else {
-                    logger.warn("Interrupted poll() but we are not shutting down!",
-                            e);
-                }
-                break;
-            }
+            }, timeout);
         }
         
+    }
+
+    @Override
+    protected void doShutdown() {
         if(shutdownNowFlag.get()) {
             executorService.shutdownNow();
         } else {
@@ -121,11 +110,7 @@ public class JobScheduler implements Runnable {
                 }
             }
         }
-    }
-    
-    /** Returns the queue. */
-    public final JobQueue getQueue() {
-        return queue;
+        
     }
     
     /** Returns the queue. */

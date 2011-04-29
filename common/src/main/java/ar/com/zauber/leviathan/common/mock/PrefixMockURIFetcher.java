@@ -18,7 +18,6 @@ package ar.com.zauber.leviathan.common.mock;
 import java.net.URI;
 import java.nio.charset.Charset;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 
 import ar.com.zauber.commons.dao.Transformer;

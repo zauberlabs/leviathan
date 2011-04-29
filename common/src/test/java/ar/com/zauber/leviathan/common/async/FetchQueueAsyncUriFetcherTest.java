@@ -53,9 +53,9 @@ public class FetchQueueAsyncUriFetcherTest {
     /** intenta cerra un fetcher ya cerrado */
     @Test(timeout = 2000)
     public final void shutdownShiny() {
-        final JobQueue fetcherQueue = new BlockingQueueJobQueue(
+        final JobQueue<Job> fetcherQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
-        final JobQueue processingQueue = new BlockingQueueJobQueue(
+        final JobQueue<Job> processingQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
         
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
@@ -73,9 +73,9 @@ public class FetchQueueAsyncUriFetcherTest {
      */
     @Test(timeout = 2000)
     public final void poll() throws URISyntaxException {
-        final JobQueue fetcherQueue = new BlockingQueueJobQueue(
+        final JobQueue<Job> fetcherQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
-        final JobQueue processingQueue = new BlockingQueueJobQueue(
+        final JobQueue<Job> processingQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
         
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
@@ -129,7 +129,7 @@ public class FetchQueueAsyncUriFetcherTest {
             new ArrayList<AsyncUriFetcher>(1);
         final URI uri = new URI("http://123");
         
-        final JobQueue queue = new BlockingQueueJobQueue(
+        final JobQueue<Job> queue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>()) {
             private final AtomicInteger i = new AtomicInteger(0);
             public void onPoll() {
@@ -157,7 +157,7 @@ public class FetchQueueAsyncUriFetcherTest {
                 }
             };
         };
-        final JobQueue processingQueue = new BlockingQueueJobQueue(
+        final JobQueue<Job> processingQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
         
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
@@ -207,7 +207,7 @@ public class FetchQueueAsyncUriFetcherTest {
             new ArrayList<AsyncUriFetcher>(1);
         final URI uri = new URI("http://123");
         
-        final JobQueue queue = new BlockingQueueJobQueue(
+        final JobQueue<Job> queue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>()) {
             private final AtomicInteger i = new AtomicInteger(0);
             public void onPoll() {
@@ -235,7 +235,7 @@ public class FetchQueueAsyncUriFetcherTest {
                 }
             };
         };
-        final JobQueue processingQueue = new BlockingQueueJobQueue(
+        final JobQueue<Job> processingQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
         
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
@@ -261,7 +261,7 @@ public class FetchQueueAsyncUriFetcherTest {
      */
     @Test(timeout = 2000)
     public final void avoidUsingSameQueue() {
-        final JobQueue queue = new BlockingQueueJobQueue(
+        final JobQueue<Job> queue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
         
         try {
@@ -282,9 +282,9 @@ public class FetchQueueAsyncUriFetcherTest {
     @Test(timeout = 2000)
     public final void waitIdlenesss() 
         throws URISyntaxException, InterruptedException {
-        final JobQueue fetchQueue = new BlockingQueueJobQueue(
+        final JobQueue<Job> fetchQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
-        final JobQueue processingQueue = new BlockingQueueJobQueue(
+        final JobQueue<Job> processingQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
                 new FixedURIFetcher(new HashMap<URI, String>()), 
@@ -327,9 +327,9 @@ public class FetchQueueAsyncUriFetcherTest {
     @Test(timeout = 2000)
     public final void waitIdlenesssWithExceptions() 
         throws URISyntaxException, InterruptedException {
-        final JobQueue fetchQueue = new BlockingQueueJobQueue(
+        final JobQueue<Job> fetchQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
-        final JobQueue processingQueue = new BlockingQueueJobQueue(
+        final JobQueue<Job> processingQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
                 new FixedURIFetcher(new HashMap<URI, String>()), 
@@ -372,9 +372,9 @@ public class FetchQueueAsyncUriFetcherTest {
     @Test(timeout = 5000)
     public final void timeoutInterrupteableTask() 
         throws URISyntaxException, InterruptedException {
-        final JobQueue fetchQueue = new BlockingQueueJobQueue(
+        final JobQueue<Job> fetchQueue = new BlockingQueueJobQueue<Job>(
                 new SynchronousQueue<Job>());
-        final JobQueue processingQueue = new BlockingQueueJobQueue(
+        final JobQueue<Job> processingQueue = new BlockingQueueJobQueue<Job>(
                 new SynchronousQueue<Job>());
         
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
@@ -409,9 +409,9 @@ public class FetchQueueAsyncUriFetcherTest {
      */
     @Test(timeout = 2000)
     public final void shutdownNow() throws Exception {
-        final JobQueue fetchQueue = new BlockingQueueJobQueue(
+        final JobQueue<Job> fetchQueue = new BlockingQueueJobQueue<Job>(
                 new SynchronousQueue<Job>());
-        final JobQueue processingQueue = new BlockingQueueJobQueue(
+        final JobQueue<Job> processingQueue = new BlockingQueueJobQueue<Job>(
                 new SynchronousQueue<Job>());
         
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
