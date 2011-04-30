@@ -235,7 +235,7 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
     }
 
     /** obtiene el encoding */
-    private ResponseMetadata getMetaResponse(final URI uri,
+    public static ResponseMetadata getMetaResponse(final URI uri,
             final HttpResponse response, final HttpEntity entity) {
 
         final String contentType = (entity.getContentType() != null)
