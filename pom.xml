@@ -20,9 +20,9 @@
   <packaging>pom</packaging>
 
   <scm>
-     <connection>scm:svn:https://code.zaubersoftware.com/repos/sandbox/components/leviathan/code/trunk/</connection>
-     <developerConnection>scm:svn:https://code.zaubersoftware.com/repos/sandbox/components/leviathan/code/trunk/</developerConnection>
-     <url>https://code.zaubersoftware.com/repos/sandbox/components/leviathan/code/trunk/</url>
+    <connection>scm:git:git@github.com:zaubersoftware/leviathan.git</connection>
+    <url>scm:git:git@github.com:zaubersoftware/leviathan.git</url>
+    <developerConnection>scm:git:git@github.com:zaubersoftware/leviathan.git</developerConnection>
   </scm>
   <licenses>
      <license>
@@ -399,7 +399,15 @@
              </execution>
           </executions>
       </plugin>
-
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+                <autoVersionSubmodules>true</autoVersionSubmodules>
+                <pushChanges>false</pushChanges>
+        </configuration>
+        <version>2.1</version>
+      </plugin>
     </plugins>
   </build>
 
