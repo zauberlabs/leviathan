@@ -90,7 +90,7 @@
 
   <properties>
     <spring.version>3.0.5.RELEASE</spring.version>
-    <commons.version>3.47</commons.version>
+    <commons.version>3.48-SNAPSHOT</commons.version>
     <slf4j.version>1.6.1</slf4j.version>
   </properties>
 
@@ -263,74 +263,74 @@
      </dependency>
 	<dependency>
 	    <artifactId>commons-repository-impl-entities</artifactId>
-	    <groupId>ar.com.zauber.commons.repository.impl</groupId>
+	    <groupId>com.zaubersoftware.commons.repository.impl</groupId>
 	    <version>${commons.version}</version>
 	</dependency>
 	<dependency>
 	    <artifactId>commons-web-transformation</artifactId>
-	    <groupId>ar.com.zauber.commons.web</groupId>
+	    <groupId>com.zaubersoftware.commons.web</groupId>
 	    <version>${commons.version}</version>
 	</dependency>
        <dependency>
 	    <artifactId>commons-web-version</artifactId>
-	    <groupId>ar.com.zauber.commons.web</groupId>
+	    <groupId>com.zaubersoftware.commons.web</groupId>
 	    <version>${commons.version}</version>
 	</dependency>
        <dependency>
 	    <artifactId>commons-conversion-spring</artifactId>
-	    <groupId>ar.com.zauber.commons</groupId>
+	    <groupId>com.zaubersoftware.commons</groupId>
 	    <version>${commons.version}</version>
 	</dependency>
 
        <dependency>
 	    <artifactId>commons-web-utils</artifactId>
-	    <groupId>ar.com.zauber.commons.web</groupId>
+	    <groupId>com.zaubersoftware.commons.web</groupId>
 	    <version>${commons.version}</version>
 	</dependency>
 
 	<dependency>
 	    <artifactId>commons-message-api</artifactId>
-	    <groupId>ar.com.zauber.commons.message</groupId>
+	    <groupId>com.zaubersoftware.commons.message</groupId>
 	    <version>${commons.version}</version>
 	</dependency>
 	<dependency>
 	    <artifactId>commons-image-api</artifactId>
-	    <groupId>ar.com.zauber.commons.image</groupId>
+	    <groupId>com.zaubersoftware.commons.image</groupId>
 	    <version>${commons.version}</version>
 	</dependency>
 	<dependency>
 	    <artifactId>commons</artifactId>
-	    <groupId>ar.com.zauber.commons</groupId>
+	    <groupId>com.zaubersoftware.commons</groupId>
 	    <version>${commons.version}</version>
 	</dependency>
 	<dependency>
 	    <artifactId>commons-image-impl</artifactId>
-	    <groupId>ar.com.zauber.commons.image</groupId>
+	    <groupId>com.zaubersoftware.commons.image</groupId>
 	    <version>${commons.version}</version>
 	</dependency>
 	<dependency>
 	    <artifactId>commons-auth-api</artifactId>
-	    <groupId>ar.com.zauber.commons.auth</groupId>
+	    <groupId>com.zaubersoftware.commons.auth</groupId>
 	    <version>${commons.version}</version>
 	</dependency>
 	<dependency>
 	    <artifactId>commons-auth-impl</artifactId>
-	    <groupId>ar.com.zauber.commons.auth</groupId>
+	    <groupId>com.zaubersoftware.commons.auth</groupId>
 	    <version>${commons.version}</version>
 	</dependency>
         <dependency>
           <artifactId>commons-web-proxy</artifactId>
-          <groupId>ar.com.zauber.commons.web</groupId>
+          <groupId>com.zaubersoftware.commons.web</groupId>
           <version>${commons.version}</version>
         </dependency>
         <dependency>
           <artifactId>commons-dao</artifactId>
-          <groupId>ar.com.zauber.commons</groupId>
+          <groupId>com.zaubersoftware.commons</groupId>
           <version>${commons.version}</version>
         </dependency>
         <dependency>
           <artifactId>commons-base</artifactId>
-          <groupId>ar.com.zauber.commons</groupId>
+          <groupId>com.zaubersoftware.commons</groupId>
           <version>${commons.version}</version>
         </dependency>
         <dependency>

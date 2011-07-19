@@ -27,7 +27,7 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>ar.com.zauber.commons</groupId>
+            <groupId>com.zaubersoftware.commons</groupId>
             <artifactId>commons-base</artifactId>
         </dependency>
     </dependencies>
