@@ -8,10 +8,14 @@
 
 package com.zaubersoftware.leviathan.api.engine.impl.dto;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -40,7 +44,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "description",
-    "body"
+    "body",
+    "categories"
 })
 @XmlRootElement(name = "link")
 public class Link {
@@ -51,6 +56,10 @@ public class Link {
     protected String body;
     @XmlAttribute(required = true)
     protected String title;
+    @XmlElementWrapper(name="categories")
+    @XmlElement(name="category")
+    protected Collection<String> categories;
+    
 
     /**
      * Gets the value of the description property.
@@ -123,11 +132,22 @@ public class Link {
     public void setTitle(String value) {
         this.title = value;
     }
+    
+    /**
+     * Returns the categories.
+     * 
+     * @return <code>Collection<String></code> with the categories.
+     */
+    public Collection<String> getCategories() {
+        return categories;
+    }
+    
 
     /** @see java.lang.Object#toString() */
     @Override
     public String toString() {
-        return "Link [description=" + description + ", body=" + body + ", title=" + title + "]";
+        return "Link [description=" + description + ", body=" + body + ", title=" + title + ", categories="
+                + categories + "]";
     }
 
 }

@@ -15,6 +15,12 @@
             <body>
                 <xsl:apply-templates select="/html/body"/>
             </body>
+            <categories>
+                <category>Autos</category>
+                <category>Ropa</category>
+                <category>Motos</category>
+                <category>Musica</category>
+            </categories>
         </link>
     </xsl:template>
       
