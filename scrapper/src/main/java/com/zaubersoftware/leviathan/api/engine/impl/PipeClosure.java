@@ -7,6 +7,8 @@ import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zaubersoftware.leviathan.api.engine.impl.pipe.Pipe;
+
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 

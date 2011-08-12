@@ -1,13 +1,15 @@
 /*
  * Copyright (c) 2011 Zauber S.A.  -- All rights reserved
  */
-package ar.com.zauber.leviathan.api;
+package com.zaubersoftware.leviathan.api.engine;
 
 import java.net.URI;
 import java.util.Map;
 
+import ar.com.zauber.leviathan.api.URIAndContextDictionary;
+
 /**
- * TODO: Description of the class, Comments in english by default  
+ * TODO: Description of the class, Comments in english by default
  * 
  * 
  * @author Guido Marucci Blas
@@ -28,13 +30,18 @@ public class CurrentThreadURIAndContextDictionary implements URIAndContextDictio
     }
 
     @Override
-    public final Object get(String key) {
+    public final Object get(final String key) {
         // TODO: Auto-generated method stub
         return null;
     }
 
+    public final boolean contains(final String key) {
+        // TODO
+        return false;
+    }
+
     @Override
-    public final void put(String key, Object value) {
+    public final void put(final String key, final Object value) {
         // TODO: Auto-generated method stub
 
     }

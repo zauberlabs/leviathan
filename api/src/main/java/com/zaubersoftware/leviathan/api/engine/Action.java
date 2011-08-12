@@ -1,7 +1,8 @@
 /*
  * Copyright (c) 2011 Zauber S.A.  -- All rights reserved
  */
-package ar.com.zauber.leviathan.api;
+package com.zaubersoftware.leviathan.api.engine;
+
 
 
 /**

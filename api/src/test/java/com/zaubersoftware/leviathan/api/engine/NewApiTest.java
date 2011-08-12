@@ -9,8 +9,6 @@ import org.junit.Test;
 
 import ar.com.zauber.commons.dao.Predicate;
 import ar.com.zauber.commons.dao.exception.DuplicatedEntityException;
-import ar.com.zauber.leviathan.api.Action;
-import ar.com.zauber.leviathan.api.ContextAwareClosure;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 
 

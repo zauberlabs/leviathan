@@ -5,8 +5,6 @@ package com.zaubersoftware.leviathan.api.engine;
 
 import java.net.URI;
 
-import ar.com.zauber.leviathan.api.Action;
-import ar.com.zauber.leviathan.api.ContextAwareClosure;
 
 /**
  * Defines all the actions that can be configured for the fetched resource in order to process it.

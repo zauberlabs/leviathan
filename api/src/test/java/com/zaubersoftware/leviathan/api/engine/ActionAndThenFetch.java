@@ -3,7 +3,6 @@
  */
 package com.zaubersoftware.leviathan.api.engine;
 
-import ar.com.zauber.leviathan.api.Action;
 
 /**
  * TODO: Description of the class, Comments in english by default  

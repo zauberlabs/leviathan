@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011 Zauber S.A.  -- All rights reserved
  */
-package com.zaubersoftware.leviathan.api.engine.impl;
+package com.zaubersoftware.leviathan.api.engine.impl.pipe;
 
 /**
  * TODO: Description of the class, Comments in english by default  
