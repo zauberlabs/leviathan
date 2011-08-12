@@ -53,6 +53,24 @@ public class NewApiTest {
                     }
                 });
         
+        engine.afterFetch().sanitizeHTML().transformXML("raiz.xsl")
+            .transformXML("otramas.xml")
+            .toJavaObject(Categories.class)
+            .then(new Action<Categories, List<Category>>() {
+                @Override
+                public List<Category> execute(final Categories t) {
+                    get("ContextVariable");
+                    put("ContextObject", "VALUE");
+                    return t.getCategories();
+                }
+           
+           }).then(new ContextAwareClosure<List<Category>>() {
+               @Override
+               public void execute(final List<Category> categories) {
+                   get("ContextVariable");
+               }
+           });
+            
         
         engine.forUri("http://www.dmoz.org/")
             .sanitizeHTML()

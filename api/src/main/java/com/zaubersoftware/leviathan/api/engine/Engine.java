@@ -27,6 +27,14 @@ public interface Engine extends ErrorTolerant<Engine> {
     AfterFetchingHandler forUri(String uriTemplate);
     
     /**
+     * Builder method which is the entry point to configure the engine behavior.
+     * 
+     * @return An {@link AfterFetchingHandler} that let's the users configure what to do after
+     * the resource pointed by the URI template has been fetched.
+     */
+    AfterFetchingHandler afterFetch();
+    
+    /**
      * Builder method which is the entry point to configure the engine behavior for the given
      * <code>URI</code>
      * 
