@@ -13,40 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zaubersoftware.leviathan.api.engine.impl.pipe;
+package com.zaubersoftware.leviathan.api.engine.impl;
 
 import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ar.com.zauber.commons.dao.Closure;
+import ar.com.zauber.leviathan.api.URIFetcherResponse;
+
+import com.zaubersoftware.leviathan.api.engine.impl.pipe.Pipe;
+
 /**
- * TODO: Description of the class, Comments in english by default
- * 
- * 
+ * A {@link Closure} that feeds {@link URIFetcherResponse}s to {@link Pipe}
+ *
+ * @param <O> The {@link Pipe}'s output type
  * @author Guido Marucci Blas
  * @since Aug 12, 2011
  */
-public final class LoggerPipe<I, O> implements Pipe<I, O> {
-
+public final class FetcherResponsePipeAdapterClosure<O> implements Closure<URIFetcherResponse> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    @SuppressWarnings("rawtypes")
-    private final Pipe<I, O> pipe;
+    private final Pipe<URIFetcherResponse, O> pipe;
 
     /**
-     * Creates the DeadEndPipe.
+     * Creates the PipeClosure.
      *
      * @param pipe
      */
-    public <T> LoggerPipe(final Pipe<I, O> pipe) {
-        Validate.notNull(pipe, "The pipe cannot be null");
+    public FetcherResponsePipeAdapterClosure(final Pipe<URIFetcherResponse, O> pipe) {
+        Validate.notNull(pipe);
         this.pipe = pipe;
     }
 
+
     @Override
-    public O execute(final I input) {
-        final O result = this.pipe.execute(input);
-        logger.debug("Pipe's flow -> {}", (result == null) ? null : result.toString());
-        return result;
+    public void execute(final URIFetcherResponse response) {
+        Validate.notNull(response);
+
+        final O out = pipe.execute(response);
+        if(out != null) {
+            logger.warn("The last pipe returned a value != null. Null was expected: {}", out);
+        }
     }
 
 }

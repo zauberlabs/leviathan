@@ -13,19 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zaubersoftware.leviathan.api.engine;
+package com.zaubersoftware.leviathan.api.engine.impl;
+
+import org.apache.commons.lang.Validate;
+
+import ar.com.zauber.commons.dao.Closure;
+
+import com.zaubersoftware.leviathan.api.engine.impl.pipe.Pipe;
 
 /**
  * TODO: Description of the class, Comments in english by default
- * 
- * 
+ *
+ *
  * @author Guido Marucci Blas
  * @since Aug 12, 2011
  */
-public interface ContextKeys {
+public final class PipeAdapterClosure<I, O> implements Closure<I> {
 
-    String INPUT_CLASS_KEY = ContextKeys.class.getPackage().getName() + ".input_class_key";
+    private final Pipe<I,O> pipe;
 
-    String INPUT_OBJECT_KEY = ContextKeys.class.getPackage().getName() + ".input_object_key";
+    /**
+     * Creates the PipeAdapterClosure.
+     *
+     * @param pipe
+     */
+    public PipeAdapterClosure(final Pipe<I, O> pipe) {
+        Validate.notNull(pipe, "The adaptee pipe cannot be null");
+        this.pipe = pipe;
+    }
+
+    @Override
+    public void execute(final I input) {
+        pipe.execute(input);
+    }
 
 }
