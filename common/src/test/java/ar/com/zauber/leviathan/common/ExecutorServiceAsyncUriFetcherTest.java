@@ -38,6 +38,7 @@ import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.UriFetcherRequest;
 import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.async.FetchQueueAsyncUriFetcher;
@@ -83,7 +84,7 @@ public class ExecutorServiceAsyncUriFetcherTest {
         final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(
             Executors.newScheduledThreadPool(2), 
             new AbstractURIFetcher() {
-                public URIFetcherResponse get(final URIAndCtx uri) {
+                public URIFetcherResponse get(final UriFetcherRequest uri) {
                     try {
                         available.await();
                         Thread.sleep(random.nextInt(500));
@@ -101,7 +102,7 @@ public class ExecutorServiceAsyncUriFetcherTest {
                     return get(uri);
                 }
                 
-                public URIFetcherResponse post(final URIAndCtx uri,
+                public URIFetcherResponse post(final UriFetcherRequest uri,
                         final InputStream body) {
                     throw new NotImplementedException();
                 }
@@ -111,7 +112,7 @@ public class ExecutorServiceAsyncUriFetcherTest {
                     throw new NotImplementedException();
                 }
 
-                public URIFetcherResponse post(final URIAndCtx uriAndCtx,
+                public URIFetcherResponse post(final UriFetcherRequest uriAndCtx,
                         final UrlEncodedPostBody body) {
                     throw new NotImplementedException();
                 }

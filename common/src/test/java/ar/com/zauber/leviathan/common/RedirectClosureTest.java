@@ -15,7 +15,8 @@
  */
 package ar.com.zauber.leviathan.common;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -35,8 +36,9 @@ import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.commons.dao.closure.MutableClosure;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
-import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
+import ar.com.zauber.leviathan.api.UriFetcherRequest;
 import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
+import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 
 /**
@@ -84,9 +86,9 @@ public class RedirectClosureTest {
         final URIFetcher fetcher = new AbstractRedirectMockFetcher() {
             @SuppressWarnings("unchecked")
             @Override
-            public URIFetcherResponse get(final URIAndCtx uriAndCtx) {
+            public URIFetcherResponse get(final UriFetcherRequest request) {
                 return new InmutableURIFetcherResponse(
-                        uriAndCtx,
+                        request.getUriAndCtx(),
                         new InmutableURIFetcherHttpResponse("", 301, 
                                 Collections.EMPTY_MAP));
             }
@@ -123,9 +125,9 @@ public class RedirectClosureTest {
         final URIFetcher fetcher = new AbstractRedirectMockFetcher() {
             @SuppressWarnings("unchecked")
             @Override
-            public URIFetcherResponse get(final URIAndCtx uriAndCtx) {
+            public URIFetcherResponse get(final UriFetcherRequest request) {
                 return new InmutableURIFetcherResponse(
-                        uriAndCtx,
+                        request.getUriAndCtx(),
                         new InmutableURIFetcherHttpResponse("", 200, 
                                 Collections.EMPTY_MAP));
             }
@@ -168,7 +170,8 @@ public class RedirectClosureTest {
     public final void testRedirect() {
         final URIFetcher fetcher = new AbstractRedirectMockFetcher() {
             @Override
-            public URIFetcherResponse get(final URIAndCtx uriAndCtx) {
+            public URIFetcherResponse get(final UriFetcherRequest request) {
+                URIAndCtx uriAndCtx = request.getUriAndCtx();
                 final Map<String, List<String>> headers = 
                     new HashMap<String, List<String>>();
                 headers.put("locAtiOn", Arrays.asList("http://www.foo2.com"));
@@ -215,14 +218,14 @@ public class RedirectClosureTest {
         final AtomicInteger i = new AtomicInteger();
         final URIFetcher fetcher = new AbstractRedirectMockFetcher() {
             @Override
-            public URIFetcherResponse get(final URIAndCtx uriAndCtx) {
+            public URIFetcherResponse get(final UriFetcherRequest request) {
                 System.out.println("Redirect number: " 
                         + i.incrementAndGet());
                 final Map<String, List<String>> headers = 
                     new HashMap<String, List<String>>();
                 headers.put("locAtiOn", Arrays.asList("http://www.foo2.com"));
                 return new InmutableURIFetcherResponse(
-                        uriAndCtx,
+                        request.getUriAndCtx(),
                         new InmutableURIFetcherHttpResponse("", 301, 
                                 headers));
             }
@@ -267,7 +270,7 @@ abstract class AbstractRedirectMockFetcher extends AbstractURIFetcher {
     }
 
     @Override
-    public URIFetcherResponse post(final URIAndCtx uri, final InputStream body) {
+    public URIFetcherResponse post(final UriFetcherRequest uri, final InputStream body) {
         throw new NotImplementedException("Post to classpath not implemented");
     }
 
@@ -280,7 +283,7 @@ abstract class AbstractRedirectMockFetcher extends AbstractURIFetcher {
 
     @Override
     public final URIFetcherResponse post(
-            final URIAndCtx uriAndCtx, 
+            final UriFetcherRequest uriAndCtx, 
             final UrlEncodedPostBody body) {
         throw new NotImplementedException("Post to classpath not implemented");
     }

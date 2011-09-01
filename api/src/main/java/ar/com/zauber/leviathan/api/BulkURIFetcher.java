@@ -28,8 +28,8 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 public interface BulkURIFetcher extends URIFetcher {
 
     /**
-     * Bulk retriever. Depende de la implementación, pero se espera que llamar a
-     * este metodo sea mucho más eficiente que llamar a fetch con una sola uri.
+     * Bulk retriever. Depende de la implementaciï¿½n, pero se espera que llamar a
+     * este metodo sea mucho mï¿½s eficiente que llamar a fetch con una sola uri.
      * 
      * @param uris
      *            URIs to retrieve
@@ -41,8 +41,8 @@ public interface BulkURIFetcher extends URIFetcher {
     BulkURIFetcherResponse fetch(Iterable<URI> uris);
 
     /**
-     * Bulk retriever. Depende de la implementación, pero se espera que llamar a
-     * este metodo sea mucho más eficiente que llamar a fetch con una sola uri.
+     * Bulk retriever. Depende de la implementaciï¿½n, pero se espera que llamar a
+     * este metodo sea mucho mï¿½s eficiente que llamar a fetch con una sola uri.
      * 
      * @param uriAndCtxs
      *            URIs to retrieve
@@ -54,8 +54,8 @@ public interface BulkURIFetcher extends URIFetcher {
     BulkURIFetcherResponse fetchCtx(Iterable<URIAndCtx> uriAndCtxs);    
 
     /**
-     * Bulk retriever. Depende de la implementación, pero se espera que
-     * llamar a este metodo sea mucho más eficiente que llamar a fetch
+     * Bulk retriever. Depende de la implementaciï¿½n, pero se espera que
+     * llamar a este metodo sea mucho mï¿½s eficiente que llamar a fetch
      * con una sola uri.
      *
      * @param uris URIs to retrieve
@@ -65,14 +65,17 @@ public interface BulkURIFetcher extends URIFetcher {
 
 
     /**
-     * Bulk retriever. Depende de la implementación, pero se espera que
-     * llamar a este metodo sea mucho más eficiente que llamar a fetch
+     * Bulk retriever. Depende de la implementaciï¿½n, pero se espera que
+     * llamar a este metodo sea mucho mï¿½s eficiente que llamar a fetch
      * con una sola uri.
      *
      * @param uriAndCtxs URIs to retrieve
      * @return the details of each fetch
      */
     BulkURIFetcherResponse getCtx(Iterable<URIAndCtx> uriAndCtxs);
+    
+    
+    BulkURIFetcherResponse getRequests(Iterable<UriFetcherRequest> requests);
 
 
 

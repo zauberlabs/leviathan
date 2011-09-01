@@ -30,6 +30,7 @@ import org.apache.commons.lang.Validate;
 
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.UriFetcherRequest;
 import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.AbstractURIFetcher;
@@ -80,7 +81,8 @@ public abstract class AbstractMockUriFetcher extends AbstractURIFetcher {
 
     /** @see URIFetcher#get(URIFetcherResponse.URIAndCtx) */
     @SuppressWarnings("unchecked")
-    public final URIFetcherResponse get(final URIAndCtx uriAndCtx) {
+    public final URIFetcherResponse get(final UriFetcherRequest request) {
+        final URIAndCtx uriAndCtx = request.getUriAndCtx();
         final URI uri = uriAndCtx.getURI();
         final String destURL = getDestinationURL(uri);
         final URIFetcherResponse ret;
@@ -117,7 +119,7 @@ public abstract class AbstractMockUriFetcher extends AbstractURIFetcher {
     protected abstract String getDestinationURL(URI uri);
 
     /** @see URIFetcher#post(URIFetcherResponse.URIAndCtx, InputStream) */
-    public final URIFetcherResponse post(final URIAndCtx uri,
+    public final URIFetcherResponse post(final UriFetcherRequest uri,
             final InputStream body) {
         throw new NotImplementedException("Post to classpath not implemented");
     }
@@ -129,7 +131,7 @@ public abstract class AbstractMockUriFetcher extends AbstractURIFetcher {
     }
 
     /** @see URIFetcher#post(URIAndCtx, UrlEncodedPostBody) */
-    public final URIFetcherResponse post(final URIAndCtx uriAndCtx, 
+    public final URIFetcherResponse post(final UriFetcherRequest uriAndCtx, 
             final UrlEncodedPostBody body) {
         throw new NotImplementedException("Post to classpath not implemented");
 

@@ -51,7 +51,9 @@ public interface URIFetcher {
     URIFetcherResponse get(URI uri);
 
     /** get from uri */
-    URIFetcherResponse get(URIAndCtx uri);    
+    URIFetcherResponse get(URIAndCtx uri);
+    
+    URIFetcherResponse get(UriFetcherRequest request);
     
     /** post to uri */
     URIFetcherResponse post(URIAndCtx uri, InputStream body);
@@ -66,4 +68,8 @@ public interface URIFetcher {
     /** post to uri, body (with collections also as parameters)
      * as "application/x-www-form-urlencoded "*/
     URIFetcherResponse post(URIAndCtx uriAndCtx, UrlEncodedPostBody body);
+    
+    URIFetcherResponse post(UriFetcherRequest request, UrlEncodedPostBody body);
+    
+    URIFetcherResponse post(UriFetcherRequest request, InputStream body);
 }

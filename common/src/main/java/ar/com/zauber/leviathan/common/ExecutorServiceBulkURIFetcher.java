@@ -34,26 +34,31 @@ import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
 
+import ar.com.zauber.commons.dao.Transformer;
 import ar.com.zauber.leviathan.api.BulkURIFetcher;
 import ar.com.zauber.leviathan.api.BulkURIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.UriFetcherRequest;
 import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 /**
  * {@link BulkURIFetcher} that uses {@link ExecutorService} to handle work
- *
+ * 
  * @author Juan F. Codagnone
  * @since Oct 12, 2009
  */
-public class ExecutorServiceBulkURIFetcher implements BulkURIFetcher {
+public class ExecutorServiceBulkURIFetcher extends AbstractURIFetcher implements
+        BulkURIFetcher {
     private final ExecutorService executorService;
     private final URIFetcher uriFetcher;
 
     /**
-     * @param executorService  {@link ExecutorService} used to balance work
-     * @param uriFetcher {@link URIFetcher} used to retrieve content
+     * @param executorService
+     *            {@link ExecutorService} used to balance work
+     * @param uriFetcher
+     *            {@link URIFetcher} used to retrieve content
      */
     public ExecutorServiceBulkURIFetcher(final ExecutorService executorService,
             final URIFetcher uriFetcher) {
@@ -66,16 +71,26 @@ public class ExecutorServiceBulkURIFetcher implements BulkURIFetcher {
 
     /** @see BulkURIFetcher#fetchCtx(Collection) */
     public final BulkURIFetcherResponse get(final Iterable<URI> urisIn) {
-        return getCtx(new Iterable<URIAndCtx>() {
-            public Iterator<URIAndCtx> iterator() {
-                final Iterator<URI> iter = urisIn.iterator();
-                return new Iterator<URIAndCtx>() {
+        return getCtx(map(urisIn, new Transformer<URI, URIAndCtx>() {
+            public URIAndCtx transform(final URI input) {
+                return new InmutableURIAndCtx(input);
+            }
+        }));
+    }
+
+    /**Lazy map*/
+    private <I, O> Iterable<O> map(final Iterable<I> urisIn,
+            final Transformer<I, O> t) {
+        return new Iterable<O>() {
+            public Iterator<O> iterator() {
+                final Iterator<I> iter = urisIn.iterator();
+                return new Iterator<O>() {
                     public boolean hasNext() {
                         return iter.hasNext();
                     }
 
-                    public URIAndCtx next() {
-                        return new InmutableURIAndCtx(iter.next());
+                    public O next() {
+                        return t.transform(iter.next());
                     }
 
                     public void remove() {
@@ -83,22 +98,69 @@ public class ExecutorServiceBulkURIFetcher implements BulkURIFetcher {
                     }
                 };
             }
-        });
+        };
     }
 
     /** @see BulkURIFetcher#fetch(Collection) */
     public final BulkURIFetcherResponse getCtx(
             final Iterable<URIAndCtx> uriAndCtxs) {
-        final Collection<URIAndCtx> uris = new ArrayList<URIAndCtx>();
-        for(final URIAndCtx u : uriAndCtxs) {
+        return getRequests(map(uriAndCtxs,
+                new Transformer<URIAndCtx, UriFetcherRequest>() {
+                    public UriFetcherRequest transform(final URIAndCtx input) {
+                        return DefaultUriFetcherRequest.from(input);
+                    }
+                }));
+    }
+
+    /**
+     * @see BulkURIFetcher#fetch(java.net.URI)
+     * @deprecated Use {@link #get(URI)} instead.
+     */
+    @Deprecated
+    public final URIFetcherResponse fetch(final URI uri) {
+        return get(Arrays.asList(uri)).getDetails().get(uri);
+    }
+
+    /**
+     * @see URIFetcher#fetch(URIFetcherResponse.URIAndCtx)
+     * @deprecated Use {@link #get(URIAndCtx)}
+     */
+    @Deprecated
+    public final URIFetcherResponse fetch(final URIAndCtx uri) {
+        return getCtx(Arrays.asList(uri)).getDetails().get(uri);
+    }
+
+    /**
+     * @see BulkURIFetcher#fetch(java.lang.Iterable)
+     * @deprecated Use {@link #fetch(Iterable)}
+     */
+    @Deprecated
+    public final BulkURIFetcherResponse fetch(final Iterable<URI> uris) {
+        return get(uris);
+    }
+
+    /**
+     * @see BulkURIFetcher#fetchCtx(java.lang.Iterable)
+     * @deprecated Use {@link #getCtx(Iterable)}
+     */
+    @Deprecated
+    public final BulkURIFetcherResponse fetchCtx(
+            final Iterable<URIAndCtx> uriAndCtxs) {
+        return getCtx(uriAndCtxs);
+    }
+
+    @Override
+    public final BulkURIFetcherResponse getRequests(
+            final Iterable<UriFetcherRequest> requests) {
+        final Collection<UriFetcherRequest> uris = new ArrayList<UriFetcherRequest>();
+        for (final UriFetcherRequest u : requests) {
             uris.add(u);
         }
 
-        final CompletionService<URIFetcherResponse> completion =
-            new ExecutorCompletionService<URIFetcherResponse>(executorService);
+        final CompletionService<URIFetcherResponse> completion = new ExecutorCompletionService<URIFetcherResponse>(
+                executorService);
 
-
-        for(final URIAndCtx contexteableURI : uris) {
+        for (final UriFetcherRequest contexteableURI : uris) {
             completion.submit(new Callable<URIFetcherResponse>() {
                 public URIFetcherResponse call() throws Exception {
                     return uriFetcher.get(contexteableURI);
@@ -121,55 +183,13 @@ public class ExecutorServiceBulkURIFetcher implements BulkURIFetcher {
         return new InmutableBulkURIFetcherResponse(responses);
     }
 
-    /**
-     * @see BulkURIFetcher#fetch(java.net.URI)
-     * @deprecated Use {@link #get(URI)} instead.
-     */
-    @Deprecated
-    public final URIFetcherResponse fetch(final URI uri) {
-        return get(Arrays.asList(uri)).getDetails().get(uri);
-    }
-
-    /**
-     * @see URIFetcher#fetch(URIFetcherResponse.URIAndCtx)
-     * @deprecated Use {@link #get(URIAndCtx)}
-     */
-    @Deprecated
-    public final URIFetcherResponse fetch(final URIAndCtx uri) {
-        return getCtx(Arrays.asList(uri)).getDetails().get(uri);
-    }
-    
-    /**
-     * @see BulkURIFetcher#fetch(java.lang.Iterable)
-     * @deprecated Use {@link #fetch(Iterable)}
-     */
-    @Deprecated
-    public final BulkURIFetcherResponse fetch(final Iterable<URI> uris) {
-        return get(uris);
-    }
-    
-    /**
-     * @see BulkURIFetcher#fetchCtx(java.lang.Iterable)
-     * @deprecated Use {@link #getCtx(Iterable)}
-     */
-    @Deprecated
-    public final BulkURIFetcherResponse fetchCtx(
-            final Iterable<URIAndCtx> uriAndCtxs) {
-        return getCtx(uriAndCtxs);
-    }
-
-    /** @see URIFetcher#get(java.net.URI) */
-    public final URIFetcherResponse get(final URI uri) {
-        return get(Arrays.asList(uri)).getDetails().get(uri);
-    }
-
-    /** @see URIFetcher#get(URIFetcherResponse.URIAndCtx) */
-    public final URIFetcherResponse get(final URIAndCtx uri) {
-        return getCtx(Arrays.asList(uri)).getDetails().get(uri);
+    @Override
+    public final URIFetcherResponse get(final UriFetcherRequest request) {
+        return getRequests(Arrays.asList(request)).getDetails().get(request);
     }
 
     /** @see URIFetcher#post(URIFetcherResponse.URIAndCtx, java.io.InputStream) */
-    public final URIFetcherResponse post(final URIAndCtx uri,
+    public final URIFetcherResponse post(final UriFetcherRequest uri,
             final InputStream body) {
         // TODO
         throw new NotImplementedException("Bulk POST not implemented.");
@@ -183,8 +203,8 @@ public class ExecutorServiceBulkURIFetcher implements BulkURIFetcher {
     }
 
     /** @see URIFetcher#post(URIAndCtx, UrlEncodedPostBody) */
-    public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
-           final UrlEncodedPostBody body) {
+    public final URIFetcherResponse post(final UriFetcherRequest uriAndCtx,
+            final UrlEncodedPostBody body) {
         // TODO
         throw new NotImplementedException("Bulk POST not implemented.");
     }

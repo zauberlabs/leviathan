@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.UnhandledException;
@@ -43,10 +44,12 @@ import org.apache.http.util.EntityUtils;
 
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
-import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
+import ar.com.zauber.leviathan.api.UriFetcherRequest;
 import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
+import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.AbstractURIFetcher;
 import ar.com.zauber.leviathan.common.CharsetStrategy;
+import ar.com.zauber.leviathan.common.DefaultUriFetcherRequest;
 import ar.com.zauber.leviathan.common.InmutableURIFetcherHttpResponse;
 import ar.com.zauber.leviathan.common.InmutableURIFetcherResponse;
 import ar.com.zauber.leviathan.common.ResponseMetadata;
@@ -95,18 +98,19 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
         return get(uri);
     }
 
-    /** @see URIFetcher#fetch(URIFetcherResponse.URIAndCtx) */
-    public final URIFetcherResponse get(final URIAndCtx uriAndCtx) {
-        return fetchInternal(uriAndCtx, new HttpGet(uriAndCtx.getURI()));
+    
+    @Override
+    public URIFetcherResponse get(UriFetcherRequest request) {
+        return fetchInternal(request, new HttpGet(request.getUriAndCtx().getURI()));
     }
     
-    /** @see URIFetcher#post(URIFetcherResponse.URIAndCtx, InputStream) */
-    public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
-            final InputStream body) {
+    @Override
+    public URIFetcherResponse post(UriFetcherRequest request, InputStream body) {
+        URIAndCtx uriAndCtx = request.getUriAndCtx();  
         try {
             final HttpPost httpPost = new HttpPost(uriAndCtx.getURI());
             httpPost.setEntity(new ByteArrayEntity(IOUtils.toByteArray(body)));
-            return fetchInternal(uriAndCtx, httpPost);
+            return fetchInternal(request, httpPost);
         } catch (final Throwable e) {
             return new InmutableURIFetcherResponse(uriAndCtx, 
                     new UnhandledException("reading post entity", e));
@@ -127,17 +131,17 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
             final ByteArrayEntity entity = new ByteArrayEntity(content.getBytes());
             entity.setContentType("application/x-www-form-urlencoded");
             httpPost.setEntity(entity);
-            return fetchInternal(uriAndCtx, httpPost);
+            return fetchInternal(DefaultUriFetcherRequest.from(uriAndCtx), httpPost);
         } catch(Throwable t) {
             return new InmutableURIFetcherResponse(uriAndCtx, t);
         }
     }
-
-    /** Post with List parameters also */
-    public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
-            final UrlEncodedPostBody body) {
+    
+    @Override
+    public URIFetcherResponse post(UriFetcherRequest request,
+            UrlEncodedPostBody body) {
         try {
-            final HttpPost httpPost = new HttpPost(uriAndCtx.getURI());
+            final HttpPost httpPost = new HttpPost(request.getUriAndCtx().getURI());
 
             final List<NameValuePair> pairs = new ArrayList<NameValuePair>();
             
@@ -156,9 +160,9 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
             final ByteArrayEntity entity = new ByteArrayEntity(content.getBytes());
             entity.setContentType("application/x-www-form-urlencoded");
             httpPost.setEntity(entity);
-            return fetchInternal(uriAndCtx, httpPost);
+            return fetchInternal(request, httpPost);
         } catch(Throwable t) {
-            return new InmutableURIFetcherResponse(uriAndCtx, t);
+            return new InmutableURIFetcherResponse(request.getUriAndCtx(), t);
         }
     }
 
@@ -167,12 +171,18 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
      * 
      * @param httpMethod 
      */
-    private URIFetcherResponse fetchInternal(final URIAndCtx uriAndCtx,
+    private URIFetcherResponse fetchInternal(final UriFetcherRequest request,
             final HttpUriRequest httpMethod) {
         HttpResponse response = null;
         try {
-            final URI uri = uriAndCtx.getURI();
+            final URI uri = request.getUriAndCtx().getURI();
             Validate.notNull(uri, "uri is null");
+            
+            for (Entry<String, List<String>> e : request.getHeaders().entrySet()) {
+                for(String value : e.getValue()) {
+                    httpMethod.addHeader(e.getKey(), value);
+                }
+            }
             
             response  = httpClient.execute(httpMethod);
             Validate.notNull(response);
@@ -190,20 +200,20 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
                 = charsetStrategy.getCharset(meta, new ByteArrayInputStream(data));
 
             return new InmutableURIFetcherResponse(
-                uriAndCtx,
+                request.getUriAndCtx(),
                 new InmutableURIFetcherHttpResponse(
                     new String(data, charset.displayName()), 
                     meta.getStatusCode(), 
                     extractHeaders(response), data));
             
         } catch (final Throwable e) {
-            return new InmutableURIFetcherResponse(uriAndCtx, e);
+            return new InmutableURIFetcherResponse(request.getUriAndCtx(), e);
         } finally {
             if(response != null) {
                 try {
                     response.getEntity().consumeContent();
                 } catch (final IOException e) {
-                    return new InmutableURIFetcherResponse(uriAndCtx, e);
+                    return new InmutableURIFetcherResponse(request.getUriAndCtx(), e);
                 }
             }
         }

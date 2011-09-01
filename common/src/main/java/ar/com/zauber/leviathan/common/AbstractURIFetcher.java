@@ -15,13 +15,17 @@
  */
 package ar.com.zauber.leviathan.common;
 
+import java.io.InputStream;
 import java.net.URI;
 
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.UriFetcherRequest;
+import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
+import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 /**
- * Clase base para los  {@link URIFetcher}
+ * Clase base para los {@link URIFetcher}
  * 
  * @author Juan F. Codagnone
  * @since Jan 21, 2010
@@ -31,6 +35,23 @@ public abstract class AbstractURIFetcher implements URIFetcher {
     /** @see URIFetcher#get(URI) */
     public final URIFetcherResponse get(final URI uri) {
         return get(new InmutableURIAndCtx(uri));
+    }
+
+    @Override
+    public final URIFetcherResponse get(final URIAndCtx uri) {
+        return get(DefaultUriFetcherRequest.from(uri));
+    }
+
+    @Override
+    public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
+            final UrlEncodedPostBody body) {
+        return post(DefaultUriFetcherRequest.from(uriAndCtx), body);
+    }
+
+    @Override
+    public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
+            final InputStream body) {
+        return post(DefaultUriFetcherRequest.from(uriAndCtx), body);
     }
 
 }

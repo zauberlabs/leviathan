@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.UriFetcherRequest;
 import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.AbstractURIFetcher;
@@ -39,8 +40,8 @@ import ar.com.zauber.leviathan.common.CtxDecorableURIFetcherResponse;
  *
  * Inicialmente se pensaba usar
  * {@link ar.com.zauber.commons.web.rest.impl.EhcacheContentProvider}, pero en
- * ese caso se pierde la info del response, específicamente el statusCode. En
- * caso de no ser necesario se podría considerar ya que la funcionalidad es
+ * ese caso se pierde la info del response, especï¿½ficamente el statusCode. En
+ * caso de no ser necesario se podrï¿½a considerar ya que la funcionalidad es
  * similar.
  *
  * @author Francisco J. Gonzalez Costanzo
@@ -119,7 +120,8 @@ public class EhcacheURIFetcher extends AbstractURIFetcher {
     }
     
     /** @see URIFetcher#get(URI) */
-    public final URIFetcherResponse get(final URIAndCtx uriAndCtx) {
+    public final URIFetcherResponse get(final UriFetcherRequest request) {
+        final URIAndCtx uriAndCtx = request.getUriAndCtx();
         final Element e = cache.get(uriAndCtx.getURI());
         URIFetcherResponse ret;
         if (e == null) {
@@ -157,7 +159,7 @@ public class EhcacheURIFetcher extends AbstractURIFetcher {
      * 
      * @see URIFetcher#post(URIFetcherResponse.URIAndCtx, InputStream)
      */
-    public final URIFetcherResponse post(final URIAndCtx uri,
+    public final URIFetcherResponse post(final UriFetcherRequest uri,
             final InputStream body) {
         return fetcher.post(uri, body);
     }
@@ -192,7 +194,7 @@ public class EhcacheURIFetcher extends AbstractURIFetcher {
 
 
     /** @see URIFetcher#post(URIAndCtx, UrlEncodedPostBody) */
-    public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
+    public final URIFetcherResponse post(final UriFetcherRequest uriAndCtx,
                 final UrlEncodedPostBody body) {
         return fetcher.post(uriAndCtx, body);
     }
