@@ -33,6 +33,7 @@ import com.zaubersoftware.leviathan.api.engine.AfterJavaObjectHandler;
 import com.zaubersoftware.leviathan.api.engine.AfterXMLTransformer;
 import com.zaubersoftware.leviathan.api.engine.ContextAwareClosure;
 import com.zaubersoftware.leviathan.api.engine.Engine;
+import com.zaubersoftware.leviathan.api.engine.ErrorTolerantAfterThen;
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
 import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
 import com.zaubersoftware.leviathan.api.engine.impl.pipe.ClosureAdapterPipe;
@@ -46,18 +47,33 @@ import com.zaubersoftware.leviathan.api.engine.impl.pipe.ClosureAdapterPipe;
 public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
 
     private final DefaultEngine engine;
-    private final URI uri;
+
+    private final class DefaultErrorTolerantAfterThen extends EngineFowarder implements ErrorTolerantAfterThen {
+
+        /**
+         * Creates the DefaultErrorTolerantAfterThen.
+         *
+         * @param target
+         */
+        public DefaultErrorTolerantAfterThen() {
+            super(DefaultAfterFetchingHandler.this.engine);
+        }
+
+        @Override
+        public ProcessingFlow pack() {
+            return DefaultAfterFetchingHandler.this.pack();
+        }
+
+    }
 
     /**
      * Creates the DefaultAfterFetchingHandler.
      *
      * @param engine
      */
-    public DefaultAfterFetchingHandler(final DefaultEngine engine, final URI uri) {
+    public DefaultAfterFetchingHandler(final DefaultEngine engine) {
         Validate.notNull(engine, "The engine cannot be null");
-        Validate.notNull(uri, "The URI cannot be null");
         this.engine = engine;
-        this.uri = uri;
     }
 
     @Override
@@ -85,7 +101,7 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
     }
 
     @Override
-    public ActionHandler<URIFetcherResponse> onError(final ExceptionHandler<Throwable> handler) {
+    public ActionHandler<URIFetcherResponse> onAnyExceptionDo(final ExceptionHandler<Throwable> handler) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -110,9 +126,9 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
     }
 
     @Override
-    public Engine then(final ContextAwareClosure<URIFetcherResponse> closure) {
-        this.engine.appendPipe(this.uri, new ClosureAdapterPipe<URIFetcherResponse>(closure));
-        return this.engine;
+    public ErrorTolerantAfterThen then(final ContextAwareClosure<URIFetcherResponse> closure) {
+        this.engine.appendPipe(new ClosureAdapterPipe<URIFetcherResponse>(closure));
+        return new DefaultErrorTolerantAfterThen();
     }
 
     @Override
@@ -140,7 +156,7 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
 
     @Override
     public ProcessingFlow pack() {
-        return this.engine.packFlowForURI(this.uri);
+        return this.engine.packCurrentFlow();
     }
 
 }

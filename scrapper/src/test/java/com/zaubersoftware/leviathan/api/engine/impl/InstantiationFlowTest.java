@@ -33,10 +33,13 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.common.ExecutorServiceAsyncUriFetcher;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
+import com.zaubersoftware.leviathan.api.engine.ActionHandler;
 import com.zaubersoftware.leviathan.api.engine.ContextAwareClosure;
 import com.zaubersoftware.leviathan.api.engine.Engine;
+import com.zaubersoftware.leviathan.api.engine.ErrorTolerantActionHandler;
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
 import com.zaubersoftware.leviathan.api.engine.LeviathanBuilder;
+import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
 
 
 /**
@@ -78,7 +81,9 @@ public class InstantiationFlowTest {
                 assertTrue(response.isSucceeded());
                 fetchPerformed.set(true);
             }
-        }).doGet(this.mlhome).awaitIdleness();
+        }).pack();
+
+        this.engine.doGet(this.mlhome).awaitIdleness();
         assertTrue("Did not fetch!", fetchPerformed.get());
 
     }
@@ -92,13 +97,14 @@ public class InstantiationFlowTest {
             public void execute(final URIFetcherResponse response) {
                 throw exception;
             }
-        }).onError(new ExceptionHandler<Throwable>() {
+        }).onAnyExceptionDo(new ExceptionHandler<Throwable>() {
             @Override
             public void handle(final Throwable trowable) {
                 exceptionHandled.set(true);
                 assertEquals(exception, trowable);
             }
-        }).doGet(this.mlhome).awaitIdleness();
+        }).pack();
+        this.engine.doGet(this.mlhome).awaitIdleness();
         assertTrue("Did not hadle the exception", exceptionHandled.get());
     }
 
@@ -111,22 +117,43 @@ public class InstantiationFlowTest {
             public void execute(final URIFetcherResponse response) {
                 throw exception;
             }
-        }).onError(MockException.class, new ExceptionHandler<MockException>() {
+        }).on(MockException.class).handleWith(new ExceptionHandler<MockException>() {
             @Override
             public void handle(final MockException trowable) {
                 exceptionHandled.set(true);
                 assertEquals(exception, trowable);
             }
-        }).onError(new ExceptionHandler<Throwable>() {
+        }).otherwiseHandleWith(new ExceptionHandler<Throwable>() {
             @Override
             public void handle(final Throwable trowable) {
                 fail("It should never reach here, the exception should be handled by the configured handler. Look above!!!");
             }
-        }).doGet(this.mlhome).awaitIdleness();
+        }).pack();
+        this.engine.doGet(this.mlhome).awaitIdleness();
         assertTrue("Did not hadle the exception", exceptionHandled.get());
     }
 
+    @Test
+    public void testname() throws Exception {
+        final AtomicBoolean fetchPerformed = new AtomicBoolean(false);
+        final ProcessingFlow flow = this.engine
+            .afterFetch()
+            .then(new ContextAwareClosure<URIFetcherResponse>() {
+                @Override
+                public void execute(final URIFetcherResponse response) {
+                    assertTrue(response.isSucceeded());
+                    fetchPerformed.set(true);
+                }
+            })
+            .pack();
 
+        this.engine.bindURI(this.mlhome).toFlow(flow);
+        assertTrue("Did not fetch!", fetchPerformed.get());
+
+        // TODO IMPLMENET THIS!!!!
+        final ErrorTolerantActionHandler<ActionHandler<?>> a = null;
+        a.on(null).handleWith(null).on(null).handleWith(null).otherwiseHandleWith(null).pack();
+    }
 
 
 

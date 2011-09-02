@@ -30,12 +30,14 @@ import ar.com.zauber.commons.validate.Validate;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 
+import com.zaubersoftware.leviathan.api.engine.AfterExceptionCatchDefinition;
 import com.zaubersoftware.leviathan.api.engine.AfterFetchingHandler;
+import com.zaubersoftware.leviathan.api.engine.AfterHandleWith;
 import com.zaubersoftware.leviathan.api.engine.Engine;
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
 import com.zaubersoftware.leviathan.api.engine.Pipe;
 import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
-import com.zaubersoftware.leviathan.api.engine.impl.pipe.FlowBuilderPipe;
+import com.zaubersoftware.leviathan.api.engine.ProcessingFlowBinding;
 
 /**
  * The Default implementation of the {@link Engine} interface
@@ -43,7 +45,7 @@ import com.zaubersoftware.leviathan.api.engine.impl.pipe.FlowBuilderPipe;
  * @author Martin Silva
  * @since Sep 2, 2011
  */
-public final class DefaultEngine implements Engine {
+public final class DefaultEngine implements Engine, AfterHandleWith<Engine>{
 
     private static final ExceptionHandler<Throwable> DEFAULT_EXCEPTION_HANDLER = new ExceptionHandler<Throwable>() {
         @Override
@@ -53,12 +55,57 @@ public final class DefaultEngine implements Engine {
     };
 
     private final AsyncUriFetcher fetcher;
-    private final Map<URI, List<Pipe<?,?>>> pipeFlowForURIs = new HashMap<URI, List<Pipe<?,?>>>();
-    private final Map<URI, InmutableProcessingFlow> packedFlows = new HashMap<URI, InmutableProcessingFlow>();
+    private final Map<URI, ProcessingFlow> packedFlows = new HashMap<URI, ProcessingFlow>();
+    private final List<Pipe<?,?>> currentPipeFlow = new ArrayList<Pipe<?,?>>();
+    private URI currentURI;
 
     @SuppressWarnings("rawtypes")
     private final Map<Class<? extends Throwable>, ExceptionHandler> handlers = new HashMap<Class<? extends Throwable>, ExceptionHandler>();
     private ExceptionHandler<Throwable> defaultFallbackExceptionHandler = DEFAULT_EXCEPTION_HANDLER;
+
+    private final class DefaultEngineProcessingFlowBinding implements ProcessingFlowBinding {
+
+        private final URI uri;
+
+        /**
+         * Creates the DefaultProcessingFlowBinding.
+         *
+         * @param uri
+         */
+        public DefaultEngineProcessingFlowBinding(final URI uri) {
+            this.uri = uri;
+        }
+
+        @Override
+        public Engine toFlow(final ProcessingFlow flow) {
+            Validate.notNull(flow, "The flow cannot be null");
+            DefaultEngine.this.packedFlows.put(this.uri, flow);
+            return DefaultEngine.this;
+        }
+    }
+
+    private final class DefaultEngineAfterExceptionCatchDefinition<E extends Throwable> implements AfterExceptionCatchDefinition<Engine> {
+
+        private final Class<E> throwableClass;
+
+        /**
+         * Creates the DefaultEngineAfterExceptionCatchDefinition.
+         *
+         * @param throwableClass
+         */
+        public DefaultEngineAfterExceptionCatchDefinition(final Class<E> throwableClass) {
+            Validate.notNull(throwableClass, "The throwable class cannot be null");
+            this.throwableClass = throwableClass;
+        }
+
+        @Override
+        public <E extends Throwable> AfterHandleWith<Engine> handleWith(final ExceptionHandler<E> handler) {
+            Validate.notNull(handler, "The exception handler cannot be null");
+            DefaultEngine.this.handlers.put(this.throwableClass, handler);
+            return DefaultEngine.this;
+        }
+
+    }
 
     /**
      * Creates the DefaultEngine.
@@ -71,63 +118,71 @@ public final class DefaultEngine implements Engine {
     }
 
     @Override
-    public Engine onError(final ExceptionHandler<Throwable> handler) {
+    public Engine onAnyExceptionDo(final ExceptionHandler<Throwable> handler) {
         Validate.notNull(handler, "The exception handler cannot be null");
         this.defaultFallbackExceptionHandler = handler;
         return this;
     }
 
     @Override
-    public <E extends Throwable> Engine onError(final Class<E> throwableClass, final ExceptionHandler<E> handler) {
+    @SuppressWarnings("unchecked")
+    public <E extends Throwable> Engine otherwiseHandleWith(final ExceptionHandler<E> handler) {
+        return onAnyExceptionDo((ExceptionHandler<Throwable>) handler);
+    }
+
+    @Override
+    public <E extends Throwable> AfterExceptionCatchDefinition<Engine> on(final Class<E> throwableClass) {
         Validate.notNull(throwableClass, "The throwable class cannot be null");
-        Validate.notNull(handler, "The exception handler cannot be null");
-        this.handlers.put(throwableClass, handler);
-        return this;
+        return new DefaultEngineAfterExceptionCatchDefinition<E>(throwableClass);
     }
 
     @Override
     public AfterFetchingHandler forUri(final String uriTemplate) {
         Validate.notBlank(uriTemplate, "The URI template cannot be blank");
+        reset();
         throw new NotImplementedException();
     }
 
     @Override
     public AfterFetchingHandler forUri(final URI uri) {
         Validate.notNull(uri, "The URI to be fetched cannot be null");
-        this.pipeFlowForURIs.put(uri, new ArrayList<Pipe<?,?>>());
-        return new DefaultAfterFetchingHandler(this, uri);
+        reset();
+        this.currentURI = uri;
+        return new DefaultAfterFetchingHandler(this);
     }
 
     @Override
-    public Engine forUri(final URI uri, final ProcessingFlow flow) {
-        return null;
+    public ProcessingFlowBinding bindURI(final URI uri) {
+        Validate.notNull(uri, "The URI cannot be null");
+        return new DefaultEngineProcessingFlowBinding(uri);
     }
 
     @Override
-    public Engine forUri(final String uriTemplate, final ProcessingFlow flow) {
+    public ProcessingFlowBinding bindURI(final String uriTemplate) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public AfterFetchingHandler afterFetch() {
-        // TODO Auto-generated method stub
-        return null;
+        reset();
+        return new DefaultAfterFetchingHandler(this);
     }
 
     @Override
     public Engine doGet(final URI uri) {
         Validate.notNull(uri, "The URI for which a GET request will be done cannot be null");
         if (!this.packedFlows.containsKey(uri)) {
-            packFlowForURI(uri);
+            throw new IllegalStateException(String.format("There is no processing flow for the given URI %s", uri));
         }
-        this.fetcher.get(uri, checkedGetFlow(uri).getRootClosure());
+        this.fetcher.get(uri, adaptProcessingFlowToClosure(checkedGetFlow(uri)));
         return this;
     }
 
     @Override
     public Engine doGet(final URI uri, final ProcessingFlow flow) {
         Validate.notNull(uri, "The URI for which a GET request will be done cannot be null");
+        this.fetcher.get(uri, adaptProcessingFlowToClosure(flow));
         return this;
     }
 
@@ -148,10 +203,9 @@ public final class DefaultEngine implements Engine {
      * @param uri
      * @param pipe
      */
-    protected void appendPipe(final URI uri, final Pipe<?,?> pipe) {
-        Validate.notNull(uri, "The URI for which a pipe will be appended cannot be null");
+    protected void appendPipe(final Pipe<?,?> pipe) {
         Validate.notNull(pipe, "The pipe to be appended cannot be null");
-        this.checkedGetPipes(uri).add(pipe);
+        this.currentPipeFlow.add(pipe);
     }
 
     /**
@@ -161,58 +215,55 @@ public final class DefaultEngine implements Engine {
      * @param flow
      */
     protected void flowForURI(final URI uri, final InmutableProcessingFlow flow) {
-        Validate.notNull(uri, "The URI for which a flow will be registered cannot be null");
         Validate.notNull(flow, "The processing flow cannot be null");
-        this.packedFlows.put(uri, flow);
+        if (uri != null) {
+            this.packedFlows.put(uri, flow);
+        }
     }
 
     /**
      * Builds and defines a {@link InmutableProcessingFlow} for the given URI using the current {@link Pipe} flow
-     *
-     * @param uri
      */
-    protected ProcessingFlow packFlowForURI(final URI uri) {
-        final InmutableProcessingFlow flow = new InmutableProcessingFlow(buildClosureFromPipesFlow(uri));
-        flowForURI(uri, flow);
+    protected ProcessingFlow packCurrentFlow() {
+        final InmutableProcessingFlow flow = new InmutableProcessingFlow(this.currentPipeFlow,
+                this.handlers, this.defaultFallbackExceptionHandler);
+        flowForURI(this.currentURI, flow);
+
+        reset();
+
         return flow;
     }
 
     /**
-     * Checks if exists a pipe flow for the given URI and returns it.
-     *
-     * @param uri The URI for which a pipe flow will be obtained.
-     * @return The pipe flow
-     * @throws IllegalArgumentException if there is not pipe flow for the given URI
-     */
-    private List<Pipe<?, ?>> checkedGetPipes(final URI uri) {
-        Validate.notNull(uri, "The URI cannot be null");
-        final List<Pipe<?, ?>> pipes = this.pipeFlowForURIs.get(uri);
-        Validate.notNull(pipes, String.format("There is not pipe flow for the given URI: %s", uri));
-        return pipes;
-    }
-
-    private InmutableProcessingFlow checkedGetFlow(final URI uri) {
-        Validate.notNull(uri, "The URI cannot be null");
-        final InmutableProcessingFlow flow = this.packedFlows.get(uri);
-        Validate.notNull(flow, String.format("There is not flow for the given URI: %s", uri));
-        return flow;
-    }
-
-    /**
-     * Builds the {@link Closure}<{@link URIFetcherResponse}> from a collection of pipes
-     * for the given {@link URI}
+     * Adapts a {@link ProcessingFlow} to a {@link Closure}&lt;{@link URIFetcherResponse}&gt;
      *
      * @param uri
      * @return
      */
-    private Closure<URIFetcherResponse> buildClosureFromPipesFlow(final URI uri) {
-        // Pipe chain
-        final FlowBuilderPipe<URIFetcherResponse, Object> rootPipe =
-            new FlowBuilderPipe<URIFetcherResponse, Object>(checkedGetPipes(uri), this.handlers);
+    private FetcherResponsePipeAdapterClosure<Void> adaptProcessingFlowToClosure(final ProcessingFlow flow) {
+        return new FetcherResponsePipeAdapterClosure<Void>(flow.toPipe());
+    }
 
-        rootPipe.setDefaultExceptionHandler(this.defaultFallbackExceptionHandler);
+    /**
+     * Resets current state
+     */
+    private void reset() {
+        this.currentPipeFlow.clear();
+        this.currentURI = null;
+    }
 
-        return new FetcherResponsePipeAdapterClosure<Object>(rootPipe);
+    /**
+     * Checks if exists a flow for the given URI and returns it.
+     *
+     * @param uri The URI for which a pipe flow will be obtained.
+     * @return The processing flow
+     * @throws IllegalArgumentException if there is not flow for the given URI
+     */
+    private ProcessingFlow checkedGetFlow(final URI uri) {
+        Validate.notNull(uri, "The URI cannot be null");
+        final ProcessingFlow flow = this.packedFlows.get(uri);
+        Validate.notNull(flow, String.format("There is not flow for the given URI: %s", uri));
+        return flow;
     }
 
 }

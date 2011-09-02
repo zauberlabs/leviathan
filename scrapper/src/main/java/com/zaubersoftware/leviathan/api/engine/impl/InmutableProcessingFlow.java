@@ -15,54 +15,54 @@
  */
 package com.zaubersoftware.leviathan.api.engine.impl;
 
-import org.apache.commons.lang.NotImplementedException;
+import java.util.Collection;
+import java.util.Map;
+
 import org.apache.commons.lang.Validate;
 
-import ar.com.zauber.commons.dao.Closure;
+import ar.com.zauber.commons.dao.closure.NullClosure;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 
+import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
 import com.zaubersoftware.leviathan.api.engine.Pipe;
 import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
+import com.zaubersoftware.leviathan.api.engine.impl.pipe.ClosureAdapterPipe;
+import com.zaubersoftware.leviathan.api.engine.impl.pipe.FlowBuilderPipe;
 
 /**
- * An inmutable implementation of {@link ProcessingFlow} that is backed by a {@link Closure}&lt;{@link URIFetcherResponse}&gt;
+ * An inmutable implementation of {@link ProcessingFlow}
  *
  * @author Martin Silva
  * @since Sep 2, 2011
  */
 public final class InmutableProcessingFlow implements ProcessingFlow {
 
-    private final Closure<URIFetcherResponse> rootClosure;
+    private final FlowBuilderPipe<URIFetcherResponse, Void> pipeFlow;
 
     /**
      * Creates the InmutableProcessingFlow.
      *
-     * @param rootClosure
+     * @param pipes
+     * @param exceptionHandlers
+     * @param defaultExceptionHandler
      */
-    public InmutableProcessingFlow(final Closure<URIFetcherResponse> rootClosure) {
-        Validate.notNull(rootClosure, "The root closure cannot be null");
-        this.rootClosure = rootClosure;
+    @SuppressWarnings("rawtypes")
+    public InmutableProcessingFlow(
+            final Collection<Pipe<?,?>> pipes,
+            final Map<Class<? extends Throwable>, ExceptionHandler> exceptionHandlers,
+            final ExceptionHandler<Throwable> defaultExceptionHandler) {
+        Validate.notNull(pipes, "The collection of pipes to be assembled cannot be built");
+        Validate.notNull(exceptionHandlers, "The exception handles cannot be null");
+        Validate.notNull(defaultExceptionHandler, "The default exception handler cannot be null");
+
+        pipes.add(new ClosureAdapterPipe<Object>(new NullClosure<Object>()));
+        this.pipeFlow = new FlowBuilderPipe<URIFetcherResponse, Void>(pipes, exceptionHandlers);
+        this.pipeFlow.setDefaultExceptionHandler(defaultExceptionHandler);
     }
 
     @Override
-    public ProcessingFlow concat(final ProcessingFlow flow) {
-        Validate.notNull(flow, "The flow to be concatenated cannot be null");
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public ProcessingFlow append(final Pipe<?, ?> pipe) {
-        Validate.notNull(pipe, "The pipe to be appended cannot be null");
-        throw new NotImplementedException();
-    }
-
-    /**
-     * Returns the rootClosure.
-     *
-     * @return <code>Closure<URIFetcherResponse></code> with the rootClosure.
-     */
-    Closure<URIFetcherResponse> getRootClosure() {
-        return this.rootClosure;
+    public Pipe<URIFetcherResponse, Void> toPipe() {
+        return this.pipeFlow;
     }
 
 }

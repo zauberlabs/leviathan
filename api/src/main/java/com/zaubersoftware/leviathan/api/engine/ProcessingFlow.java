@@ -15,6 +15,8 @@
  */
 package com.zaubersoftware.leviathan.api.engine;
 
+import ar.com.zauber.leviathan.api.URIFetcherResponse;
+
 
 /**
  * Represents a Leviathan fetching response processing flow.
@@ -25,18 +27,10 @@ package com.zaubersoftware.leviathan.api.engine;
 public interface ProcessingFlow {
 
     /**
-     * Concatenates the given processing flow and returns a the concatenated ProcessingFlow.
+     * Obtains a {@link Pipe} representation of the processing flow.
      *
-     * @param flow The flow to be concatenated.
-     * @return The resulting concatenated flow.
+     * @return The processing flow as a {@link Pipe}
      */
-    ProcessingFlow concat(ProcessingFlow flow);
+    Pipe<URIFetcherResponse, Void> toPipe();
 
-    /**
-     * Appends a new pipe to the processing flow.
-     *
-     * @param pipe The pipe to be appended to the processing flow.
-     * @return The resulting processing flow.
-     */
-    ProcessingFlow append(Pipe<?,?> pipe);
 }

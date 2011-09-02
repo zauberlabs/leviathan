@@ -27,7 +27,7 @@ import java.net.URI;
  * @author Juan F. Codagnone
  * @since Jul 22, 2011
  */
-public interface ActionHandler<T>  {
+public interface ActionHandler<T>  extends AfterThen {
 
     /**
      * Configures the next processing {@link Action} in the chain.
@@ -53,7 +53,7 @@ public interface ActionHandler<T>  {
      * @return {@link AfterFetchingHandler} all the available actions to performed over a fetched resource.
      * @throws IllegalStateException if the object is null.
      */
-    Engine then(ContextAwareClosure<T> object);
+    ErrorTolerantAfterThen then(ContextAwareClosure<T> object);
 
 
     /**
@@ -78,10 +78,4 @@ public interface ActionHandler<T>  {
      */
     Engine thenDoNothing();
 
-    /**
-     * Packs all the pipes into a processing flow
-     *
-     * @return The processing flow.
-     */
-    ProcessingFlow pack();
 }

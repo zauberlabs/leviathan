@@ -50,9 +50,9 @@ public final class FetcherResponsePipeAdapterClosure<O> implements Closure<URIFe
     public void execute(final URIFetcherResponse response) {
         Validate.notNull(response);
 
-        final O out = pipe.execute(response);
+        final O out = this.pipe.execute(response);
         if(out != null) {
-            logger.warn("The last pipe returned a value != null. Null was expected: {}", out);
+            this.logger.warn("The last pipe returned a value != null. Null was expected: {}", out);
         }
     }
 

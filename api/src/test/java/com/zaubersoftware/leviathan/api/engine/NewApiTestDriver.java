@@ -100,7 +100,7 @@ public class NewApiTestDriver {
                         public void execute(final URIFetcherResponse arg0) {
                         }
                     })
-                    .onError(DuplicatedEntityException.class, new ExceptionHandler<DuplicatedEntityException>() {
+                    .on(DuplicatedEntityException.class).handleWith(new ExceptionHandler<DuplicatedEntityException>() {
                         @Override
                         public void handle(final DuplicatedEntityException trowable) {
                             // Log error
@@ -118,7 +118,7 @@ public class NewApiTestDriver {
            });
 
 
-        engine.onError(new ExceptionHandler<Throwable>() {
+        engine.onAnyExceptionDo(new ExceptionHandler<Throwable>() {
             @Override
             public void handle(final Throwable trowable) {
                 // Log error

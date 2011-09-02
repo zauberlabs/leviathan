@@ -44,20 +44,18 @@ public interface Engine extends ErrorTolerant<Engine> {
      * <code>URI</code>
      *
      * @param uri The location of the resource to be fetched. Must not be <code>null</code>.
-     * @param flow The {@link ProcessingFlow} associated to the given {@link URI}.
-     * @return The {@link Engine}
+     * @return The {@link ProcessingFlowBinding} to bind a flow.
      */
-    Engine forUri(URI uri, ProcessingFlow flow);
+    ProcessingFlowBinding bindURI(URI uri);
 
     /**
      * Builder method which is the entry point to configure the engine behavior for the given
      * <code>uriTemplate</code>
      *
      * @param uriTemplate An URI template. Must not be <code>null</code> or empty.
-     * @param flow The {@link ProcessingFlow} associated to the given URI template.
-     * @return The {@link Engine}
+     * @return The {@link ProcessingFlowBinding} to bind a flow.
      */
-    Engine forUri(String uriTemplate, ProcessingFlow flow);
+    ProcessingFlowBinding bindURI(String uriTemplate);
 
     /**
      * Builder method which is the entry point to configure the engine behavior for the given
