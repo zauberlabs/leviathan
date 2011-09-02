@@ -16,9 +16,9 @@
 package com.zaubersoftware.leviathan.api.engine;
 
 /**
- * TODO: Description of the class, Comments in english by default  
- * 
- * 
+ * TODO: Description of the class, Comments in english by default
+ *
+ *
  * @author Guido Marucci Blas
  * @since Jul 22, 2011
  */

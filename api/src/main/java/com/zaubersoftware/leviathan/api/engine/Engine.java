@@ -16,11 +16,12 @@
 package com.zaubersoftware.leviathan.api.engine;
 
 import java.net.URI;
+import java.util.concurrent.TimeUnit;
 
 /**
- * This class represents a fetching engine that is an instance of Leviathan. 
+ * This class represents a fetching engine that is an instance of Leviathan.
  * It is the entry point for the engine configuration.
- * 
+ *
  * @author Guido Marucci Blas
  * @author Martín Silva
  * @author Juan F. Codagnone
@@ -31,29 +32,84 @@ public interface Engine extends ErrorTolerant<Engine> {
     /**
      * Builder method which is the entry point to configure the engine behavior for the given
      * <code>uriTemplate</code>
-     * 
+     *
      * @param uriTemplate An URI template. Must not be <code>null</code> or empty.
      * @return An {@link AfterFetchingHandler} that let's the users configure what to do after
      * the resource pointed by the URI template has been fetched.
      */
     AfterFetchingHandler forUri(String uriTemplate);
-    
-    /**
-     * Builder method which is the entry point to configure the engine behavior.
-     * 
-     * @return An {@link AfterFetchingHandler} that let's the users configure what to do after
-     * the resource pointed by the URI template has been fetched.
-     */
-    AfterFetchingHandler afterFetch();
-    
+
     /**
      * Builder method which is the entry point to configure the engine behavior for the given
      * <code>URI</code>
-     * 
+     *
+     * @param uri The location of the resource to be fetched. Must not be <code>null</code>.
+     * @param flow The {@link ProcessingFlow} associated to the given {@link URI}.
+     * @return The {@link Engine}
+     */
+    Engine forUri(URI uri, ProcessingFlow flow);
+
+    /**
+     * Builder method which is the entry point to configure the engine behavior for the given
+     * <code>uriTemplate</code>
+     *
+     * @param uriTemplate An URI template. Must not be <code>null</code> or empty.
+     * @param flow The {@link ProcessingFlow} associated to the given URI template.
+     * @return The {@link Engine}
+     */
+    Engine forUri(String uriTemplate, ProcessingFlow flow);
+
+    /**
+     * Builder method which is the entry point to configure the engine behavior for the given
+     * <code>URI</code>
+     *
      * @param uri The location of the resource to be fetched. Must not be <code>null</code>.
      * @return An {@link AfterFetchingHandler} that let's the users configure what to do after
      * the resource pointed by the URI has been fetched.
      */
     AfterFetchingHandler forUri(URI uri);
-    
+
+    /**
+     * Builder method which is the entry point to configure the engine behavior.
+     *
+     * @return An {@link AfterFetchingHandler} that let's the users configure what to do after
+     * the resource pointed by the URI template has been fetched.
+     */
+    AfterFetchingHandler afterFetch();
+
+    /**
+     * Performs the GET request for the given {@link URI}.
+     *
+     * @param uri The {@link URI} to be fetched.
+     * @return The {@link Engine}
+     */
+    Engine doGet(URI uri);
+
+    /**
+     * Performs the GET request for the given {@link URI}.
+     *
+     * @param uri The {@link URI} to be fetched.
+     * @return The {@link Engine}
+     */
+    Engine doGet(URI uri, ProcessingFlow flow);
+
+    /**
+     * Blocks until all tasks have completed execution
+     *
+     * @return The {@link Engine}
+     */
+    Engine awaitIdleness() throws InterruptedException;
+
+    /**
+     * Blocks until all tasks have completed execution,
+     * or the timeout occurs, or the current thread is interrupted, whichever
+     * happens first.
+     *
+     * @param timeout the maximum time to wait
+     * @param unit    the time unit of the timeout argument
+     * @return <tt>true</tt> if this executor terminated and <tt>false</tt> if
+     *         the timeout elapsed before termination
+     */
+    boolean awaitIdleness(long timeout, TimeUnit unit) throws InterruptedException;
+
 }

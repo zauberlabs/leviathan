@@ -42,13 +42,13 @@ import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
 import com.zaubersoftware.leviathan.api.engine.Action;
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
+import com.zaubersoftware.leviathan.api.engine.Pipe;
 import com.zaubersoftware.leviathan.api.engine.impl.dto.Link;
 import com.zaubersoftware.leviathan.api.engine.impl.pipe.ActionPipe;
 import com.zaubersoftware.leviathan.api.engine.impl.pipe.ClosureAdapterPipe;
 import com.zaubersoftware.leviathan.api.engine.impl.pipe.FlowBuilderPipe;
 import com.zaubersoftware.leviathan.api.engine.impl.pipe.ForEachPipe;
 import com.zaubersoftware.leviathan.api.engine.impl.pipe.HTMLSanitizerPipe;
-import com.zaubersoftware.leviathan.api.engine.impl.pipe.Pipe;
 import com.zaubersoftware.leviathan.api.engine.impl.pipe.ToJavaObjectPipe;
 import com.zaubersoftware.leviathan.api.engine.impl.pipe.XMLPipe;
 
@@ -276,7 +276,7 @@ public final class ConfigurationFlowTest {
             final ExceptionHandler<Throwable> defaultExceptionHandler) {
         // Fetcher Configuration
         final Map<URI, String> pages = new HashMap<URI, String>();
-        pages.put(mlhome, "com/zaubersoftware/leviathan/api/engine/pages/homeml.html");
+        pages.put(this.mlhome, "com/zaubersoftware/leviathan/api/engine/pages/homeml.html");
 
         final URIFetcher httpClientFetcher = new FixedURIFetcher(pages);
         final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -292,7 +292,7 @@ public final class ConfigurationFlowTest {
 
         final Closure<URIFetcherResponse> rootClosure = new FetcherResponsePipeAdapterClosure<Object>(rootPipe);
 
-        fetcher.get(mlhome, rootClosure);
+        fetcher.get(this.mlhome, rootClosure);
         try {
             fetcher.awaitIdleness();
         } catch (final InterruptedException e) {

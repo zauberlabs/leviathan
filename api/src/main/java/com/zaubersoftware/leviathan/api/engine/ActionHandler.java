@@ -20,7 +20,7 @@ import java.net.URI;
 
 /**
  * Defines all the actions that can be configured for the fetched resource in order to process it.
- * 
+ *
  * @param <T> The type of the object for which the action will be performed.
  * @author Guido Marucci Blas
  * @author Martín Silva
@@ -37,8 +37,8 @@ public interface ActionHandler<T>  {
      * @throws IllegalStateException if the object is null.
      */
     <R> ActionAndControlStructureHandler<R> then(Action<T, R> object);
-    
-    
+
+
     /**
      * Configures the next processing {@link Action} in the chain and then fetches a new resource.
      * @param object the {@link Action} to execute over the T object.
@@ -54,8 +54,8 @@ public interface ActionHandler<T>  {
      * @throws IllegalStateException if the object is null.
      */
     Engine then(ContextAwareClosure<T> object);
-    
-    
+
+
     /**
      * Configures the next resource to be fetched.
      * @param uriTemplate the location of the resource.
@@ -63,7 +63,7 @@ public interface ActionHandler<T>  {
      * @throws IllegalStateException if the uriTemplate is null.
      */
     AfterFetchingHandler thenFetch(String uriTemplate);
-    
+
     /**
      * Configures the next resource to be fetched.
      * @param uri the location of the resource.
@@ -71,10 +71,17 @@ public interface ActionHandler<T>  {
      * @throws IllegalStateException if the uri is null.
      */
     AfterFetchingHandler thenFetch(URI uri);
- 
+
     /**
      * Null action.
      * @return An {@link Engine}
      */
     Engine thenDoNothing();
+
+    /**
+     * Packs all the pipes into a processing flow
+     *
+     * @return The processing flow.
+     */
+    ProcessingFlow pack();
 }

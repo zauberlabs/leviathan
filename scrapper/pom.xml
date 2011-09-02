@@ -17,7 +17,7 @@
 		</dependency>
 		<dependency>
 			<groupId>ar.com.zauber.leviathan</groupId>
-			<artifactId>leviathan-api-commons</artifactId>
+			<artifactId>leviathan-api-common</artifactId>
 			<version>${pom.version}</version>
 			<scope>test</scope>
 		</dependency>

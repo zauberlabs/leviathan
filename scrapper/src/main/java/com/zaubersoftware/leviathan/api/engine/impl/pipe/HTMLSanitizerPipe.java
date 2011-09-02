@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.tidy.Tidy;
 
+import com.zaubersoftware.leviathan.api.engine.Pipe;
+
 import ar.com.zauber.commons.validate.Validate;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 

@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 
-import com.zaubersoftware.leviathan.api.engine.impl.pipe.Pipe;
+import com.zaubersoftware.leviathan.api.engine.Pipe;
 
 /**
  * A {@link Closure} that feeds {@link URIFetcherResponse}s to {@link Pipe}

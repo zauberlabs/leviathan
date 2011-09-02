@@ -22,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import com.zaubersoftware.leviathan.api.engine.Pipe;
+
 import ar.com.zauber.commons.validate.Validate;
 
 

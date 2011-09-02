@@ -26,6 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
+import com.zaubersoftware.leviathan.api.engine.Pipe;
+
 /**
  * TODO: Description of the class, Comments in english by default
  *

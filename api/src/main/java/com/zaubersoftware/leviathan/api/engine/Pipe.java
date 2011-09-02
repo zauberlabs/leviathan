@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zaubersoftware.leviathan.api.engine.impl.pipe;
+package com.zaubersoftware.leviathan.api.engine;
 
 /**
  * TODO: Description of the class, Comments in english by default  

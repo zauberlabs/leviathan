@@ -16,6 +16,7 @@
 package com.zaubersoftware.leviathan.api.engine.impl.pipe;
 
 import com.zaubersoftware.leviathan.api.engine.Action;
+import com.zaubersoftware.leviathan.api.engine.Pipe;
 
 import ar.com.zauber.commons.validate.Validate;
 

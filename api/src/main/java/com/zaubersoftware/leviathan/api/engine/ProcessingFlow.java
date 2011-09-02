@@ -15,18 +15,28 @@
  */
 package com.zaubersoftware.leviathan.api.engine;
 
-import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 
 /**
- * TODO: Description of the class, Comments in english by default
+ * Represents a Leviathan fetching response processing flow.
  *
- *
- * @author Guido Marucci Blas
- * @since Jul 22, 2011
+ * @author Martin Silva
+ * @since Sep 2, 2011
  */
-public interface LeviathanBuilder {
+public interface ProcessingFlow {
 
-    LeviathanBuilder withAsyncURIFetcher(AsyncUriFetcher fetcher);
-    Engine build();
+    /**
+     * Concatenates the given processing flow and returns a the concatenated ProcessingFlow.
+     *
+     * @param flow The flow to be concatenated.
+     * @return The resulting concatenated flow.
+     */
+    ProcessingFlow concat(ProcessingFlow flow);
 
+    /**
+     * Appends a new pipe to the processing flow.
+     *
+     * @param pipe The pipe to be appended to the processing flow.
+     * @return The resulting processing flow.
+     */
+    ProcessingFlow append(Pipe<?,?> pipe);
 }

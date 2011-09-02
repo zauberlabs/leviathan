@@ -35,6 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
+import com.zaubersoftware.leviathan.api.engine.Pipe;
+
 /**
  * A {@link Pipe} that applies an XSL transformation
  * 

@@ -17,34 +17,31 @@ package com.zaubersoftware.leviathan.api.engine.impl;
 
 import org.apache.commons.lang.Validate;
 
-import ar.com.zauber.commons.dao.Closure;
+import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 
-import com.zaubersoftware.leviathan.api.engine.Pipe;
+import com.zaubersoftware.leviathan.api.engine.Engine;
+import com.zaubersoftware.leviathan.api.engine.LeviathanBuilder;
 
 /**
- * TODO: Description of the class, Comments in english by default
+ * The Default implementation of the {@link LeviathanBuilder} interface
  *
- *
- * @author Guido Marucci Blas
- * @since Aug 12, 2011
+ * @author Martin Silva
+ * @since Sep 2, 2011
  */
-public final class PipeAdapterClosure<I, O> implements Closure<I> {
+public final class DefaultLeviathanBuilder implements LeviathanBuilder {
 
-    private final Pipe<I,O> pipe;
+    private AsyncUriFetcher fetcher;
 
-    /**
-     * Creates the PipeAdapterClosure.
-     *
-     * @param pipe
-     */
-    public PipeAdapterClosure(final Pipe<I, O> pipe) {
-        Validate.notNull(pipe, "The adaptee pipe cannot be null");
-        this.pipe = pipe;
+    @Override
+    public LeviathanBuilder withAsyncURIFetcher(final AsyncUriFetcher fetcher) {
+        Validate.notNull(fetcher, "The fetcher cannot be null");
+        this.fetcher = fetcher;
+        return this;
     }
 
     @Override
-    public void execute(final I input) {
-        pipe.execute(input);
+    public Engine build() {
+        return new DefaultEngine(this.fetcher);
     }
 
 }
