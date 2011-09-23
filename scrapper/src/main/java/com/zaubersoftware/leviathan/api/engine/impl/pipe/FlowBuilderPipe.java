@@ -27,6 +27,7 @@ import ar.com.zauber.commons.dao.Closure;
 
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
 import com.zaubersoftware.leviathan.api.engine.Pipe;
+import com.zaubersoftware.leviathan.api.engine.impl.PipeExceptionResolver;
 
 /**
  * A {@link Pipe} that builds the flow of pipes and dispatch exception to the registered {@link ExceptionHandler}s
@@ -41,7 +42,7 @@ public final class FlowBuilderPipe<I, O> implements Pipe<I, O> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Iterable<Pipe<?, ?>> pipes;
 
-    private ExceptionHandler<Throwable> defaultExceptionHandler = new ExceptionHandler<Throwable>() {
+    private ExceptionHandler<? extends Throwable> defaultExceptionHandler = new ExceptionHandler<Throwable>() {
         @Override
         public void handle(final Throwable trowable) {
             FlowBuilderPipe.this.logger.error("No one is willing to handle this exception. It will blow up!!!!!", trowable);
@@ -50,8 +51,10 @@ public final class FlowBuilderPipe<I, O> implements Pipe<I, O> {
     };
 
     @SuppressWarnings("rawtypes")
-    private final Map<Class<? extends Throwable>, ExceptionHandler> handlers =
-        new HashMap<Class<? extends Throwable>, ExceptionHandler>();
+    private final Map<Class<? extends Throwable>, ExceptionHandler<? extends Throwable>> handlers =
+        new HashMap<Class<? extends Throwable>, ExceptionHandler<? extends Throwable>>();
+    private final Map<Pipe<?, ?>, PipeExceptionResolver> pipeExceptionResolvers =
+        new HashMap<Pipe<?,?>, PipeExceptionResolver>();
 
     /**
      * Creates the FlowBuilderPipe.
@@ -59,14 +62,18 @@ public final class FlowBuilderPipe<I, O> implements Pipe<I, O> {
      * @param pipes The pipe to be assembled into a {@link Closure}
      * @param handlers The exception handlers.
      */
-    @SuppressWarnings("rawtypes")
     public FlowBuilderPipe(
             final Iterable<Pipe<?, ?>> pipes,
-            final Map<Class<? extends Throwable>, ExceptionHandler> handlers) {
+            final Map<Class<? extends Throwable>, ExceptionHandler<? extends Throwable>> handlers,
+            final Map<Pipe<?, ?>, PipeExceptionResolver> pipeExceptionResolvers) {
         Validate.notNull(pipes);
+
         this.pipes = pipes;
         if (handlers != null) {
             this.handlers.putAll(handlers);
+        }
+        if (this.pipeExceptionResolvers != null) {
+            this.pipeExceptionResolvers.putAll(pipeExceptionResolvers);
         }
     }
 
@@ -75,7 +82,16 @@ public final class FlowBuilderPipe<I, O> implements Pipe<I, O> {
      *
      */
     public FlowBuilderPipe(final Iterable<Pipe<?, ?>> pipes) {
-        this(pipes, null);
+        this(pipes, null, null);
+    }
+
+    /**
+     * Creates the CompositePipe.
+     *
+     */
+    @SuppressWarnings("rawtypes")
+    public FlowBuilderPipe(final Iterable<Pipe<?, ?>> pipes, final Map<Class<? extends Throwable>, ExceptionHandler<? extends Throwable>> handlers) {
+        this(pipes, handlers, null);
     }
 
     @Override
@@ -87,8 +103,18 @@ public final class FlowBuilderPipe<I, O> implements Pipe<I, O> {
                 ret = pipe.execute(ret);
             } catch(final Throwable e) {
                 this.logger.error("There was an error in the pipe chain execution", e);
-                this.logger.warn("TODO: Handle exception with context stack handlers");
-                if (this.handlers.containsKey(e.getClass())) {
+
+                // Serching for exception handlers for this pipe if not delegates to engine exception handlers
+                if (this.pipeExceptionResolvers.containsKey(pipe)) {
+                    final PipeExceptionResolver resolver = this.pipeExceptionResolvers.get(pipe);
+                    if (resolver.getHandlers().containsKey(e)) {
+                        resolver.getHandlers().get(e).handle(e);
+                        return null;
+                    } else if (resolver.hasDefaultHandler()) {
+                        resolver.getDefaultHandler().handle(e);
+                        return null;
+                    }
+                } else if (this.handlers.containsKey(e.getClass())) {
                     this.handlers.get(e.getClass()).handle(e);
                     this.logger.info("The pipe's flow has been stopped");
                     return null;
@@ -106,8 +132,9 @@ public final class FlowBuilderPipe<I, O> implements Pipe<I, O> {
      *
      * @param defaultExceptionHandler <code>ExceptionHandler<Throwable></code> with the defaultExceptionHandler.
      */
-    public void setDefaultExceptionHandler(final ExceptionHandler<Throwable> defaultExceptionHandler) {
+    public void setDefaultExceptionHandler(final ExceptionHandler<? extends Throwable> defaultExceptionHandler) {
         Validate.notNull(defaultExceptionHandler, "The default exception handler cannot be null");
         this.defaultExceptionHandler = defaultExceptionHandler;
     }
+
 }

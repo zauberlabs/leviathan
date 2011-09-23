@@ -45,18 +45,20 @@ public final class InmutableProcessingFlow implements ProcessingFlow {
      * @param pipes
      * @param exceptionHandlers
      * @param defaultExceptionHandler
+     * @param pipeExceptionResolvers
      */
-    @SuppressWarnings("rawtypes")
     public InmutableProcessingFlow(
             final Collection<Pipe<?,?>> pipes,
-            final Map<Class<? extends Throwable>, ExceptionHandler> exceptionHandlers,
-            final ExceptionHandler<Throwable> defaultExceptionHandler) {
+            final Map<Class<? extends Throwable>, ExceptionHandler<? extends Throwable>> exceptionHandlers,
+            final ExceptionHandler<? extends Throwable> defaultExceptionHandler,
+            final Map<Pipe<?, ?>, PipeExceptionResolver> pipeExceptionResolvers) {
         Validate.notNull(pipes, "The collection of pipes to be assembled cannot be built");
         Validate.notNull(exceptionHandlers, "The exception handles cannot be null");
         Validate.notNull(defaultExceptionHandler, "The default exception handler cannot be null");
+        Validate.notNull(pipeExceptionResolvers, "The pipeExceptionResolvers cannot be null");
 
         pipes.add(new ClosureAdapterPipe<Object>(new NullClosure<Object>()));
-        this.pipeFlow = new FlowBuilderPipe<URIFetcherResponse, Void>(pipes, exceptionHandlers);
+        this.pipeFlow = new FlowBuilderPipe<URIFetcherResponse, Void>(pipes, exceptionHandlers, pipeExceptionResolvers);
         this.pipeFlow.setDefaultExceptionHandler(defaultExceptionHandler);
     }
 

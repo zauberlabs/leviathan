@@ -20,6 +20,7 @@ import java.net.URI;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.Validate;
 
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
@@ -28,8 +29,11 @@ import com.zaubersoftware.leviathan.api.engine.Action;
 import com.zaubersoftware.leviathan.api.engine.ActionAndControlStructureHandler;
 import com.zaubersoftware.leviathan.api.engine.ActionAndThenFetch;
 import com.zaubersoftware.leviathan.api.engine.ActionHandler;
+import com.zaubersoftware.leviathan.api.engine.AfterExceptionCatchDefinition;
 import com.zaubersoftware.leviathan.api.engine.AfterFetchingHandler;
+import com.zaubersoftware.leviathan.api.engine.AfterHandleWith;
 import com.zaubersoftware.leviathan.api.engine.AfterJavaObjectHandler;
+import com.zaubersoftware.leviathan.api.engine.AfterThen;
 import com.zaubersoftware.leviathan.api.engine.AfterXMLTransformer;
 import com.zaubersoftware.leviathan.api.engine.ContextAwareClosure;
 import com.zaubersoftware.leviathan.api.engine.Engine;
@@ -48,20 +52,38 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
 
     private final DefaultEngine engine;
 
-    private final class DefaultErrorTolerantAfterThen extends EngineFowarder implements ErrorTolerantAfterThen {
+    private final class DefaultErrorTolerantAfterThen implements ErrorTolerantAfterThen, AfterExceptionCatchDefinition<AfterThen>, AfterHandleWith<AfterThen> {
 
-        /**
-         * Creates the DefaultErrorTolerantAfterThen.
-         *
-         * @param target
-         */
-        public DefaultErrorTolerantAfterThen() {
-            super(DefaultAfterFetchingHandler.this.engine);
-        }
+        private Class<? extends Throwable> throwableClass;
 
         @Override
         public ProcessingFlow pack() {
             return DefaultAfterFetchingHandler.this.pack();
+        }
+
+        @Override
+        public AfterThen onAnyExceptionDo(final ExceptionHandler<? extends Throwable> handler) {
+            DefaultAfterFetchingHandler.this.engine.addExceptionHandlerForCurrentPipe(handler);
+            return this;
+        }
+
+        @Override
+        public <E extends Throwable> AfterExceptionCatchDefinition<AfterThen> on(final Class<E> throwableClass) {
+            Validate.notNull(throwableClass, "The throwable class canont be null");
+            this.throwableClass = throwableClass;
+            return this;
+        }
+
+        @Override
+        public AfterHandleWith<AfterThen> handleWith(final ExceptionHandler<? extends Throwable> handler) {
+            DefaultAfterFetchingHandler.this.engine.addExceptionHandlerForCurrentPipe(this.throwableClass, handler);
+            return this;
+        }
+
+        @Override
+        public AfterThen otherwiseHandleWith(final ExceptionHandler<? extends Throwable> handler) {
+            DefaultAfterFetchingHandler.this.engine.addExceptionHandlerForCurrentPipe(handler);
+            return this;
         }
 
     }
@@ -101,14 +123,7 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
     }
 
     @Override
-    public ActionHandler<URIFetcherResponse> onAnyExceptionDo(final ExceptionHandler<Throwable> handler) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <E extends Throwable> ActionHandler<URIFetcherResponse> onError(final Class<E> throwableClass,
-            final ExceptionHandler<E> handler) {
+    public ActionHandler<URIFetcherResponse> onAnyExceptionDo(final ExceptionHandler<? extends Throwable> handler) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -159,4 +174,9 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
         return this.engine.packCurrentFlow();
     }
 
+    @Override
+    public <E extends Throwable> AfterExceptionCatchDefinition<ActionHandler<URIFetcherResponse>> on(
+            final Class<E> throwableClass) {
+        throw new NotImplementedException("This should handle exeception that occur while fetching (POST or GET). They should be treated as engine exceptions");
+    }
 }

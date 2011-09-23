@@ -32,13 +32,8 @@ public abstract class EngineFowarder implements Engine {
     }
 
     @Override
-    public Engine onAnyExceptionDo(final ExceptionHandler<Throwable> handler) {
+    public Engine onAnyExceptionDo(final ExceptionHandler<? extends Throwable> handler) {
         return this.target.onAnyExceptionDo(handler);
-    }
-
-    @Override
-    public <E extends Throwable> Engine onError(final Class<E> throwableClass, final ExceptionHandler<E> handler) {
-        return this.target.onError(throwableClass, handler);
     }
 
     @Override

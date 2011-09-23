@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * It is the entry point for the engine configuration.
  *
  * @author Guido Marucci Blas
- * @author Martín Silva
+ * @author Martï¿½n Silva
  * @author Juan F. Codagnone
  * @since Jul 22, 2011
  */

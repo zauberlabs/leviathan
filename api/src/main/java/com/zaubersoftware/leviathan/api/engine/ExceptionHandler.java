@@ -18,14 +18,14 @@ package com.zaubersoftware.leviathan.api.engine;
 
 /**
  * TODO: Description of the class, Comments in english by default
- * 
- * 
+ *
+ *
  * @author Guido Marucci Blas
  * @since Jul 22, 2011
  */
-public abstract class ExceptionHandler<T extends Throwable> extends CurrentThreadURIAndContextDictionary {
+public abstract class ExceptionHandler extends CurrentThreadURIAndContextDictionary {
 
-    public abstract void handle(T trowable);
+    public abstract void handle(Throwable trowable);
 
     @SuppressWarnings("unchecked")
     public final <C> Class<C> getInputClass() {

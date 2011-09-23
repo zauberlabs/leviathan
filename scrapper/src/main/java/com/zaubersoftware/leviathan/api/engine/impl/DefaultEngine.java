@@ -58,10 +58,11 @@ public final class DefaultEngine implements Engine, AfterHandleWith<Engine>{
     private final Map<URI, ProcessingFlow> packedFlows = new HashMap<URI, ProcessingFlow>();
     private final List<Pipe<?,?>> currentPipeFlow = new ArrayList<Pipe<?,?>>();
     private URI currentURI;
+    private Pipe<?, ?> currentPipe;
 
-    @SuppressWarnings("rawtypes")
-    private final Map<Class<? extends Throwable>, ExceptionHandler> handlers = new HashMap<Class<? extends Throwable>, ExceptionHandler>();
-    private ExceptionHandler<Throwable> defaultFallbackExceptionHandler = DEFAULT_EXCEPTION_HANDLER;
+    private final Map<Class<? extends Throwable>, ExceptionHandler<? extends Throwable>> handlers = new HashMap<Class<? extends Throwable>, ExceptionHandler<? extends Throwable>>();
+    private ExceptionHandler<? extends Throwable> defaultFallbackExceptionHandler = DEFAULT_EXCEPTION_HANDLER;
+    private final Map<Pipe<?,?>, PipeExceptionResolver> pipeExceptionResolvers = new HashMap<Pipe<?,?>, PipeExceptionResolver>();
 
     private final class DefaultEngineProcessingFlowBinding implements ProcessingFlowBinding {
 
@@ -99,7 +100,7 @@ public final class DefaultEngine implements Engine, AfterHandleWith<Engine>{
         }
 
         @Override
-        public <E extends Throwable> AfterHandleWith<Engine> handleWith(final ExceptionHandler<E> handler) {
+        public AfterHandleWith<Engine> handleWith(final ExceptionHandler<? extends Throwable> handler) {
             Validate.notNull(handler, "The exception handler cannot be null");
             DefaultEngine.this.handlers.put(this.throwableClass, handler);
             return DefaultEngine.this;
@@ -118,16 +119,15 @@ public final class DefaultEngine implements Engine, AfterHandleWith<Engine>{
     }
 
     @Override
-    public Engine onAnyExceptionDo(final ExceptionHandler<Throwable> handler) {
+    public Engine onAnyExceptionDo(final ExceptionHandler<? extends Throwable> handler) {
         Validate.notNull(handler, "The exception handler cannot be null");
         this.defaultFallbackExceptionHandler = handler;
         return this;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <E extends Throwable> Engine otherwiseHandleWith(final ExceptionHandler<E> handler) {
-        return onAnyExceptionDo((ExceptionHandler<Throwable>) handler);
+    public Engine otherwiseHandleWith(final ExceptionHandler<? extends Throwable> handler) {
+        return onAnyExceptionDo(handler);
     }
 
     @Override
@@ -198,6 +198,21 @@ public final class DefaultEngine implements Engine, AfterHandleWith<Engine>{
     }
 
     /**
+     * @param handler
+     */
+    public void addExceptionHandlerForCurrentPipe(final ExceptionHandler<? extends Throwable> handler) {
+        this.pipeExceptionResolvers.get(this.currentPipe).setDefaultExceptionHandler(handler);
+    }
+
+    /**
+     * @param handler
+     */
+    public void addExceptionHandlerForCurrentPipe(final Class<? extends Throwable> throwableClass, final ExceptionHandler<? extends Throwable> handler) {
+        this.pipeExceptionResolvers.get(this.currentPipe).addExceptionHandler(throwableClass, handler);
+    }
+
+
+    /**
      * Appends a {@link Pipe} to {@link URI}'s pipe flow
      *
      * @param uri
@@ -205,6 +220,7 @@ public final class DefaultEngine implements Engine, AfterHandleWith<Engine>{
      */
     protected void appendPipe(final Pipe<?,?> pipe) {
         Validate.notNull(pipe, "The pipe to be appended cannot be null");
+        this.currentPipe = pipe;
         this.currentPipeFlow.add(pipe);
     }
 
@@ -225,8 +241,11 @@ public final class DefaultEngine implements Engine, AfterHandleWith<Engine>{
      * Builds and defines a {@link InmutableProcessingFlow} for the given URI using the current {@link Pipe} flow
      */
     protected ProcessingFlow packCurrentFlow() {
-        final InmutableProcessingFlow flow = new InmutableProcessingFlow(this.currentPipeFlow,
-                this.handlers, this.defaultFallbackExceptionHandler);
+        final InmutableProcessingFlow flow =
+            new InmutableProcessingFlow(this.currentPipeFlow,
+                                        this.handlers,
+                                        this.defaultFallbackExceptionHandler,
+                                        this.pipeExceptionResolvers);
         flowForURI(this.currentURI, flow);
 
         reset();

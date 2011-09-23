@@ -22,7 +22,7 @@ package com.zaubersoftware.leviathan.api.engine;
  * @param <T> The interface type that defines the available actions that can be configured once the error
  * handler has been subscribed.
  * @author Guido Marucci Blas
- * @author Martín Silva
+ * @author Martï¿½n Silva
  * @author Juan F. Codagnone
  * @since Jul 22, 2011
  */
@@ -37,6 +37,6 @@ public interface ErrorTolerant<T> extends ExceptionCatchDefinition<T> {
      * @throws IllegalArgumentException if the handler is null.
      * handler has been subscribed.
      */
-    T onAnyExceptionDo(ExceptionHandler<Throwable> handler);
+    T onAnyExceptionDo(ExceptionHandler<? extends Throwable> handler);
 
 }
