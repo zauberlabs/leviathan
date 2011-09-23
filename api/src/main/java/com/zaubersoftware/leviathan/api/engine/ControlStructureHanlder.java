@@ -18,23 +18,23 @@ package com.zaubersoftware.leviathan.api.engine;
 
 /**
  * Defines all the available control structures actions.
- * 
+ *
  * @author Guido Marucci Blas
- * @author Martín Silva
+ * @author Martï¿½n Silva
  * @author Juan F. Codagnone
  * @since Jul 22, 2011
  */
-public interface ControlStructureHanlder {
+public interface ControlStructureHanlder<T> {
 
     /**
      * Iterates over an {@link Iterable}
-     * 
+     *
      * @param <R> The type of the elements that will be returned by the Iterator.
-     * @param elementClass The class of the elements that will be returned by the Iterator. Must not be null. 
+     * @param elementClass The class of the elements that will be returned by the Iterator. Must not be null.
      * @return An {@link AfterForEachHandler} that will export the method to indicate which method should
      * be called to obtain the iterator.
      * @throws IllegalArgumentException if the elementClass is null.
      */
-    <R> AfterForEachHandler<R> forEach(Class<R> elementClass);
+    <R> AfterForEachHandler<R,T> forEach(Class<R> elementClass);
 
 }

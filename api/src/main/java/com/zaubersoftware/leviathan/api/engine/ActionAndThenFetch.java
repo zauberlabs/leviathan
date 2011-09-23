@@ -17,12 +17,11 @@ package com.zaubersoftware.leviathan.api.engine;
 
 
 /**
- * TODO: Description of the class, Comments in english by default  
- * 
- * 
+ * Is an {@link Action} that a return a {@link FetchRequest}
+ *
  * @author Guido Marucci Blas
  * @since Jul 22, 2011
  */
 public abstract class ActionAndThenFetch<T> extends Action<T, FetchRequest> {
-    
+
 }

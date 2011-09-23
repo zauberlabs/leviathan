@@ -37,6 +37,6 @@ public interface ErrorTolerant<T> extends ExceptionCatchDefinition<T> {
      * @throws IllegalArgumentException if the handler is null.
      * handler has been subscribed.
      */
-    T onAnyExceptionDo(ExceptionHandler<? extends Throwable> handler);
+    T onAnyExceptionDo(ExceptionHandler handler);
 
 }

@@ -49,8 +49,8 @@ public final class InmutableProcessingFlow implements ProcessingFlow {
      */
     public InmutableProcessingFlow(
             final Collection<Pipe<?,?>> pipes,
-            final Map<Class<? extends Throwable>, ExceptionHandler<? extends Throwable>> exceptionHandlers,
-            final ExceptionHandler<? extends Throwable> defaultExceptionHandler,
+            final Map<Class<? extends Throwable>, ExceptionHandler> exceptionHandlers,
+            final ExceptionHandler defaultExceptionHandler,
             final Map<Pipe<?, ?>, PipeExceptionResolver> pipeExceptionResolvers) {
         Validate.notNull(pipes, "The collection of pipes to be assembled cannot be built");
         Validate.notNull(exceptionHandlers, "The exception handles cannot be null");

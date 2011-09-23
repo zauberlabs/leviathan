@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,7 @@ public final class ConfigurationFlowTest {
                 assertEquals("MercadoLibre Argentina - Donde comprar y vender de todo.", input);
             }
         };
-        final Iterable<Pipe<?, ?>> pipes = Arrays.asList(new Pipe<?, ?>[] {
+        final Collection<Pipe<?, ?>> pipes = Arrays.asList(new Pipe<?, ?>[] {
                 new HTMLSanitizerPipe(),
                 new XMLPipe(xsltSource),
                 new ToJavaObjectPipe<Link>(Link.class),
@@ -107,7 +108,7 @@ public final class ConfigurationFlowTest {
                 fail("The exception has not been catched. :(");
             }
         };
-        final Iterable<Pipe<?, ?>> pipes = Arrays.asList(new Pipe<?, ?>[] {
+        final Collection<Pipe<?, ?>> pipes = Arrays.asList(new Pipe<?, ?>[] {
                 new HTMLSanitizerPipe(),
                 new XMLPipe(xsltSource),
                 new ToJavaObjectPipe<Link>(Link.class),
@@ -118,9 +119,9 @@ public final class ConfigurationFlowTest {
         final AtomicBoolean handlerHasBeenReached = new AtomicBoolean(false);
         final Map<Class<? extends Throwable>, ExceptionHandler> handlers =
             new HashMap<Class<? extends Throwable>, ExceptionHandler>();
-        handlers.put(ArrayIndexOutOfBoundsException.class, new ExceptionHandler<ArrayIndexOutOfBoundsException>() {
+        handlers.put(ArrayIndexOutOfBoundsException.class, new ExceptionHandler() {
             @Override
-            public void handle(final ArrayIndexOutOfBoundsException trowable) {
+            public void handle(final Throwable trowable) {
                 assertNotNull(trowable);
                 handlerHasBeenReached.set(true);
                 // OK The exception has been handled
@@ -153,7 +154,7 @@ public final class ConfigurationFlowTest {
                 fail("The exception has not been catched. :(");
             }
         };
-        final Iterable<Pipe<?, ?>> pipes = Arrays.asList(new Pipe<?, ?>[] {
+        final Collection<Pipe<?, ?>> pipes = Arrays.asList(new Pipe<?, ?>[] {
                 new HTMLSanitizerPipe(),
                 new XMLPipe(xsltSource),
                 new ToJavaObjectPipe<Link>(Link.class),
@@ -162,7 +163,7 @@ public final class ConfigurationFlowTest {
         });
 
         final AtomicBoolean defaultHandleHasBeenReached = new AtomicBoolean(false);
-        final ExceptionHandler<Throwable> defaultExceptionHandler = new ExceptionHandler<Throwable>() {
+        final ExceptionHandler defaultExceptionHandler = new ExceptionHandler() {
             @Override
             public void handle(final Throwable trowable) {
                 assertNotNull(trowable);
@@ -209,7 +210,7 @@ public final class ConfigurationFlowTest {
                 resultingCategories.add(input);
             }
         });
-        final Iterable<Pipe<?, ?>> pipes = Arrays.asList(new Pipe<?, ?>[] {
+        final Collection<Pipe<?, ?>> pipes = Arrays.asList(new Pipe<?, ?>[] {
                 new HTMLSanitizerPipe(),
                 new XMLPipe(xsltSource),
                 new ToJavaObjectPipe<Link>(Link.class),
@@ -230,7 +231,7 @@ public final class ConfigurationFlowTest {
      * @param pipes
      * @throws InterruptedException
      */
-    private void doFetch(final Iterable<Pipe<?, ?>> pipes) {
+    private void doFetch(final Collection<Pipe<?, ?>> pipes) {
         doFetch(pipes, null, null);
     }
 
@@ -243,7 +244,7 @@ public final class ConfigurationFlowTest {
      */
     @SuppressWarnings("rawtypes")
     private void doFetch(
-            final Iterable<Pipe<?, ?>> pipes,
+            final Collection<Pipe<?, ?>> pipes,
             final Map<Class<? extends Throwable>, ExceptionHandler> handlers) {
         doFetch(pipes, handlers, null);
     }
@@ -256,8 +257,8 @@ public final class ConfigurationFlowTest {
      * @throws InterruptedException
      */
     private void doFetch(
-            final Iterable<Pipe<?, ?>> pipes,
-            final ExceptionHandler<Throwable> defaultExceptionHandler) {
+            final Collection<Pipe<?, ?>> pipes,
+            final ExceptionHandler defaultExceptionHandler) {
         doFetch(pipes, null, defaultExceptionHandler);
     }
 
@@ -269,11 +270,10 @@ public final class ConfigurationFlowTest {
      * @param handlers
      * @throws InterruptedException
      */
-    @SuppressWarnings("rawtypes")
     private void doFetch(
-            final Iterable<Pipe<?, ?>> pipes,
+            final Collection<Pipe<?, ?>> pipes,
             final Map<Class<? extends Throwable>, ExceptionHandler> handlers,
-            final ExceptionHandler<Throwable> defaultExceptionHandler) {
+            final ExceptionHandler defaultExceptionHandler) {
         // Fetcher Configuration
         final Map<URI, String> pages = new HashMap<URI, String>();
         pages.put(this.mlhome, "com/zaubersoftware/leviathan/api/engine/pages/homeml.html");

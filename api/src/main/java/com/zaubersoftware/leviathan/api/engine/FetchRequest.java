@@ -18,9 +18,9 @@ package com.zaubersoftware.leviathan.api.engine;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 /**
- * TODO: Description of the class, Comments in english by default  
- * 
- * 
+ * Is a request to the engine to perform a fetch action
+ * that will go through the hole pipe machinery
+ *
  * @author Guido Marucci Blas
  * @since Jul 22, 2011
  */

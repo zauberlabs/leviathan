@@ -23,6 +23,10 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,15 +35,16 @@ import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.common.ExecutorServiceAsyncUriFetcher;
+import ar.com.zauber.leviathan.common.InmutableURIAndCtx;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
-import com.zaubersoftware.leviathan.api.engine.ActionHandler;
+import com.zaubersoftware.leviathan.api.engine.Action;
 import com.zaubersoftware.leviathan.api.engine.ContextAwareClosure;
 import com.zaubersoftware.leviathan.api.engine.Engine;
-import com.zaubersoftware.leviathan.api.engine.ErrorTolerantActionHandler;
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
 import com.zaubersoftware.leviathan.api.engine.LeviathanBuilder;
 import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
+import com.zaubersoftware.leviathan.api.engine.impl.dto.Link;
 
 
 /**
@@ -97,7 +102,7 @@ public class InstantiationFlowTest {
             public void execute(final URIFetcherResponse response) {
                 throw exception;
             }
-        }).onAnyExceptionDo(new ExceptionHandler<Throwable>() {
+        }).onAnyExceptionDo(new ExceptionHandler() {
             @Override
             public void handle(final Throwable trowable) {
                 exceptionHandled.set(true);
@@ -117,13 +122,13 @@ public class InstantiationFlowTest {
             public void execute(final URIFetcherResponse response) {
                 throw exception;
             }
-        }).on(MockException.class).handleWith(new ExceptionHandler<MockException>() {
+        }).on(MockException.class).handleWith(new ExceptionHandler() {
             @Override
-            public void handle(final MockException trowable) {
+            public void handle(final Throwable trowable) {
                 exceptionHandled.set(true);
                 assertEquals(exception, trowable);
             }
-        }).otherwiseHandleWith(new ExceptionHandler<Throwable>() {
+        }).otherwiseHandleWith(new ExceptionHandler() {
             @Override
             public void handle(final Throwable trowable) {
                 fail("It should never reach here, the exception should be handled by the configured handler. Look above!!!");
@@ -134,7 +139,7 @@ public class InstantiationFlowTest {
     }
 
     @Test
-    public void testname() throws Exception {
+    public void shouldBindUriToAFlow() throws Exception {
         final AtomicBoolean fetchPerformed = new AtomicBoolean(false);
         final ProcessingFlow flow = this.engine
             .afterFetch()
@@ -148,17 +153,122 @@ public class InstantiationFlowTest {
             .pack();
 
         this.engine.bindURI(this.mlhome).toFlow(flow);
+        this.engine.doGet(this.mlhome).awaitIdleness();
         assertTrue("Did not fetch!", fetchPerformed.get());
-
-        // TODO IMPLMENET THIS!!!!
-        final ErrorTolerantActionHandler<ActionHandler<?>> a = null;
-        a.on(null).handleWith(null).on(null).handleWith(null).otherwiseHandleWith(null).pack();
-
     }
 
+    @Test
+    public void shouldHaveContext() throws Exception {
+        final String KEY = "FOO";
+        final String VAL = "VAL";
 
+        final AtomicBoolean fetchPerformed = new AtomicBoolean(false);
+        final ProcessingFlow flow = this.engine
+            .afterFetch()
+            .then(new ContextAwareClosure<URIFetcherResponse>() {
+                @Override
+                public void execute(final URIFetcherResponse response) {
+                    assertTrue(response.isSucceeded());
+                    assertEquals(VAL, get(KEY));
+                    fetchPerformed.set(true);
+                }
+            })
+            .pack();
 
+        this.engine.bindURI(this.mlhome).toFlow(flow);
+        final Map<String, Object> ctx = new HashMap<String, Object>();
+        ctx.put(KEY, VAL);
+        this.engine.doGet(new InmutableURIAndCtx(this.mlhome, ctx)).awaitIdleness();
+        assertTrue("Did not fetch!", fetchPerformed.get());
+    }
 
+    @Test
+    public void shouldHaveContextAndCanBeShareBetweenActions() throws Exception {
+        final String KEY = "FOO";
+        final String VAL = "VAL";
 
+        final AtomicBoolean fetchPerformed = new AtomicBoolean(false);
+        final ProcessingFlow flow = this.engine
+            .afterFetch()
+            .then(new ContextAwareClosure<URIFetcherResponse>() {
+                @Override
+                public void execute(final URIFetcherResponse response) {
+                    assertTrue(response.isSucceeded());
+                    assertEquals(VAL, get(KEY));
+                    fetchPerformed.set(true);
+                }
+            })
+            .pack();
 
+        this.engine.bindURI(this.mlhome).toFlow(flow);
+        final Map<String, Object> ctx = new HashMap<String, Object>();
+        ctx.put(KEY, VAL);
+        this.engine.doGet(new InmutableURIAndCtx(this.mlhome, ctx)).awaitIdleness();
+        assertTrue("Did not fetch!", fetchPerformed.get());
+    }
+
+    @Test
+    public void shouldFlow() throws Exception {
+        final Source xsltSource = new StreamSource(getClass().getClassLoader().getResourceAsStream(
+        "com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl"));
+        final AtomicBoolean actionPerformed = new AtomicBoolean(false);
+        this.engine
+            .forUri(this.mlhome)
+            .sanitizeHTML()
+            .transformXML(xsltSource)
+            .toJavaObject(Link.class)
+            .then(new Action<Link, String>() {
+                @Override
+                public String execute(final Link link) {
+                    actionPerformed.set(true);
+                    return link.getTitle();
+                }
+            })
+            .then(new ContextAwareClosure<String>() {
+                @Override
+                public void execute(final String input) {
+                    assertEquals("MercadoLibre Argentina - Donde comprar y vender de todo.", input);
+                }
+            })
+            .pack();
+        this.engine.doGet(this.mlhome).awaitIdleness();
+        assertTrue("Did not hadle the exception", actionPerformed.get());
+    }
+
+    @Test
+    public void shouldForEachFlow() throws Exception {
+        final Source xsltSource = new StreamSource(getClass().getClassLoader().getResourceAsStream(
+        "com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl"));
+        final AtomicBoolean actionPerformed = new AtomicBoolean(false);
+        final AtomicInteger count = new AtomicInteger(0);
+        this.engine
+            .forUri(this.mlhome)
+            .sanitizeHTML()
+            .transformXML(xsltSource)
+            .toJavaObject(Link.class)
+            .then(new Action<Link, Link>() {
+                @Override
+                public Link execute(final Link link) {
+                    actionPerformed.set(true);
+                    return link;
+                }
+            })
+            .forEach(String.class).in("categories")
+                .then(new ContextAwareClosure<String>() {
+                    @Override
+                    public void execute(final String category) {
+                        count.incrementAndGet();
+                    }
+                })
+            .endFor()
+            .then(new ContextAwareClosure<Link>() {
+                @Override
+                public void execute(final Link link) {
+                    assertEquals(4, count.get());
+                }
+            })
+            .pack();
+        this.engine.doGet(this.mlhome).awaitIdleness();
+        assertTrue("Did not hadle the exception", actionPerformed.get());
+    }
 }

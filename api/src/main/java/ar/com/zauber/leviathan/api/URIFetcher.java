@@ -20,7 +20,6 @@ import java.net.URI;
 import java.util.Map;
 
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
-
 /**
  * URI fetcher
  *
@@ -31,7 +30,7 @@ public interface URIFetcher {
 
     /**
      * fetch uri
-     * 
+     *
      * @deprecated Use {@link #get(URI)} instead. This method will be deleted on
      *             next version.
      */
@@ -40,24 +39,24 @@ public interface URIFetcher {
 
     /**
      * fetch uri
-     * 
+     *
      * @deprecated Use {@link #get(URIAndCtx)} instead. This method will be
      *             deleted on next version.
      */
     @Deprecated
     URIFetcherResponse fetch(URIAndCtx uri);
-    
+
     /** get from uri */
     URIFetcherResponse get(URI uri);
 
     /** get from uri */
-    URIFetcherResponse get(URIAndCtx uri);    
-    
+    URIFetcherResponse get(URIAndCtx uri);
+
     /** post to uri */
     URIFetcherResponse post(URIAndCtx uri, InputStream body);
-    
+
     /** post to uri, body as "application/x-www-form-urlencoded"
-     * Now is deprecated: 
+     * Now is deprecated:
      * @deprecated to use post with {@link UrlEncodedPostBody} as parameter
      * @use post(URIAndCtx uriAndCtx, UrlEncodedPostBody body)*/
     @Deprecated

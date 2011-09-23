@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 
+import com.zaubersoftware.leviathan.api.engine.CurrentThreadURIAndContextDictionary;
 import com.zaubersoftware.leviathan.api.engine.Pipe;
-
 /**
  * A {@link Closure} that feeds {@link URIFetcherResponse}s to {@link Pipe}
  *
@@ -32,6 +32,7 @@ import com.zaubersoftware.leviathan.api.engine.Pipe;
  * @since Aug 12, 2011
  */
 public final class FetcherResponsePipeAdapterClosure<O> implements Closure<URIFetcherResponse> {
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Pipe<URIFetcherResponse, O> pipe;
 
@@ -50,9 +51,15 @@ public final class FetcherResponsePipeAdapterClosure<O> implements Closure<URIFe
     public void execute(final URIFetcherResponse response) {
         Validate.notNull(response);
 
-        final O out = this.pipe.execute(response);
-        if(out != null) {
-            this.logger.warn("The last pipe returned a value != null. Null was expected: {}", out);
+
+        try {
+            CurrentThreadURIAndContextDictionary.ctxHolder.set(response.getURIAndCtx());
+            final O out = this.pipe.execute(response);
+            if(out != null) {
+                this.logger.warn("The last pipe returned a value != null. Null was expected: {}", out);
+            }
+        } finally {
+            CurrentThreadURIAndContextDictionary.ctxHolder.set(null);
         }
     }
 

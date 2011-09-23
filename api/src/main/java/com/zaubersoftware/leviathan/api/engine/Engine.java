@@ -18,6 +18,8 @@ package com.zaubersoftware.leviathan.api.engine;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
+import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
+
 /**
  * This class represents a fetching engine that is an instance of Leviathan.
  * It is the entry point for the engine configuration.
@@ -83,6 +85,9 @@ public interface Engine extends ErrorTolerant<Engine> {
      */
     Engine doGet(URI uri);
 
+    /** @see #doGet(URI) */
+    Engine doGet(URIAndCtx uriAndCtx);
+
     /**
      * Performs the GET request for the given {@link URI}.
      *
@@ -90,6 +95,9 @@ public interface Engine extends ErrorTolerant<Engine> {
      * @return The {@link Engine}
      */
     Engine doGet(URI uri, ProcessingFlow flow);
+
+    /** @see #doGet(URI) */
+    Engine doGet(URIAndCtx uriAndCtx, ProcessingFlow flow);
 
     /**
      * Blocks until all tasks have completed execution

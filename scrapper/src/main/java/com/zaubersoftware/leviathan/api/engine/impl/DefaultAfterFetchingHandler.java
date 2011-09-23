@@ -15,12 +15,16 @@
  */
 package com.zaubersoftware.leviathan.api.engine.impl;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.URI;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
 
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
@@ -31,16 +35,25 @@ import com.zaubersoftware.leviathan.api.engine.ActionAndThenFetch;
 import com.zaubersoftware.leviathan.api.engine.ActionHandler;
 import com.zaubersoftware.leviathan.api.engine.AfterExceptionCatchDefinition;
 import com.zaubersoftware.leviathan.api.engine.AfterFetchingHandler;
+import com.zaubersoftware.leviathan.api.engine.AfterForEachHandler;
+import com.zaubersoftware.leviathan.api.engine.AfterForEachHandler.EndFor;
+import com.zaubersoftware.leviathan.api.engine.AfterForEachHandler.ThenWithContextAwareClosure;
 import com.zaubersoftware.leviathan.api.engine.AfterHandleWith;
 import com.zaubersoftware.leviathan.api.engine.AfterJavaObjectHandler;
 import com.zaubersoftware.leviathan.api.engine.AfterThen;
 import com.zaubersoftware.leviathan.api.engine.AfterXMLTransformer;
 import com.zaubersoftware.leviathan.api.engine.ContextAwareClosure;
 import com.zaubersoftware.leviathan.api.engine.Engine;
+import com.zaubersoftware.leviathan.api.engine.ErrorTolerantActionAndControlStructureHandler;
 import com.zaubersoftware.leviathan.api.engine.ErrorTolerantAfterThen;
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
 import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
+import com.zaubersoftware.leviathan.api.engine.impl.pipe.ActionPipe;
 import com.zaubersoftware.leviathan.api.engine.impl.pipe.ClosureAdapterPipe;
+import com.zaubersoftware.leviathan.api.engine.impl.pipe.ForEachPipe;
+import com.zaubersoftware.leviathan.api.engine.impl.pipe.HTMLSanitizerPipe;
+import com.zaubersoftware.leviathan.api.engine.impl.pipe.ToJavaObjectPipe;
+import com.zaubersoftware.leviathan.api.engine.impl.pipe.XMLPipe;
 
 /**
  * Default implementation of the {@link AfterFetchingHandler} interface that uses a {@link DefaultEngine}
@@ -62,7 +75,7 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
         }
 
         @Override
-        public AfterThen onAnyExceptionDo(final ExceptionHandler<? extends Throwable> handler) {
+        public AfterThen onAnyExceptionDo(final ExceptionHandler handler) {
             DefaultAfterFetchingHandler.this.engine.addExceptionHandlerForCurrentPipe(handler);
             return this;
         }
@@ -75,14 +88,176 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
         }
 
         @Override
-        public AfterHandleWith<AfterThen> handleWith(final ExceptionHandler<? extends Throwable> handler) {
+        public AfterHandleWith<AfterThen> handleWith(final ExceptionHandler handler) {
             DefaultAfterFetchingHandler.this.engine.addExceptionHandlerForCurrentPipe(this.throwableClass, handler);
             return this;
         }
 
         @Override
-        public AfterThen otherwiseHandleWith(final ExceptionHandler<? extends Throwable> handler) {
+        public AfterThen otherwiseHandleWith(final ExceptionHandler handler) {
             DefaultAfterFetchingHandler.this.engine.addExceptionHandlerForCurrentPipe(handler);
+            return this;
+        }
+
+    }
+
+    private final class DefaultErrorTolerant<T> implements AfterExceptionCatchDefinition<T>, AfterHandleWith<T> {
+
+        private Class<? extends Throwable> throwableClass;
+        private final T ret;
+
+        /**
+         * Creates the DefaultErrorTolerant.
+         *
+         * @param throwableClass
+         * @param ret
+         */
+        public DefaultErrorTolerant(final Class<? extends Throwable> throwableClass, final T ret) {
+            Validate.notNull(throwableClass, "The throwableClass cannot be null");
+            Validate.notNull(ret, "The return object cannot be null");
+            this.throwableClass = throwableClass;
+            this.ret = ret;
+        }
+
+        @Override
+        public <E extends Throwable> AfterExceptionCatchDefinition<T> on(final Class<E> throwableClass) {
+            Validate.notNull(throwableClass, "The throwable class canont be null");
+            this.throwableClass = throwableClass;
+            return this;
+        }
+
+        @Override
+        public AfterHandleWith<T> handleWith(final ExceptionHandler handler) {
+            DefaultAfterFetchingHandler.this.engine.addExceptionHandlerForCurrentPipe(this.throwableClass, handler);
+            return this;
+        }
+
+        @Override
+        public T otherwiseHandleWith(final ExceptionHandler handler) {
+            DefaultAfterFetchingHandler.this.engine.addExceptionHandlerForCurrentPipe(handler);
+            return this.ret;
+        }
+
+    }
+
+    private final class DefaultActionAndControlStructureHandler<T> implements ErrorTolerantActionAndControlStructureHandler<T>, AfterJavaObjectHandler<T> {
+
+        @Override
+        public <R> ActionAndControlStructureHandler<R> then(final Action<T, R> action) {
+            Validate.notNull(action, "The action cannot be null");
+            DefaultAfterFetchingHandler.this.engine.appendPipe(new ActionPipe<T, R>(action));
+            return new DefaultActionAndControlStructureHandler<R>();
+        }
+        @Override
+        public AfterFetchingHandler then(final ActionAndThenFetch<T> object) {
+            throw new NotImplementedException();
+        }
+
+        @Override
+        public ErrorTolerantAfterThen then(final ContextAwareClosure<T> closure) {
+            Validate.notNull(closure, "The closure cannot be null");
+            DefaultAfterFetchingHandler.this.engine.appendPipe(new ClosureAdapterPipe<T>(closure));
+            return new DefaultErrorTolerantAfterThen();
+        }
+
+        @Override
+        public AfterFetchingHandler thenFetch(final String uriTemplate) {
+            throw new NotImplementedException();
+        }
+
+        @Override
+        public AfterFetchingHandler thenFetch(final URI uri) {
+            throw new NotImplementedException();
+        }
+
+        @Override
+        public Engine thenDoNothing() {
+            pack();
+            return DefaultAfterFetchingHandler.this.engine;
+        }
+
+        @Override
+        public ProcessingFlow pack() {
+            return DefaultAfterFetchingHandler.this.pack();
+        }
+
+        @Override
+        public ErrorTolerantActionAndControlStructureHandler<T> onAnyExceptionDo(final ExceptionHandler handler) {
+            DefaultAfterFetchingHandler.this.engine.addExceptionHandlerForCurrentPipe(handler);
+            return this;
+        }
+
+        @Override
+        public <E extends Throwable> AfterExceptionCatchDefinition<ErrorTolerantActionAndControlStructureHandler<T>> on(
+                final Class<E> throwableClass) {
+            return new DefaultErrorTolerant<ErrorTolerantActionAndControlStructureHandler<T>>(throwableClass, this);
+        }
+
+        @Override
+        public <R> AfterForEachHandler<R, T> forEach(final Class<R> elementClass) {
+            return new DefaultAfterForEachHandler<R, T>();
+        }
+
+    }
+
+    public final class DefaultAfterForEachHandler<R,T> implements AfterForEachHandler<R,T>, ThenWithContextAwareClosure<R,T>, EndFor<T> {
+
+        private String propertyName;
+        private ContextAwareClosure<R> closure;
+
+        @Override
+        public ThenWithContextAwareClosure<R, T> in(
+                final String propertyName) {
+            this.propertyName = propertyName;
+            return this;
+        }
+
+        @Override
+        public EndFor<T> then(
+                final ContextAwareClosure<R> closure) {
+            this.closure = closure;
+            return this;
+        }
+
+        @Override
+        public ErrorTolerantActionAndControlStructureHandler<T> endFor() {
+            DefaultAfterFetchingHandler.this.engine.appendPipe(new ForEachPipe<T, R>(this.propertyName, new ClosureAdapterPipe<R>(this.closure)));
+            return new DefaultActionAndControlStructureHandler<T>();
+        }
+
+    }
+
+    private final class DefaultAfterXMLTransformer implements AfterXMLTransformer {
+
+        @Override
+        public <T> AfterJavaObjectHandler<T> toJavaObject(final Class<T> aClass) {
+            Validate.notNull(aClass, "The class cannot be null");
+            DefaultAfterFetchingHandler.this.engine.appendPipe(new ToJavaObjectPipe<T>(aClass));
+            return new DefaultActionAndControlStructureHandler<T>();
+        }
+
+        @Override
+        public AfterXMLTransformer transformXML(final String xsl) {
+            Validate.notNull(xsl, "The XSLT path cannot be null");
+            try {
+                DefaultAfterFetchingHandler.this.engine.appendPipe(new XMLPipe(new StreamSource(new FileInputStream(xsl))));
+            } catch (final FileNotFoundException e) {
+                throw new UnhandledException(e);
+            }
+            return this;
+        }
+
+        @Override
+        public AfterXMLTransformer transformXML(final Source xsl) {
+            Validate.notNull(xsl, "The XSLT source cannot be null");
+            DefaultAfterFetchingHandler.this.engine.appendPipe(new XMLPipe(xsl));
+            return this;
+        }
+
+        @Override
+        public AfterXMLTransformer transformXML(final Transformer xsl) {
+            Validate.notNull(xsl, "The XSLT transformer cannot be null");
+            DefaultAfterFetchingHandler.this.engine.appendPipe(new XMLPipe(xsl));
             return this;
         }
 
@@ -100,44 +275,53 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
 
     @Override
     public AfterXMLTransformer transformXML(final String xsl) {
-        // TODO Auto-generated method stub
-        return null;
+        Validate.notNull(xsl, "The XSLT source cannot be null");
+        try {
+            this.engine.appendPipe(new XMLPipe(new StreamSource(new FileInputStream(xsl))));
+        } catch (final FileNotFoundException e) {
+            throw new UnhandledException(e);
+        }
+        return this;
     }
 
     @Override
     public AfterXMLTransformer transformXML(final Source xsl) {
-        // TODO Auto-generated method stub
-        return null;
+        Validate.notNull(xsl, "The XSLT transformer cannot be null");
+        this.engine.appendPipe(new XMLPipe(xsl));
+        return this;
     }
 
     @Override
     public AfterXMLTransformer transformXML(final Transformer xsl) {
-        // TODO Auto-generated method stub
-        return null;
+        Validate.notNull(xsl, "The XSLT transformer cannot be null");
+        this.engine.appendPipe(new XMLPipe(xsl));
+        return this;
     }
 
     @Override
     public <T> AfterJavaObjectHandler<T> toJavaObject(final Class<T> aClass) {
-        // TODO Auto-generated method stub
-        return null;
+        Validate.notNull(aClass, "The class cannot be null");
+        this.engine.appendPipe(new ToJavaObjectPipe<T>(aClass));
+        return new DefaultActionAndControlStructureHandler<T>();
     }
 
     @Override
-    public ActionHandler<URIFetcherResponse> onAnyExceptionDo(final ExceptionHandler<? extends Throwable> handler) {
-        // TODO Auto-generated method stub
-        return null;
+    public ActionHandler<URIFetcherResponse> onAnyExceptionDo(final ExceptionHandler handler) {
+        Validate.notNull(handler, "The handler cannot be null");
+        this.engine.onAnyExceptionDo(handler);
+        return new DefaultActionAndControlStructureHandler<URIFetcherResponse>();
     }
 
     @Override
     public <R> ActionAndControlStructureHandler<R> then(final Action<URIFetcherResponse, R> object) {
-        // TODO Auto-generated method stub
-        return null;
+        Validate.notNull(object, "The action cannot be null");
+        this.engine.appendPipe(new ActionPipe<URIFetcherResponse, R>(object));
+        return new DefaultActionAndControlStructureHandler<R>();
     }
 
     @Override
     public AfterFetchingHandler then(final ActionAndThenFetch<URIFetcherResponse> object) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
@@ -148,14 +332,12 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
 
     @Override
     public AfterFetchingHandler thenFetch(final String uriTemplate) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public AfterFetchingHandler thenFetch(final URI uri) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
@@ -165,8 +347,8 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
 
     @Override
     public AfterXMLTransformer sanitizeHTML() {
-        // TODO Auto-generated method stub
-        return null;
+        this.engine.appendPipe(new HTMLSanitizerPipe());
+        return new DefaultAfterXMLTransformer();
     }
 
     @Override

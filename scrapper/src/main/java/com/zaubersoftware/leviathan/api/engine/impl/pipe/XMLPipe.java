@@ -23,6 +23,7 @@ import java.util.Properties;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -30,6 +31,7 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +41,7 @@ import com.zaubersoftware.leviathan.api.engine.Pipe;
 
 /**
  * A {@link Pipe} that applies an XSL transformation
- * 
+ *
  * @author Guido Marucci Blas
  * @since Aug 12, 2011
  */
@@ -48,21 +50,26 @@ public final class XMLPipe implements Pipe<Node, Node> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Map<String, Object> extraModel;
     private final String encoding;
-    private final Source xsltSource;
-    
+    private final Transformer transformer;
+
     /**
      * Creates the XMLPipe.
      *
      * @param scrapper
      */
     public XMLPipe(
-            final Source xsltSource, 
-            final Map<String, Object> extraModel, 
+            final Source xsltSource,
+            final Map<String, Object> extraModel,
             final String encoding) {
         Validate.notNull(xsltSource, "The xslt source cannot be null");
         this.extraModel = (extraModel == null) ? new HashMap<String, Object>() : extraModel;
         this.encoding = encoding;
-        this.xsltSource = xsltSource;
+        final TransformerFactory factory = TransformerFactory.newInstance();
+        try {
+            this.transformer = factory.newTransformer(xsltSource);
+        } catch (final TransformerConfigurationException e) {
+            throw new UnhandledException(e);
+        }
     }
 
     /**
@@ -85,7 +92,7 @@ public final class XMLPipe implements Pipe<Node, Node> {
     public XMLPipe(final Source xsltSource, final String encodig) {
         this(xsltSource, null, null);
     }
-    
+
     /**
      * Creates the XMLPipe.
      *
@@ -95,19 +102,39 @@ public final class XMLPipe implements Pipe<Node, Node> {
         this(xsltSource, null, null);
     }
 
+    /**
+     * Creates the XMLPipe.
+     *
+     * @param scraper
+     */
+    public XMLPipe(final Transformer transformer) {
+        this(transformer, null, null);
+    }
+
+    /**
+     * Creates the XMLPipe.
+     *
+     * @param scraper
+     */
+    public XMLPipe(final Transformer transformer, final String encoding, final Map<String, Object> extraModel) {
+        this.extraModel = (extraModel == null) ? new HashMap<String, Object>() : extraModel;
+        this.encoding = encoding;
+        this.transformer = transformer;
+    }
+
     @Override
     public Node execute(final Node input) {
         Validate.notNull(input, "The input XML document cannot be null");
-        
-        final Map<String, Object> model = extraModel;
+
+        final Map<String, Object> model = this.extraModel;
         // TODO Retrieve model from current context in local thread and merge it with extra model.
-        logger.warn("TODO Retrieve model from current context in local thread and merge it with extra model");
+        this.logger.warn("TODO Retrieve model from current context in local thread and merge it with extra model");
         return applyXSLT(input, model, null);
     }
 
     /**
      * Applies the XSL Transformation and returns the resulting Node.
-     * 
+     *
      * @param node
      * @param model
      * @param oformat
@@ -115,18 +142,16 @@ public final class XMLPipe implements Pipe<Node, Node> {
      * @throws TransformerFactoryConfigurationError
      */
     private Node applyXSLT(
-            final Node node, 
+            final Node node,
             final Map<String, Object> model,
             final Properties oformat) {
         Validate.notNull(node, "The node cannot be null.");
         // NOTE: This code was extracted from ar.com.zauber.leviathan.scrapper.transformation.XSLTTransformer
-        
+
         try {
-            final TransformerFactory factory = TransformerFactory.newInstance();
-            final Transformer transformer = factory.newTransformer(xsltSource);
-            Validate.notNull(transformer);
+            Validate.notNull(this.transformer);
             for(final Entry<String, Object> entry : model.entrySet()) {
-                transformer.setParameter(entry.getKey(), entry.getValue());
+                this.transformer.setParameter(entry.getKey(), entry.getValue());
             }
             Properties options;
             if(oformat != null) {
@@ -134,19 +159,19 @@ public final class XMLPipe implements Pipe<Node, Node> {
             } else {
                 options = new Properties();
             }
-            if(encoding != null) {
-                options.setProperty(OutputKeys.ENCODING, encoding);
+            if(this.encoding != null) {
+                options.setProperty(OutputKeys.ENCODING, this.encoding);
             }
-            transformer.setOutputProperties(options);
+            this.transformer.setOutputProperties(options);
             final DOMResult result = new DOMResult();
-            transformer.transform(new DOMSource(node), result);
+            this.transformer.transform(new DOMSource(node), result);
             return result.getNode();
         } catch (final TransformerException e) {
-            logger.error("An error ocurred while applying the XSL transformation", e);
+            this.logger.error("An error ocurred while applying the XSL transformation", e);
             // TODO
             throw new NotImplementedException("Handle exception with context stack handlers");
         } catch (final TransformerFactoryConfigurationError e) {
-            logger.error("An error ocurred while applying the XSL transformation", e);
+            this.logger.error("An error ocurred while applying the XSL transformation", e);
             // TODO
             throw new NotImplementedException("Handle exception with context stack handlers");
         }

@@ -19,43 +19,40 @@ import java.net.URI;
 import java.util.Map;
 
 import ar.com.zauber.leviathan.api.URIAndContextDictionary;
+import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 /**
  * TODO: Description of the class, Comments in english by default
- * 
- * 
+ *
+ *
  * @author Guido Marucci Blas
  * @since Jul 22, 2011
  */
 public class CurrentThreadURIAndContextDictionary implements URIAndContextDictionary {
+    public final static ThreadLocal<URIAndCtx> ctxHolder = new ThreadLocal<URIAndCtx>();
 
     @Override
     public final URI getURI() {
-        // TODO: Auto-generated method stub
-        return null;
+        return ctxHolder.get().getURI();
     }
 
     @Override
     public final Map<String, Object> getCtx() {
-        // TODO: Auto-generated method stub
-        return null;
+        return ctxHolder.get().getCtx();
     }
 
     @Override
     public final Object get(final String key) {
-        // TODO: Auto-generated method stub
-        return null;
+        return ctxHolder.get().getCtx().get(key);
     }
 
     public final boolean contains(final String key) {
-        // TODO
-        return false;
+        return ctxHolder.get().getCtx().containsKey(key);
     }
 
     @Override
     public final void put(final String key, final Object value) {
-        // TODO: Auto-generated method stub
-
+        ctxHolder.get().getCtx().put(key, value);
     }
 
 }

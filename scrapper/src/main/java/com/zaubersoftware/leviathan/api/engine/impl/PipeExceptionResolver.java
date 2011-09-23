@@ -19,18 +19,18 @@ import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
  */
 public final class PipeExceptionResolver {
 
-    private final Map<Class<? extends Throwable>, ExceptionHandler<? extends Throwable>> handlers = new HashMap<Class<? extends Throwable>, ExceptionHandler<? extends Throwable>>();
-    private ExceptionHandler<? extends Throwable> defaultHandler;
+    private final Map<Class<? extends Throwable>, ExceptionHandler> handlers = new HashMap<Class<? extends Throwable>, ExceptionHandler>();
+    private ExceptionHandler defaultHandler;
 
     /**
      * @param handler
      */
-    public void setDefaultExceptionHandler(final ExceptionHandler<? extends Throwable> handler) {
+    public void setDefaultExceptionHandler(final ExceptionHandler handler) {
         Validate.notNull(handler, "The handler cannot be null");
         this.defaultHandler = handler;
     }
 
-    public <E extends Throwable> void addExceptionHandler(final Class<E> throwableClass, final ExceptionHandler<? extends Throwable> handler) {
+    public <E extends Throwable> void addExceptionHandler(final Class<E> throwableClass, final ExceptionHandler handler) {
         Validate.notNull(throwableClass, "The throwable class cannot be null");
         Validate.notNull(handler, "The exception handler cannot be null");
         this.handlers.put(throwableClass, handler);
@@ -45,7 +45,7 @@ public final class PipeExceptionResolver {
      *
      * @return <code>Map<Class<? extends Throwable>,ExceptionHandler<?>></code> with the handlers.
      */
-    public Map<Class<? extends Throwable>, ExceptionHandler<? extends Throwable>> getHandlers() {
+    public Map<Class<? extends Throwable>, ExceptionHandler> getHandlers() {
         return this.handlers;
     }
 
@@ -54,7 +54,7 @@ public final class PipeExceptionResolver {
      *
      * @return <code>ExceptionHandler<?></code> with the defaultHandler.
      */
-    public ExceptionHandler<? extends Throwable> getDefaultHandler() {
+    public ExceptionHandler getDefaultHandler() {
         return this.defaultHandler;
     }
 }

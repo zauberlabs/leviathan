@@ -23,7 +23,7 @@ import java.net.URI;
  *
  * @param <T> The type of the object for which the action will be performed.
  * @author Guido Marucci Blas
- * @author Martín Silva
+ * @author Martï¿½n Silva
  * @author Juan F. Codagnone
  * @since Jul 22, 2011
  */

@@ -22,9 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.zaubersoftware.leviathan.api.engine.Pipe;
-
 import ar.com.zauber.commons.validate.Validate;
+
+import com.zaubersoftware.leviathan.api.engine.Pipe;
 
 
 /**
@@ -55,12 +55,8 @@ public final class ForEachPipe<T, V> implements Pipe<T, T> {
 
     @Override
     public T execute(final T input) {
-        for (final V element : getIterable(input, propertyName)) {
-            // TODO: Create a new context for this pipe execution. An abstract pipe could be created
-            // which generates a new context an insert as the parent context the context it is using
-            logger.warn("TODO: Create a new context for this pipe execution. An abstract pipe could be created"
-            + " which generates a new context an insert as the parent context the context it is using");
-            pipe.execute(element);
+        for (final V element : getIterable(input, this.propertyName)) {
+            this.pipe.execute(element);
         }
         return input;
     }
