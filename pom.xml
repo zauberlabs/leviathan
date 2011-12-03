@@ -14,7 +14,7 @@
 
   It surfs the web, and retrieves data :)
   </description>
-  <groupId>ar.com.zauber.leviathan</groupId>
+  <groupId>com.zaubersoftware.leviathan</groupId>
   <artifactId>leviathan-parent</artifactId>
   <version>0.8-SNAPSHOT</version>
   <packaging>pom</packaging>
