@@ -93,19 +93,19 @@ public class NewApiTestDriver {
                     return t;
                 }
             })
-            .forEach(Category.class).in("categories")
-                .thenFetch("http://www.dmoz.org/#[root.getName()]")
-                    .then(new ContextAwareClosure<URIFetcherResponse>() {
-                        @Override
-                        public void execute(final URIFetcherResponse arg0) {
-                        }
-                    })
-                    .on(DuplicatedEntityException.class).handleWith(new ExceptionHandler() {
-                        @Override
-                        public void handle(final Throwable trowable) {
-                            // Log error
-                        }
-                    });
+            .forEach(Category.class).in("categories");
+//                .thenFetch("http://www.dmoz.org/#[root.getName()]")
+//                    .then(new ContextAwareClosure<URIFetcherResponse>() {
+//                        @Override
+//                        public void execute(final URIFetcherResponse arg0) {
+//                        }
+//                    })
+//                    .on(DuplicatedEntityException.class).handleWith(new ExceptionHandler() {
+//                        @Override
+//                        public void handle(final Throwable trowable) {
+//                            // Log error
+//                        }
+//                    });
 
         engine.forUri("http://www.dmoz.org/").sanitizeHTML().transformXML("raiz.xsl")
             .transformXML("otramas.xml")
