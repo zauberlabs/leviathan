@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import ar.com.zauber.commons.dao.exception.DuplicatedEntityException;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 
 
@@ -34,7 +33,7 @@ public class NewApiTestDriver {
 
     @Test
     public void testname() throws Exception {
-        final Engine engine = Leviathan.newEngine().build();
+        final Engine engine = null;
 
         engine.forUri("http://google.com/").then(new ContextAwareClosure<URIFetcherResponse>() {
             @Override
