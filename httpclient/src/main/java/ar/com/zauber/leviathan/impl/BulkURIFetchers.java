@@ -172,7 +172,7 @@ public final class BulkURIFetchers {
         final JobScheduler procesessingScheduler = new JobScheduler(
                 new BlockingQueueJobQueue<Job>(new LinkedBlockingQueue<Job>()), 
                 new ThreadPoolExecutor(2, 2, 0, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), 
-                        new BlockingRejectedExecutionHandler()), new Timer(), 10000);
+                        new BlockingRejectedExecutionHandler()), new Timer(true), 10000);
         
         final FetchQueueAsyncUriFetcher f = new FetchQueueAsyncUriFetcher(createSafeHttpClientURIFetcher(),
                 fecherScheduler, 
