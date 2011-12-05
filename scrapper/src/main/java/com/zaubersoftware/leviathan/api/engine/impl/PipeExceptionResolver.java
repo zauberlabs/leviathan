@@ -31,7 +31,8 @@ import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
  */
 public final class PipeExceptionResolver {
 
-    private final Map<Class<? extends Throwable>, ExceptionHandler> handlers = new HashMap<Class<? extends Throwable>, ExceptionHandler>();
+    private final Map<Class<? extends Throwable>, ExceptionHandler> handlers = 
+            new HashMap<Class<? extends Throwable>, ExceptionHandler>();
     private ExceptionHandler defaultHandler;
 
     /**
@@ -42,7 +43,8 @@ public final class PipeExceptionResolver {
         this.defaultHandler = handler;
     }
 
-    public <E extends Throwable> void addExceptionHandler(final Class<E> throwableClass, final ExceptionHandler handler) {
+    public <E extends Throwable> void addExceptionHandler(final Class<E> throwableClass, 
+                                                         final ExceptionHandler handler) {
         Validate.notNull(throwableClass, "The throwable class cannot be null");
         Validate.notNull(handler, "The exception handler cannot be null");
         this.handlers.put(throwableClass, handler);

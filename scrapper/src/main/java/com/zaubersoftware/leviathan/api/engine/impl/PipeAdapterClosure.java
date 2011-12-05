@@ -30,7 +30,7 @@ import com.zaubersoftware.leviathan.api.engine.Pipe;
  */
 public final class PipeAdapterClosure<I, O> implements Closure<I> {
 
-    private final Pipe<I,O> pipe;
+    private final Pipe<I, O> pipe;
 
     /**
      * Creates the PipeAdapterClosure.

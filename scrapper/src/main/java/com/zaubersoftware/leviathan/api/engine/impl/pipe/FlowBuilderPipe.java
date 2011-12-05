@@ -46,7 +46,8 @@ public final class FlowBuilderPipe<I, O> implements Pipe<I, O> {
     private ExceptionHandler defaultExceptionHandler = new ExceptionHandler() {
         @Override
         public void handle(final Throwable trowable) {
-            FlowBuilderPipe.this.logger.error("No one is willing to handle this exception. It will blow up!!!!!", trowable);
+            FlowBuilderPipe.this.logger.error("No one is willing to handle this exception. It will blow up!!!!!", 
+                    trowable);
             throw new UnhandledException(trowable);
         }
     };
@@ -54,7 +55,7 @@ public final class FlowBuilderPipe<I, O> implements Pipe<I, O> {
     private final Map<Class<? extends Throwable>, ExceptionHandler> handlers =
         new HashMap<Class<? extends Throwable>, ExceptionHandler>();
     private final Map<Pipe<?, ?>, PipeExceptionResolver> pipeExceptionResolvers =
-        new HashMap<Pipe<?,?>, PipeExceptionResolver>();
+        new HashMap<Pipe<?, ?>, PipeExceptionResolver>();
 
     /**
      * Creates the FlowBuilderPipe.
@@ -90,7 +91,8 @@ public final class FlowBuilderPipe<I, O> implements Pipe<I, O> {
      * Creates the CompositePipe.
      *
      */
-    public FlowBuilderPipe(final Collection<Pipe<?, ?>> pipes, final Map<Class<? extends Throwable>, ExceptionHandler> handlers) {
+    public FlowBuilderPipe(final Collection<Pipe<?, ?>> pipes, 
+                           final Map<Class<? extends Throwable>, ExceptionHandler> handlers) {
         this(pipes, handlers, null);
     }
 

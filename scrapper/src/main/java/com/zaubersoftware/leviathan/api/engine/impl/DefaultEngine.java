@@ -47,7 +47,7 @@ import com.zaubersoftware.leviathan.api.engine.ProcessingFlowBinding;
  * @author Martin Silva
  * @since Sep 2, 2011
  */
-public final class DefaultEngine implements Engine, AfterHandleWith<Engine>{
+public final class DefaultEngine implements Engine, AfterHandleWith<Engine> {
 
     private static final ExceptionHandler DEFAULT_EXCEPTION_HANDLER = new ExceptionHandler() {
         @Override
@@ -58,23 +58,21 @@ public final class DefaultEngine implements Engine, AfterHandleWith<Engine>{
 
     private final AsyncUriFetcher fetcher;
     private final Map<URI, ProcessingFlow> packedFlows = new HashMap<URI, ProcessingFlow>();
-    private List<Pipe<?,?>> currentPipeFlow = new ArrayList<Pipe<?,?>>();
+    private List<Pipe<?, ?>> currentPipeFlow = new ArrayList<Pipe<?, ?>>();
     private URI currentURI;
     private Pipe<?, ?> currentPipe;
 
-    private final Map<Class<? extends Throwable>, ExceptionHandler> handlers = new HashMap<Class<? extends Throwable>, ExceptionHandler>();
+    private final Map<Class<? extends Throwable>, ExceptionHandler> handlers = 
+            new HashMap<Class<? extends Throwable>, ExceptionHandler>();
     private ExceptionHandler defaultFallbackExceptionHandler = DEFAULT_EXCEPTION_HANDLER;
-    private final Map<Pipe<?,?>, PipeExceptionResolver> pipeExceptionResolvers = new HashMap<Pipe<?,?>, PipeExceptionResolver>();
+    private final Map<Pipe<?, ?>, PipeExceptionResolver> pipeExceptionResolvers = 
+            new HashMap<Pipe<?, ?>, PipeExceptionResolver>();
 
     private final class DefaultEngineProcessingFlowBinding implements ProcessingFlowBinding {
 
         private final URI uri;
 
-        /**
-         * Creates the DefaultProcessingFlowBinding.
-         *
-         * @param uri
-         */
+        /** Creates the DefaultProcessingFlowBinding. */
         public DefaultEngineProcessingFlowBinding(final URI uri) {
             this.uri = uri;
         }
@@ -87,7 +85,8 @@ public final class DefaultEngine implements Engine, AfterHandleWith<Engine>{
         }
     }
 
-    private final class DefaultEngineAfterExceptionCatchDefinition<E extends Throwable> implements AfterExceptionCatchDefinition<Engine> {
+    private final class DefaultEngineAfterExceptionCatchDefinition<E extends Throwable> 
+             implements AfterExceptionCatchDefinition<Engine> {
 
         private final Class<E> throwableClass;
 
@@ -179,7 +178,8 @@ public final class DefaultEngine implements Engine, AfterHandleWith<Engine>{
     public Engine doGet(final URIAndCtx uriAndCtx) {
         Validate.notNull(uriAndCtx, "The URI for which a GET request will be done cannot be null");
         if (!this.packedFlows.containsKey(uriAndCtx.getURI())) {
-            throw new IllegalStateException(String.format("There is no processing flow for the given URI %s", uriAndCtx.getURI()));
+            throw new IllegalStateException(String.format("There is no processing flow for the given URI %s", 
+                    uriAndCtx.getURI()));
         }
         this.fetcher.get(uriAndCtx, adaptProcessingFlowToClosure(checkedGetFlow(uriAndCtx.getURI())));
         return this;
@@ -219,7 +219,8 @@ public final class DefaultEngine implements Engine, AfterHandleWith<Engine>{
     /**
      * @param handler
      */
-    public void addExceptionHandlerForCurrentPipe(final Class<? extends Throwable> throwableClass, final ExceptionHandler handler) {
+    public void addExceptionHandlerForCurrentPipe(final Class<? extends Throwable> throwableClass, 
+                                                  final ExceptionHandler handler) {
         this.pipeExceptionResolvers.get(this.currentPipe).addExceptionHandler(throwableClass, handler);
     }
 
@@ -230,7 +231,7 @@ public final class DefaultEngine implements Engine, AfterHandleWith<Engine>{
      * @param uri
      * @param pipe
      */
-    protected void appendPipe(final Pipe<?,?> pipe) {
+    protected void appendPipe(final Pipe<?, ?> pipe) {
         Validate.notNull(pipe, "The pipe to be appended cannot be null");
         this.currentPipe = pipe;
         this.pipeExceptionResolvers.put(pipe, new PipeExceptionResolver());
@@ -280,7 +281,7 @@ public final class DefaultEngine implements Engine, AfterHandleWith<Engine>{
      * Resets current state
      */
     private void reset() {
-        this.currentPipeFlow = new ArrayList<Pipe<?,?>>();
+        this.currentPipeFlow = new ArrayList<Pipe<?, ?>>();
         this.currentURI = null;
         this.currentPipe = null;
     }

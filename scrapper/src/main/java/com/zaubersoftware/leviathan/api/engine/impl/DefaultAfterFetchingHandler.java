@@ -89,7 +89,8 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
 
         @Override
         public AfterHandleWith<AfterThen> handleWith(final ExceptionHandler handler) {
-            DefaultAfterFetchingHandler.this.engine.addExceptionHandlerForCurrentPipe(this.throwableClass, handler);
+            DefaultAfterFetchingHandler.this
+                .engine.addExceptionHandlerForCurrentPipe(this.throwableClass, handler);
             return this;
         }
 
@@ -200,7 +201,8 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
 
     }
 
-    public final class DefaultAfterForEachHandler<R,T> implements AfterForEachHandler<R,T>, ThenWithContextAwareClosure<R,T>, EndFor<T> {
+    public final class DefaultAfterForEachHandler<R,T> 
+            implements AfterForEachHandler<R, T>, ThenWithContextAwareClosure<R, T>, EndFor<T> {
 
         private String propertyName;
         private ContextAwareClosure<R> closure;
@@ -221,7 +223,8 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
 
         @Override
         public ErrorTolerantActionAndControlStructureHandler<T> endFor() {
-            DefaultAfterFetchingHandler.this.engine.appendPipe(new ForEachPipe<T, R>(this.propertyName, new ClosureAdapterPipe<R>(this.closure)));
+            DefaultAfterFetchingHandler.this.engine.appendPipe(new ForEachPipe<T, R>(
+                    this.propertyName, new ClosureAdapterPipe<R>(this.closure)));
             return new DefaultActionAndControlStructureHandler<T>();
         }
 
@@ -240,7 +243,8 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
         public AfterXMLTransformer transformXML(final String xsl) {
             Validate.notNull(xsl, "The XSLT path cannot be null");
             try {
-                DefaultAfterFetchingHandler.this.engine.appendPipe(new XMLPipe(new StreamSource(new FileInputStream(xsl))));
+                DefaultAfterFetchingHandler.this.engine.appendPipe(
+                        new XMLPipe(new StreamSource(new FileInputStream(xsl))));
             } catch (final FileNotFoundException e) {
                 throw new UnhandledException(e);
             }
@@ -359,6 +363,7 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
     @Override
     public <E extends Throwable> AfterExceptionCatchDefinition<ActionHandler<URIFetcherResponse>> on(
             final Class<E> throwableClass) {
-        throw new NotImplementedException("This should handle exeception that occur while fetching (POST or GET). They should be treated as engine exceptions");
+        throw new NotImplementedException("This should handle exeception that occur while fetching "
+            + "(POST or GET). They should be treated as engine exceptions");
     }
 }

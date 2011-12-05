@@ -48,7 +48,7 @@ public final class InmutableProcessingFlow implements ProcessingFlow {
      * @param pipeExceptionResolvers
      */
     public InmutableProcessingFlow(
-            final Collection<Pipe<?,?>> pipes,
+            final Collection<Pipe<?, ?>> pipes,
             final Map<Class<? extends Throwable>, ExceptionHandler> exceptionHandlers,
             final ExceptionHandler defaultExceptionHandler,
             final Map<Pipe<?, ?>, PipeExceptionResolver> pipeExceptionResolvers) {
@@ -58,7 +58,8 @@ public final class InmutableProcessingFlow implements ProcessingFlow {
         Validate.notNull(pipeExceptionResolvers, "The pipeExceptionResolvers cannot be null");
 
         pipes.add(new ClosureAdapterPipe<Object>(new NullClosure<Object>()));
-        this.pipeFlow = new FlowBuilderPipe<URIFetcherResponse, Void>(pipes, exceptionHandlers, pipeExceptionResolvers);
+        this.pipeFlow = new FlowBuilderPipe<URIFetcherResponse, Void>(pipes, exceptionHandlers, 
+                                                                      pipeExceptionResolvers);
         this.pipeFlow.setDefaultExceptionHandler(defaultExceptionHandler);
     }
 

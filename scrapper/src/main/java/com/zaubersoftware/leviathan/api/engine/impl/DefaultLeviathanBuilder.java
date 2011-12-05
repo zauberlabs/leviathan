@@ -33,9 +33,9 @@ public final class DefaultLeviathanBuilder implements LeviathanBuilder {
     private AsyncUriFetcher fetcher;
 
     @Override
-    public LeviathanBuilder withAsyncURIFetcher(final AsyncUriFetcher fetcher) {
-        Validate.notNull(fetcher, "The fetcher cannot be null");
-        this.fetcher = fetcher;
+    public LeviathanBuilder withAsyncURIFetcher(final AsyncUriFetcher f) {
+        Validate.notNull(f, "The fetcher cannot be null");
+        this.fetcher = f;
         return this;
     }
 
