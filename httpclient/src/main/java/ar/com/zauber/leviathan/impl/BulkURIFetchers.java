@@ -111,7 +111,7 @@ public final class BulkURIFetchers {
     public static URIFetcher createSafeHttpClientURIFetcher() {
         final Map<String, Scheme> registries = new HashMap<String, Scheme>();
         registries.put("http", new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        registries.put("http", new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
+        registries.put("https", new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
         final SchemeRegistry schemaRegistry = new SchemeRegistry();
         schemaRegistry.setItems(registries);
         
