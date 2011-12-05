@@ -51,7 +51,7 @@ import com.zaubersoftware.leviathan.api.engine.impl.dto.Link;
  * @author Martin Silva
  * @since Sep 2, 2011
  */
-public class InstantiationFlowTest {
+public final class InstantiationFlowTest {
 
     private final URI mlhome = URI.create("http://www.mercadolibre.com.ar/");
     private LeviathanBuilder leviathan;
