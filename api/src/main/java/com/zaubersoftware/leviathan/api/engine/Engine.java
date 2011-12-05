@@ -18,6 +18,7 @@ package com.zaubersoftware.leviathan.api.engine;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
+import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 /**
@@ -118,4 +119,9 @@ public interface Engine extends ErrorTolerant<Engine> {
      */
     boolean awaitIdleness(long timeout, TimeUnit unit) throws InterruptedException;
 
+    /** @see  AsyncUriFetcher#shutdown() */
+    void shutdown();
+    
+    /** @see  AsyncUriFetcher#shutdownNow()() */
+    void shutdownNow();
 }

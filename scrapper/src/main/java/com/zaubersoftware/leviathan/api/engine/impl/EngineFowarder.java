@@ -93,5 +93,13 @@ public abstract class EngineFowarder implements Engine {
         return this.target.awaitIdleness(timeout, unit);
     }
 
+    @Override
+    public void shutdown() {
+        this.target.shutdown();
+    }
 
+    @Override
+    public void shutdownNow() {
+        this.target.shutdownNow();
+    }
 }

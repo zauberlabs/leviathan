@@ -299,4 +299,13 @@ public final class DefaultEngine implements Engine, AfterHandleWith<Engine>{
         return flow;
     }
 
+    @Override
+    public void shutdown() {
+        fetcher.shutdown();
+    }
+
+    @Override
+    public void shutdownNow() {
+        fetcher.shutdownNow();
+    }
 }
