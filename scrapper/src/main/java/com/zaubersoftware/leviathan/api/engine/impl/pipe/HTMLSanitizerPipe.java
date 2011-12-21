@@ -61,6 +61,7 @@ public final class HTMLSanitizerPipe implements Pipe<URIFetcherResponse, Node> {
         tidy.setErrfile("foo");
         tidy.setOnlyErrors(true);
         tidy.setErrout(new PrintWriter(new NullWriter()));
+        tidy.setInputEncoding("utf-8");
         // TODO XXX Poner buenos defaults
     }
 
