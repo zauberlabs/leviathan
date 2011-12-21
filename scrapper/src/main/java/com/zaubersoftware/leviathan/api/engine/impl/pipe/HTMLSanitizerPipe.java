@@ -38,31 +38,32 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse;
  */
 public final class HTMLSanitizerPipe implements Pipe<URIFetcherResponse, Node> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final Tidy tidy;
+    private final TidyFactory tidyFactory;
 
-    /**
-     * Creates the HTMLSanitizerPipe.
-     *
-     * @param tidy
-     */
-    public HTMLSanitizerPipe(final Tidy tidy) {
+    /** Creates the HTMLSanitizerPipe */
+    public HTMLSanitizerPipe(final TidyFactory tidy) {
         Validate.notNull(tidy);
-        this.tidy = tidy;
+        this.tidyFactory = tidy;
     }
 
     /**
      * Creates the HTMLSanitizerPipe with a default configuration for {@link Tidy}
      */
     public HTMLSanitizerPipe() {
-        this.tidy = new Tidy();
-        tidy.setQuiet(true);
-        tidy.setShowWarnings(false);
-        tidy.setXHTML(true);
-        tidy.setErrfile("foo");
-        tidy.setOnlyErrors(true);
-        tidy.setErrout(new PrintWriter(new NullWriter()));
-        tidy.setInputEncoding("utf-8");
-        // TODO XXX Poner buenos defaults
+        this.tidyFactory = new TidyFactory() {
+            @Override
+            public Tidy newInstance() {
+                final Tidy tidy = new Tidy();
+                tidy.setQuiet(true);
+                tidy.setShowWarnings(false);
+                tidy.setXHTML(true);
+                tidy.setErrfile("foo");
+                tidy.setOnlyErrors(true);
+                tidy.setErrout(new PrintWriter(new NullWriter()));
+                tidy.setInputEncoding("utf-8");
+                return tidy;
+            }
+        };
     }
 
     @Override
@@ -71,7 +72,7 @@ public final class HTMLSanitizerPipe implements Pipe<URIFetcherResponse, Node> {
         // TODO Move response status code validation to a previous pipe
         if (response.isSucceeded()) {
             final Reader input = response.getHttpResponse().getContent();
-            return tidy.parseDOM(input, new NullWriter());
+            return tidyFactory.newInstance().parseDOM(input, new NullWriter());
         } else {
             logger.error("Fetch did not succeded: " + response.getURIAndCtx().getURI());
             // TODO
@@ -79,5 +80,4 @@ public final class HTMLSanitizerPipe implements Pipe<URIFetcherResponse, Node> {
                     response.getError());
         }
     }
-
 }
