@@ -22,6 +22,7 @@ import java.util.Properties;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
+import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -50,7 +51,7 @@ public final class XMLPipe implements Pipe<Node, Node> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Map<String, Object> extraModel;
     private final String encoding;
-    private final Transformer transformer;
+    private final Templates template;
 
     /**
      * Creates the XMLPipe.
@@ -66,7 +67,7 @@ public final class XMLPipe implements Pipe<Node, Node> {
         this.encoding = encoding;
         final TransformerFactory factory = TransformerFactory.newInstance();
         try {
-            this.transformer = factory.newTransformer(xsltSource);
+            template = factory.newTemplates(xsltSource);
         } catch (final TransformerConfigurationException e) {
             throw new UnhandledException(e);
         }
@@ -107,7 +108,7 @@ public final class XMLPipe implements Pipe<Node, Node> {
      *
      * @param scraper
      */
-    public XMLPipe(final Transformer transformer) {
+    public XMLPipe(final Templates transformer) {
         this(transformer, null, null);
     }
 
@@ -116,10 +117,10 @@ public final class XMLPipe implements Pipe<Node, Node> {
      *
      * @param scraper
      */
-    public XMLPipe(final Transformer transformer, final String encoding, final Map<String, Object> extraModel) {
+    public XMLPipe(final Templates transformer, final String encoding, final Map<String, Object> extraModel) {
         this.extraModel = (extraModel == null) ? new HashMap<String, Object>() : extraModel;
         this.encoding = encoding;
-        this.transformer = transformer;
+        this.template = transformer; 
     }
 
     @Override
@@ -147,11 +148,11 @@ public final class XMLPipe implements Pipe<Node, Node> {
             final Properties oformat) {
         Validate.notNull(node, "The node cannot be null.");
         // NOTE: This code was extracted from ar.com.zauber.leviathan.scrapper.transformation.XSLTTransformer
-
         try {
-            Validate.notNull(this.transformer);
+            final Transformer transformer = template.newTransformer();
+            Validate.notNull(transformer);
             for(final Entry<String, Object> entry : model.entrySet()) {
-                this.transformer.setParameter(entry.getKey(), entry.getValue());
+                transformer.setParameter(entry.getKey(), entry.getValue());
             }
             Properties options;
             if(oformat != null) {
@@ -162,9 +163,9 @@ public final class XMLPipe implements Pipe<Node, Node> {
             if(this.encoding != null) {
                 options.setProperty(OutputKeys.ENCODING, this.encoding);
             }
-            this.transformer.setOutputProperties(options);
+            transformer.setOutputProperties(options);
             final DOMResult result = new DOMResult();
-            this.transformer.transform(new DOMSource(node), result);
+            transformer.transform(new DOMSource(node), result);
             return result.getNode();
         } catch (final TransformerException e) {
             this.logger.error("An error ocurred while applying the XSL transformation", e);

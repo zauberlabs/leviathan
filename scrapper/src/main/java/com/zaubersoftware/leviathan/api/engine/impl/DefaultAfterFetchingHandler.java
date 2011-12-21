@@ -20,7 +20,7 @@ import java.io.FileNotFoundException;
 import java.net.URI;
 
 import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
+import javax.xml.transform.Templates;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang.NotImplementedException;
@@ -259,7 +259,7 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
         }
 
         @Override
-        public AfterXMLTransformer transformXML(final Transformer xsl) {
+        public AfterXMLTransformer transformXML(final Templates xsl) {
             Validate.notNull(xsl, "The XSLT transformer cannot be null");
             DefaultAfterFetchingHandler.this.engine.appendPipe(new XMLPipe(xsl));
             return this;
@@ -296,7 +296,7 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
     }
 
     @Override
-    public AfterXMLTransformer transformXML(final Transformer xsl) {
+    public AfterXMLTransformer transformXML(final Templates xsl) {
         Validate.notNull(xsl, "The XSLT transformer cannot be null");
         this.engine.appendPipe(new XMLPipe(xsl));
         return this;

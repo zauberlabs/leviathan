@@ -16,6 +16,7 @@
 package com.zaubersoftware.leviathan.api.engine;
 
 import javax.xml.transform.Source;
+import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 
 /**
@@ -54,6 +55,6 @@ public interface AfterXMLTransformer extends JavaObjectTransformer {
      * @return An {@link AfterXMLTransformer} interface that publishes all the actions that can be performed
      * after an XML Transformation.
      */
-    AfterXMLTransformer transformXML(Transformer xsl);
+    AfterXMLTransformer transformXML(Templates xsl);
     
 }
