@@ -42,13 +42,12 @@ public class OutputStreamAsyncUriFetcherObserver implements
 
     /** OutputStreamAsyncUriFetcherObserver. */
     public OutputStreamAsyncUriFetcherObserver() {
-        this(System.out, new NullAsyncUriFetcherObserver());
+        this(System.out);
     }
     
     /** OutputStreamAsyncUriFetcherObserver. */
-    public OutputStreamAsyncUriFetcherObserver(
-            final AsyncUriFetcherObserver target) {
-        this(System.out, target);
+    public OutputStreamAsyncUriFetcherObserver(final PrintStream out) {
+        this(System.out, new NullAsyncUriFetcherObserver());
     }
     
     /** OutputStreamAsyncUriFetcherObserver. */
