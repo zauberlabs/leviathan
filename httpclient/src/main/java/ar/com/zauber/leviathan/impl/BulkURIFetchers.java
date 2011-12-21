@@ -164,6 +164,12 @@ public final class BulkURIFetchers {
     
     /** builds a safe default {@link AsyncUriFetcher} */
     public static AsyncUriFetcher createAsyncUriFetcher() {
+        return createAsyncUriFetcher(createSafeHttpClientURIFetcher());
+
+    }
+    
+    /** builds a safe default {@link AsyncUriFetcher} */
+    public static AsyncUriFetcher createAsyncUriFetcher(final URIFetcher fetcher) {
         final JobScheduler fecherScheduler = new JobScheduler(
                 new MultiDomainPoliteJobQueue(500L, TimeUnit.MILLISECONDS), 
                 new ThreadPoolExecutor(1, 20, 10, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), 
@@ -174,10 +180,10 @@ public final class BulkURIFetchers {
                 new ThreadPoolExecutor(2, 2, 0, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), 
                         new BlockingRejectedExecutionHandler()), new Timer(true), 10000);
         
-        final FetchQueueAsyncUriFetcher f = new FetchQueueAsyncUriFetcher(createSafeHttpClientURIFetcher(),
+        final FetchQueueAsyncUriFetcher f = new FetchQueueAsyncUriFetcher(fetcher,
                 fecherScheduler, 
                 procesessingScheduler);
-        f.setObserver(new OutputStreamAsyncUriFetcherObserver());
+        f.setObserver(new OutputStreamAsyncUriFetcherObserver(System.err));
         return f;
     }
 }
