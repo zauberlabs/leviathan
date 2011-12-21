@@ -15,6 +15,7 @@
  */
 package com.zaubersoftware.leviathan.api.engine.impl.pipe;
 
+import java.io.PrintWriter;
 import java.io.Reader;
 
 import org.apache.commons.io.output.NullWriter;
@@ -54,6 +55,12 @@ public final class HTMLSanitizerPipe implements Pipe<URIFetcherResponse, Node> {
      */
     public HTMLSanitizerPipe() {
         this.tidy = new Tidy();
+        tidy.setQuiet(true);
+        tidy.setShowWarnings(false);
+        tidy.setXHTML(true);
+        tidy.setErrfile("foo");
+        tidy.setOnlyErrors(true);
+        tidy.setErrout(new PrintWriter(new NullWriter()));
         // TODO XXX Poner buenos defaults
     }
 
