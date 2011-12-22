@@ -18,6 +18,7 @@ package com.zaubersoftware.leviathan.api.engine.impl.pipe;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.Properties;
 
 import javax.xml.transform.OutputKeys;
@@ -123,13 +124,17 @@ public final class XMLPipe implements Pipe<Node, Node> {
         this.template = transformer; 
     }
 
+    private static AtomicBoolean warningShown = new AtomicBoolean(false);
     @Override
     public Node execute(final Node input) {
         Validate.notNull(input, "The input XML document cannot be null");
 
         final Map<String, Object> model = this.extraModel;
         // TODO Retrieve model from current context in local thread and merge it with extra model.
-        this.logger.warn("TODO Retrieve model from current context in local thread and merge it with extra model");
+        if(!warningShown.getAndSet(true)) {
+            this.logger.warn(
+                    "TODO Retrieve model from current context in local thread and merge it with extra model");
+        }
         return applyXSLT(input, model, null);
     }
 
