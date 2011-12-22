@@ -343,6 +343,7 @@
                 <excludes>
                     <exclude>target/**</exclude>
                     <exclude>.gitignore</exclude>
+                    <exclude>**/doxia/**/*.java</exclude>
                     <exclude>**/*.txt</exclude>
                 </excludes>
                 <encoding>iso-8859-1</encoding>
