@@ -115,6 +115,13 @@ public final class FlowBuilderPipe<I, O> implements Pipe<I, O> {
                     } else if (resolver.hasDefaultHandler()) {
                         resolver.getDefaultHandler().handle(e);
                         return null;
+                    } else if (this.handlers.containsKey(e.getClass())) {
+                        this.handlers.get(e.getClass()).handle(e);
+                        this.logger.info("The pipe's flow has been stopped");
+                        return null;
+                    } else {
+                        this.defaultExceptionHandler.handle(e);
+                        return null;
                     }
                 } else if (this.handlers.containsKey(e.getClass())) {
                     this.handlers.get(e.getClass()).handle(e);
