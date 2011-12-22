@@ -56,7 +56,7 @@ public final class HTMLSanitizerPipe implements Pipe<URIFetcherResponse, Node> {
                 final Tidy tidy = new Tidy();
                 tidy.setQuiet(true);
                 tidy.setShowWarnings(false);
-                tidy.setXHTML(true);
+                tidy.setXmlOut(true);
                 tidy.setErrfile("foo");
                 tidy.setOnlyErrors(true);
                 tidy.setErrout(new PrintWriter(new NullWriter()));
