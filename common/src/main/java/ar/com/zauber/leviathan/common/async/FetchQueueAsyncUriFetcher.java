@@ -167,27 +167,7 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
         outScheduler.start();
     }
     
-    /**
-     * @see AsyncUriFetcher#fetch(URIAndCtx, Closure)
-     * @deprecated Use {@link #get(URIAndCtx, Closure)}. This method will be
-     *             deleted on next version.
-     */
-    @Deprecated
-    public void fetch(final URIAndCtx uriAndCtx,
-            final Closure<URIFetcherResponse> closure) {
-        get(uriAndCtx, closure);
-    }
-    
-    /**
-     * @see AsyncUriFetcher#fetch(URI, Closure)
-     * @deprecated Use {@link #get(URI, Closure)}. This method will be
-     *             deleted on next version.
-     */
-    @Deprecated
-    public void fetch(final URI uri, final Closure<URIFetcherResponse> closure) {
-        get(uri, closure);
-    }
-
+   
     /** @see AsyncUriFetcher#fetch(URIAndCtx, Closure) */
     public void get(final URIAndCtx uriAndCtx, 
             final Closure<URIFetcherResponse> closure) {

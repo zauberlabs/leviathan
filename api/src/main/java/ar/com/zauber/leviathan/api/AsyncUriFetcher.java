@@ -32,35 +32,6 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
  */
 public interface AsyncUriFetcher {
 
-    /**
-     * Busca la página deda por la uri indicada y al terminar llama al closure
-     * con la respuesta
-     * 
-     * @param uri
-     *            URIs to retrieve
-     * @param closure
-     *            closure donde se publica el resultado (el contenido de la
-     *            pagina, los errores; etc).
-     * @deprecated Use {@link #get(URI, Closure)}. This method will be deleted
-     *             on next version.
-     */
-    @Deprecated
-    void fetch(URI uri, Closure<URIFetcherResponse> closure);
-
-    /**
-     * Busca la página deda por la uri indicada y al terminar llama al closure
-     * con la respuesta
-     * 
-     * @param uriAndCtx
-     *            URIs to retrieve
-     * @param closure
-     *            closure donde se publica el resultado (el contenido de la
-     *            pagina, los errores; etc).
-     * @deprecated Use {@link #get(URIAndCtx, Closure)}. This method will be
-     *             deleted on next version.
-     */
-    @Deprecated
-    void fetch(URIAndCtx uriAndCtx, Closure<URIFetcherResponse> closure);
     
     /**
      * Busca la página deda por la uri indicada y al terminar llama al closure
@@ -96,28 +67,6 @@ public interface AsyncUriFetcher {
      */
     void post(URIAndCtx uriAndCtx, InputStream body,
             Closure<URIFetcherResponse> closure);
-
-    /**
-     * Realiza un post a la uri indicada, enviando los pares clave/valor
-     * indicados en <em>body</em> en forma de
-     * "application/x-www-form-urlencoded", y al terminar llama al closure con
-     * la respuesta
-     * 
-     * @param uriAndCtx
-     *            URIs to retrieve
-     * @param body
-     *            contenido a postear
-     * @param closure
-     *            closure donde se publica el resultado (el contenido de la
-     *            pagina, los errores; etc).
-     * 
-     * @deprecated 
-     * now @use post(URIAndCtx uriAndCtx, UrlEncodedPostBody body,
-     *                Closure<URIFetcherResponse> closure);
-     */
-    @Deprecated
-    void post(URIAndCtx uriAndCtx, Map<String, String> body,
-            Closure<URIFetcherResponse> closure); 
     
     /**
      * Realiza un post a la uri indicada, enviando los pares clave/valor
