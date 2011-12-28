@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang.Validate;
 
+import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
@@ -34,7 +35,7 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
  * @author Francisco J. González Costanzó
  * @since Apr 12, 2010
  */
-public class PostHttpMethodCommand implements HttpMethodCommand {
+public class PostHttpMethodCommand implements FetchingTask {
 
     private final URIFetcher fetcher;
     private final URIFetcherResponse.URIAndCtx uri;

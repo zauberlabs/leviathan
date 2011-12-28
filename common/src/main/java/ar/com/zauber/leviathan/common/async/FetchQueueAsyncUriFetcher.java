@@ -16,8 +16,8 @@
 package ar.com.zauber.leviathan.common.async;
 
 import static ar.com.zauber.leviathan.common.async.ThreadUtils.*;
+
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
@@ -27,16 +27,16 @@ import org.slf4j.LoggerFactory;
 
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
+import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
-import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.AbstractAsyncUriFetcher;
-import ar.com.zauber.leviathan.common.GetHttpMethodCommand;
-import ar.com.zauber.leviathan.common.HttpMethodCommand;
+import ar.com.zauber.leviathan.common.GenericGetFetchingTask;
 import ar.com.zauber.leviathan.common.InmutableURIFetcherResponse;
 import ar.com.zauber.leviathan.common.PostHttpMethodCommand;
 import ar.com.zauber.leviathan.common.async.impl.DebugLoggerAsyncUriFetcherObserver;
+import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 /**
  * {@link AsyncUriFetcher} que utiliza dos colas (de tipo  {@link JobQueue}
@@ -171,7 +171,7 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
     /** @see AsyncUriFetcher#fetch(URIAndCtx, Closure) */
     public void get(final URIAndCtx uriAndCtx, 
             final Closure<URIFetcherResponse> closure) {
-        fetchInternal(new GetHttpMethodCommand(fetcher, uriAndCtx), uriAndCtx,
+        fetchInternal(new GenericGetFetchingTask(fetcher, uriAndCtx), uriAndCtx,
                 closure);
     }
     
@@ -193,7 +193,7 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
     }
     
     /** Actual fetching */
-    private void fetchInternal(final HttpMethodCommand methodCommand,
+    private void fetchInternal(final FetchingTask methodCommand,
             final URIAndCtx uriAndCtx, 
             final Closure<URIFetcherResponse> closure) {
         observer.newFetch(uriAndCtx);

@@ -13,23 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ar.com.zauber.leviathan.common;
+package ar.com.zauber.leviathan.api;
 
 import java.net.URI;
 
-import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 /**
- * Abstracción del método utilizado para el fetching (GET o POST)
+ * A Task that does the fetching of information 
  * 
- * @author Francisco J. González Costanzó
- * @since Apr 12, 2010
+ * @author Juan F. Codagnone
+ * @since Dec 28, 2011
  */
-public interface HttpMethodCommand {
-
-    /** fetch */
-    URIFetcherResponse execute();
-
-    /** uri a fetchear */
+public interface FetchingTask {
+    
+    /** 
+     * @return minimal information about the fetching task. The URI MAY be used
+     * for politeness queues and other things.
+     */
     URI getURI();
+
+    /** do the actual fetching */
+    URIFetcherResponse execute();
 }

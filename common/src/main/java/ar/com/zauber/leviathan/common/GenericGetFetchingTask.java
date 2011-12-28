@@ -19,6 +19,7 @@ import java.net.URI;
 
 import org.apache.commons.lang.Validate;
 
+import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 
@@ -29,13 +30,13 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse;
  * @author Francisco J. González Costanzó
  * @since Apr 12, 2010
  */
-public class GetHttpMethodCommand implements HttpMethodCommand {
+public class GenericGetFetchingTask implements FetchingTask {
 
     private final URIFetcher fetcher;
     private final URIFetcherResponse.URIAndCtx uri;
 
     /** Creates the GetHttpMethodCommand. */
-    public GetHttpMethodCommand(final URIFetcher fetcher,
+    public GenericGetFetchingTask(final URIFetcher fetcher,
             final URIFetcherResponse.URIAndCtx uri) {
         Validate.notNull(fetcher);
         Validate.notNull(uri);
@@ -43,12 +44,10 @@ public class GetHttpMethodCommand implements HttpMethodCommand {
         this.uri = uri;
     }
 
-    /** @see ar.com.zauber.leviathan.common.HttpMethodCommand#execute() */
     public final URIFetcherResponse execute() {
         return fetcher.get(uri);
     }
 
-    /** @see ar.com.zauber.leviathan.common.HttpMethodCommand#getURI() */
     public final URI getURI() {
         return uri.getURI();
     }

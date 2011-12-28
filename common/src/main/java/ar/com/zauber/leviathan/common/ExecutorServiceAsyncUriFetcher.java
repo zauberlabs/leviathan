@@ -28,10 +28,11 @@ import org.slf4j.LoggerFactory;
 
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
+import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
-import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
+import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 
 /**
  * {@link AsyncUriFetcher} que utiliza un {@link ExecutorService} para no 
@@ -61,7 +62,7 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
     /** @see AsyncUriFetcher#fetch(URIFetcherResponse.URIAndCtx, Closure) */
     public final void get(final URIAndCtx uriAndCtx, 
             final Closure<URIFetcherResponse> closure) {
-        fetchInternal(new GetHttpMethodCommand(fetcher, uriAndCtx), closure);
+        fetchInternal(new GenericGetFetchingTask(fetcher, uriAndCtx), closure);
     }
     
     /**
@@ -83,7 +84,7 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
     }
     
     /** Actual fetching */
-    private void fetchInternal(final HttpMethodCommand methodCommand,
+    private void fetchInternal(final FetchingTask methodCommand,
             final Closure<URIFetcherResponse> closure) {
         Validate.notNull(methodCommand);
         Validate.notNull(closure);
