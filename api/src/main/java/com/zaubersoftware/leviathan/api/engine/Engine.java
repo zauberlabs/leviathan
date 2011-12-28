@@ -32,15 +32,6 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
  */
 public interface Engine extends ErrorTolerant<Engine> {
 
-    /**
-     * Builder method which is the entry point to configure the engine behavior for the given
-     * <code>uriTemplate</code>
-     *
-     * @param uriTemplate An URI template. Must not be <code>null</code> or empty.
-     * @return An {@link AfterFetchingHandler} that let's the users configure what to do after
-     * the resource pointed by the URI template has been fetched.
-     */
-    AfterFetchingHandler forUri(String uriTemplate);
 
     /**
      * Builder method which is the entry point to configure the engine behavior for the given

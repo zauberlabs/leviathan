@@ -138,13 +138,6 @@ public final class DefaultEngine implements Engine, AfterHandleWith<Engine> {
     }
 
     @Override
-    public AfterFetchingHandler forUri(final String uriTemplate) {
-        Validate.notBlank(uriTemplate, "The URI template cannot be blank");
-        reset();
-        throw new NotImplementedException();
-    }
-
-    @Override
     public AfterFetchingHandler forUri(final URI uri) {
         Validate.notNull(uri, "The URI to be fetched cannot be null");
         reset();

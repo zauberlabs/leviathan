@@ -49,11 +49,6 @@ public abstract class EngineFowarder implements Engine {
     }
 
     @Override
-    public AfterFetchingHandler forUri(final String uriTemplate) {
-        return this.target.forUri(uriTemplate);
-    }
-
-    @Override
     public ProcessingFlowBinding bindURI(final URI uri) {
         return this.target.bindURI(uri);
     }
