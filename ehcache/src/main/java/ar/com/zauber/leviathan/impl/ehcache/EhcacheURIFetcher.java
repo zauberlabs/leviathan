@@ -18,7 +18,6 @@ package ar.com.zauber.leviathan.impl.ehcache;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Formatter;
-import java.util.Map;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
@@ -29,8 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
-import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
+import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.common.AbstractURIFetcher;
 import ar.com.zauber.leviathan.common.CtxDecorableURIFetcherResponse;
 
@@ -159,16 +158,6 @@ public class EhcacheURIFetcher extends AbstractURIFetcher {
      */
     public final URIFetcherResponse post(final URIAndCtx uri,
             final InputStream body) {
-        return fetcher.post(uri, body);
-    }
-    
-    /**
-     * Doesn't cache.
-     * 
-     * @see URIFetcher#post(URIFetcherResponse.URIAndCtx, Map)
-     */
-    public final URIFetcherResponse post(final URIAndCtx uri,
-            final Map<String, String> body) {
         return fetcher.post(uri, body);
     }
     

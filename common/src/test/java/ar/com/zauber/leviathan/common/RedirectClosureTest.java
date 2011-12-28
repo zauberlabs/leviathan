@@ -257,24 +257,12 @@ public class RedirectClosureTest {
 abstract class AbstractRedirectMockFetcher extends AbstractURIFetcher {
 
     @Override
-    public URIFetcherResponse fetch(final URI uri) {
-        return fetch(new InmutableURIAndCtx(uri));
-    }
-
-    @Override
     public URIFetcherResponse fetch(final URIAndCtx uri) {
         return get(uri);
     }
 
     @Override
     public URIFetcherResponse post(final URIAndCtx uri, final InputStream body) {
-        throw new NotImplementedException("Post to classpath not implemented");
-    }
-
-    @Override
-    public final URIFetcherResponse post(
-            final URIAndCtx uri, 
-            final Map<String, String> body) {
         throw new NotImplementedException("Post to classpath not implemented");
     }
 

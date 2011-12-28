@@ -27,16 +27,6 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
  * @since Oct 12, 2009
  */
 public interface URIFetcher {
-
-    /**
-     * fetch uri
-     *
-     * @deprecated Use {@link #get(URI)} instead. This method will be deleted on
-     *             next version.
-     */
-    @Deprecated
-    URIFetcherResponse fetch(URI uri);
-
     /**
      * fetch uri
      *
@@ -54,13 +44,6 @@ public interface URIFetcher {
 
     /** post to uri */
     URIFetcherResponse post(URIAndCtx uri, InputStream body);
-
-    /** post to uri, body as "application/x-www-form-urlencoded"
-     * Now is deprecated:
-     * @deprecated to use post with {@link UrlEncodedPostBody} as parameter
-     * @use post(URIAndCtx uriAndCtx, UrlEncodedPostBody body)*/
-    @Deprecated
-    URIFetcherResponse post(URIAndCtx uri, Map<String, String> body);
 
     /** post to uri, body (with collections also as parameters)
      * as "application/x-www-form-urlencoded "*/
