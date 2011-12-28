@@ -15,19 +15,15 @@
  */
 package com.zaubersoftware.leviathan.api.engine;
 
-import java.net.URI;
-
 /**
- * This class represents a fetching engine that is an instance of Leviathan.
- * It is the entry point for the engine configuration.
- *
- * @author Guido Marucci Blas
- * @author Mart�n Silva
+ * TODO: Description of the class, Comments in english by default  
+ * 
+ * 
  * @author Juan F. Codagnone
- * @since Jul 22, 2011
+ * @since Dec 28, 2011
  */
-public interface Engine extends ErrorTolerant<Engine> {
-
+public interface FlowEngine extends ErrorTolerant<Engine> {
+    
     /**
      * Builder method which is the entry point to configure the engine behavior.
      *
@@ -35,4 +31,6 @@ public interface Engine extends ErrorTolerant<Engine> {
      * the resource pointed by the URI template has been fetched.
      */
     AfterFetchingHandler afterFetch();
+    
+    
 }

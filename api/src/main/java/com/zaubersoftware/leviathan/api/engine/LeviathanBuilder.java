@@ -27,6 +27,6 @@ import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 public interface LeviathanBuilder {
 
     LeviathanBuilder withAsyncURIFetcher(AsyncUriFetcher fetcher);
-    Engine build();
+    FetchingEngine build();
 
 }

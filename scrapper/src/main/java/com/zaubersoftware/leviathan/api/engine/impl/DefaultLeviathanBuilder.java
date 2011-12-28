@@ -19,7 +19,7 @@ import org.apache.commons.lang.Validate;
 
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 
-import com.zaubersoftware.leviathan.api.engine.Engine;
+import com.zaubersoftware.leviathan.api.engine.FetchingEngine;
 import com.zaubersoftware.leviathan.api.engine.LeviathanBuilder;
 
 /**
@@ -40,8 +40,8 @@ public final class DefaultLeviathanBuilder implements LeviathanBuilder {
     }
 
     @Override
-    public Engine build() {
-        return new DefaultEngine(this.fetcher);
+    public FetchingEngine build() {
+        return new DefaultLeviathanEngine(this.fetcher);
     }
 
 }

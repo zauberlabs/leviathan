@@ -35,7 +35,7 @@ public class NewApiTestDriver {
     public void testname() throws Exception {
         final Engine engine = null;
 
-        engine.forUri("http://google.com/").then(new ContextAwareClosure<URIFetcherResponse>() {
+        engine.afterFetch().then(new ContextAwareClosure<URIFetcherResponse>() {
             @Override
             public void execute(final URIFetcherResponse response) {
                 // ok! nos llego la pagina.
@@ -43,7 +43,7 @@ public class NewApiTestDriver {
         });
 
 
-        engine.forUri("http://www.dmoz.org/").sanitizeHTML().transformXML("raiz.xsl")
+        engine.afterFetch().sanitizeHTML().transformXML("raiz.xsl")
                  .transformXML("otramas.xml")
                  .toJavaObject(Categories.class)
                  .then(new Action<Categories, List<Category>>() {
@@ -80,7 +80,7 @@ public class NewApiTestDriver {
            });
 
 
-        engine.forUri("http://www.dmoz.org/")
+        engine.afterFetch()
             .sanitizeHTML()
             .transformXML("raiz.xsl")
             .transformXML("otramas.xml")
@@ -106,7 +106,7 @@ public class NewApiTestDriver {
 //                        }
 //                    });
 
-        engine.forUri("http://www.dmoz.org/").sanitizeHTML().transformXML("raiz.xsl")
+        engine.afterFetch().sanitizeHTML().transformXML("raiz.xsl")
             .transformXML("otramas.xml")
             .toJavaObject(Categories.class)
             .then(new ActionAndThenFetch<Categories>() {
