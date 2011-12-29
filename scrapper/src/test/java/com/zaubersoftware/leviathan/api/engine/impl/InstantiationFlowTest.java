@@ -42,7 +42,7 @@ import com.zaubersoftware.leviathan.api.engine.Action;
 import com.zaubersoftware.leviathan.api.engine.ContextAwareClosure;
 import com.zaubersoftware.leviathan.api.engine.Engine;
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
-import com.zaubersoftware.leviathan.api.engine.LeviathanBuilder;
+import com.zaubersoftware.leviathan.api.engine.Leviathan;
 import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
 import com.zaubersoftware.leviathan.api.engine.impl.dto.Link;
 
@@ -54,7 +54,6 @@ import com.zaubersoftware.leviathan.api.engine.impl.dto.Link;
 public final class InstantiationFlowTest {
 
     private final URI mlhome = URI.create("http://www.mercadolibre.com.ar/");
-    private LeviathanBuilder leviathan;
     private AsyncUriFetcher fetcher;
     private Engine engine;
     private URIFetcher f;
@@ -67,8 +66,7 @@ public final class InstantiationFlowTest {
         final ExecutorService executor = Executors.newSingleThreadExecutor();
         this.fetcher = new ExecutorServiceAsyncUriFetcher(executor);
 
-        this.leviathan = new DefaultLeviathanBuilder();
-        this.engine = this.leviathan.build();
+        this.engine = Leviathan.flowBuilder();
     }
 
 

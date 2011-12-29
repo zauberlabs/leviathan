@@ -16,15 +16,32 @@
 package com.zaubersoftware.leviathan.api.engine;
 
 
+
 /**
- * TODO: Description of the class, Comments in english by default
- *
+ * Builder helper
  *
  * @author Guido Marucci Blas
  * @since Jul 22, 2011
  */
-public interface LeviathanBuilder {
+public class Leviathan {
+    public static Engine engine;
+    
 
-    Engine build();
+    static {
+        try {
+            engine = (Engine) Class.forName("com.zaubersoftware.leviathan.api.engine.impl.DefaultEngine")
+                    .newInstance();
+        } catch (InstantiationException e) {
+            throw new IllegalStateException();
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException();
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException();
+        }
+    }
+    
+    public static Engine flowBuilder() {
+        return engine;
+    }
 
 }
