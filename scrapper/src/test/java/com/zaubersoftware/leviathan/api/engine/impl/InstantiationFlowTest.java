@@ -36,6 +36,7 @@ import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.common.ExecutorServiceAsyncUriFetcher;
 import ar.com.zauber.leviathan.common.InmutableURIAndCtx;
+import ar.com.zauber.leviathan.common.fluent.Fetchers;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
 import com.zaubersoftware.leviathan.api.engine.Action;
@@ -61,8 +62,8 @@ public final class InstantiationFlowTest {
     @Before
     public void setUp() {
         final Map<URI, String> pages = new HashMap<URI, String>();
-        pages.put(this.mlhome, "com/zaubersoftware/leviathan/api/engine/pages/homeml.html");
-        f = new FixedURIFetcher(pages);
+        f = Fetchers.createFixed().register(mlhome, 
+                "com/zaubersoftware/leviathan/api/engine/pages/homeml.html").build();
         final ExecutorService executor = Executors.newSingleThreadExecutor();
         this.fetcher = new ExecutorServiceAsyncUriFetcher(executor);
 

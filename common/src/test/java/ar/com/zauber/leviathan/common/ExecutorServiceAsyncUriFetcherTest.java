@@ -42,6 +42,7 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.async.FetchQueueAsyncUriFetcher;
+import ar.com.zauber.leviathan.common.fluent.Fetchers;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 import ar.com.zauber.leviathan.common.utils.DirectExecutorService;
 
@@ -72,13 +73,11 @@ public class ExecutorServiceAsyncUriFetcherTest {
         final URI foo2 = new URI("http://foo2");
         final URI foo3 = new URI("http://foo3");
 
-        final Map<URI, String> map = new HashMap<URI, String>();
-        final String resource =
-            "ar/com/zauber/leviathan/impl/mock/noexiste.txt";
-        map.put(foo, resource);
-        map.put(foo2, resource);
-        final URIFetcher fixedUriFetcher = new FixedURIFetcher(map);
-
+        final String resource = "ar/com/zauber/leviathan/impl/mock/noexiste.txt";
+        final URIFetcher fixedUriFetcher = Fetchers.createFixed()
+                .when(foo).then(resource)
+                .when(foo2).then(resource)
+                .build();
         final CountDownLatch available = new CountDownLatch(1);
         final Random random = new Random();
         final URIFetcher f = new AbstractURIFetcher() {
@@ -144,7 +143,7 @@ public class ExecutorServiceAsyncUriFetcherTest {
     public final void waitIdlenesss() 
         throws URISyntaxException, InterruptedException {
         final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(new DirectExecutorService());
-        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());
+        final URIFetcher f = Fetchers.createFixed().build();
         
         final URI uri = new URI("http://foo");
         
@@ -182,7 +181,7 @@ public class ExecutorServiceAsyncUriFetcherTest {
         throws URISyntaxException, InterruptedException {
         final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(
                 new DirectExecutorService());
-        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());
+        final URIFetcher f = Fetchers.createFixed().build();
         final URI uri = new URI("http://foo");
         
         final CountDownLatch latch = new CountDownLatch(1);

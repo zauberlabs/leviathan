@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.common.fluent.Fetchers;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
 
@@ -43,10 +44,9 @@ public class FixedURIFetcherTest {
 
     /** constructor */
     public FixedURIFetcherTest() throws URISyntaxException {
-        final Map<URI, String> map = new HashMap<URI, String>();
-        map.put(new URI("http://noexiste"), 
-               "ar/com/zauber/leviathan/impl/mock/noexiste.txt");
-        fetcher = new FixedURIFetcher(map, Charset.forName("iso-8859-1"));
+        fetcher = Fetchers.createFixed().withCharset("iso-8859-1")
+                 .when("http://noexiste").then("ar/com/zauber/leviathan/impl/mock/noexiste.txt")
+                 .build();
     }
 
     /** test found  */

@@ -39,6 +39,7 @@ import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.common.async.impl.BlockingQueueJobQueue;
+import ar.com.zauber.leviathan.common.fluent.Fetchers;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 import ar.com.zauber.leviathan.common.utils.DirectExecutorService;
 
@@ -77,7 +78,7 @@ public class FetchQueueAsyncUriFetcherTest {
                 new LinkedBlockingQueue<Job>());
         final JobQueue<Job> processingQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
-        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());        
+        final URIFetcher f = Fetchers.createFixed().build();        
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
               new JobScheduler(processingQueue, Executors.newSingleThreadExecutor()),
               new JobScheduler(fetcherQueue, Executors.newSingleThreadExecutor()));
@@ -123,7 +124,7 @@ public class FetchQueueAsyncUriFetcherTest {
         final AtomicBoolean firstTaskDone = new AtomicBoolean(false);
         final AtomicInteger tasksAfterFirstTask = new AtomicInteger(0);
 
-        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());
+        final URIFetcher f = Fetchers.createFixed().build();
         final List<AsyncUriFetcher> fetcherHolder = 
             new ArrayList<AsyncUriFetcher>(1);
         final URI uri = new URI("http://123");
@@ -201,7 +202,7 @@ public class FetchQueueAsyncUriFetcherTest {
         final AtomicInteger tasksAfterFirstTask = new AtomicInteger(0);
 
         
-        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());
+        final URIFetcher f = Fetchers.createFixed().build();
         final List<AsyncUriFetcher> fetcherHolder = 
             new ArrayList<AsyncUriFetcher>(1);
         final URI uri = new URI("http://123");
@@ -283,7 +284,7 @@ public class FetchQueueAsyncUriFetcherTest {
                 new LinkedBlockingQueue<Job>());
         final JobQueue<Job> processingQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
-        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());
+        final URIFetcher f = Fetchers.createFixed().build();
         
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
                 new JobScheduler(fetchQueue, new DirectExecutorService()),
@@ -329,7 +330,7 @@ public class FetchQueueAsyncUriFetcherTest {
                 new LinkedBlockingQueue<Job>());
         final JobQueue<Job> processingQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
-        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());
+        final URIFetcher f = Fetchers.createFixed().build();
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
                 new JobScheduler(fetchQueue, new DirectExecutorService()),
                 new JobScheduler(processingQueue, new DirectExecutorService()));
@@ -380,7 +381,7 @@ public class FetchQueueAsyncUriFetcherTest {
                     new JobScheduler(processingQueue, 
                             Executors.newSingleThreadExecutor(),
                             new Timer(), 1000));
-        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());
+        final URIFetcher f = Fetchers.createFixed().build();
         
         final URI uri = new URI("http://foo");
         final List<String> l = new ArrayList<String>(1); 
@@ -415,7 +416,7 @@ public class FetchQueueAsyncUriFetcherTest {
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
                     new JobScheduler(fetchQueue, new DirectExecutorService()),
                     new JobScheduler(processingQueue, new DirectExecutorService()));
-        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());
+        final URIFetcher f = Fetchers.createFixed().build();
         
         final CountDownLatch latch = new CountDownLatch(1);
         final URI uri = new URI("http://foo");
