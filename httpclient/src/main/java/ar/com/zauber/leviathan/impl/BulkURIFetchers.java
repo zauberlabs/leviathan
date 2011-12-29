@@ -133,21 +133,4 @@ public final class BulkURIFetchers {
         return params;
     }
     
-    /** builds a safe default {@link AsyncUriFetcher} */
-    public static AsyncUriFetcher createAsyncUriFetcher() {
-        final JobScheduler fecherScheduler = new JobScheduler(
-                new MultiDomainPoliteJobQueue(500L, TimeUnit.MILLISECONDS), 
-                new ThreadPoolExecutor(1, 20, 10, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), 
-                        new BlockingRejectedExecutionHandler()));
-        
-        final JobScheduler procesessingScheduler = new JobScheduler(
-                new BlockingQueueJobQueue<Job>(new LinkedBlockingQueue<Job>()), 
-                new ThreadPoolExecutor(2, 2, 0, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), 
-                        new BlockingRejectedExecutionHandler()), new Timer(true), 10000);
-        
-        final FetchQueueAsyncUriFetcher f = new FetchQueueAsyncUriFetcher(fecherScheduler, 
-                procesessingScheduler);
-        f.setObserver(new OutputStreamAsyncUriFetcherObserver(System.err));
-        return f;
-    }
 }
