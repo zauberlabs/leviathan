@@ -15,8 +15,6 @@
  */
 package ar.com.zauber.leviathan.api;
 
-import java.net.URI;
-
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 /**
@@ -31,7 +29,7 @@ public interface FetchingTask {
      * @return minimal information about the fetching task. The URI MAY be used
      * for politeness queues and other things.
      */
-    URI getURI();
+    URIAndCtx getURIAndCtx();
 
     /** do the actual fetching */
     URIFetcherResponse execute();
