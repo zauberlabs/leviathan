@@ -280,7 +280,7 @@ public final class ConfigurationFlowTest {
 
         final URIFetcher httpClientFetcher = new FixedURIFetcher(pages);
         final ExecutorService executor = Executors.newSingleThreadExecutor();
-        final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(executor, httpClientFetcher);
+        final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(executor);
 
         // Pipe chain
         final FlowBuilderPipe<URIFetcherResponse, Object> rootPipe =
@@ -292,7 +292,7 @@ public final class ConfigurationFlowTest {
 
         final Closure<URIFetcherResponse> rootClosure = new FetcherResponsePipeAdapterClosure<Object>(rootPipe);
 
-        fetcher.get(this.mlhome, rootClosure);
+        fetcher.scheduleFetch(httpClientFetcher.createGet(mlhome), rootClosure);
         try {
             fetcher.awaitIdleness();
         } catch (final InterruptedException e) {

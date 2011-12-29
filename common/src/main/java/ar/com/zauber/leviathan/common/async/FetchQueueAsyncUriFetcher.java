@@ -17,8 +17,6 @@ package ar.com.zauber.leviathan.common.async;
 
 import static ar.com.zauber.leviathan.common.async.ThreadUtils.*;
 
-import java.io.InputStream;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang.Validate;
@@ -28,15 +26,11 @@ import org.slf4j.LoggerFactory;
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.FetchingTask;
-import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
-import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
-import ar.com.zauber.leviathan.common.AbstractAsyncUriFetcher;
-import ar.com.zauber.leviathan.common.GenericGetFetchingTask;
-import ar.com.zauber.leviathan.common.InmutableURIFetcherResponse;
-import ar.com.zauber.leviathan.common.PostHttpMethodCommand;
-import ar.com.zauber.leviathan.common.async.impl.DebugLoggerAsyncUriFetcherObserver;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
+import ar.com.zauber.leviathan.common.AbstractAsyncUriFetcher;
+import ar.com.zauber.leviathan.common.InmutableURIFetcherResponse;
+import ar.com.zauber.leviathan.common.async.impl.DebugLoggerAsyncUriFetcherObserver;
 
 /**
  * {@link AsyncUriFetcher} que utiliza dos colas (de tipo  {@link JobQueue}
@@ -44,7 +38,7 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
  * 
  * El flujo de la  información es mas o menos así:
  * <ol>
- *   <li>el cliente llama a {@link #fetch(URIAndCtx, Closure)}</li>
+ *   <li>el cliente llama a {@link #scheduleFetch(URIAndCtx, Closure)}</li>
  *   <li>Todo nuevo trabajo es encolado en una Fetch Queue. Dependiendo de la 
  *    naturaleza de la cola (limitada o infinita), si llegó a su capacidad total 
  *    podria bloquear hasta que haya espacio. 
@@ -79,7 +73,7 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
  * descargó y en base a la información decidir descargar más información. Es 
  * por esto que si las colas internas que se usan tienen un límite máximo antes
  * de bloquear, y estas se encuentra llenas; y todos los closures que se encuentran
- * en procesamiento llaman a {@link #fetch(java.net.URI, Closure)} entonces se 
+ * en procesamiento llaman a {@link #scheduleFetch(java.net.URI, Closure)} entonces se 
  * llegará a un deadlock. Esta implementación deberia tener en cuenta esto. 
  * </p>
  * 
@@ -119,7 +113,6 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
     // si se extiende los threads se van a lanzar antes que se termine de crear
     // el objeto...no nos afectaria, pero asi somo correctos 
     
-    private final URIFetcher fetcher;
     private final JobQueue<Job> fetcherQueue;
     private final Thread inScheduler;
     private final JobQueue<Job> processingQueue;
@@ -136,11 +129,9 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
     
     /** */
     public FetchQueueAsyncUriFetcher(
-            final URIFetcher fetcher,
             final JobScheduler fetcherScheduler,
             final JobScheduler processingScheduler) {
         
-        Validate.notNull(fetcher);
         Validate.notNull(fetcherScheduler);
         Validate.notNull(processingScheduler);
         
@@ -153,7 +144,6 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
                 + "compartir la misma queue");
         Validate.isTrue(fetcherScheduler != processingScheduler);
         
-        this.fetcher = fetcher;
         this.fetcherQueue = fetcherScheduler.getQueue();
         this.processingQueue = processingScheduler.getQueue();
         
@@ -167,58 +157,23 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
         outScheduler.start();
     }
     
-   
-    /** @see AsyncUriFetcher#fetch(URIAndCtx, Closure) */
-    public void get(final URIAndCtx uriAndCtx, 
-            final Closure<URIFetcherResponse> closure) {
-        fetchInternal(new GenericGetFetchingTask(fetcher, uriAndCtx), uriAndCtx,
-                closure);
-    }
-    
-    /**
-     * @see AsyncUriFetcher#post(URIFetcherResponse.URIAndCtx, InputStream,
-     *      Closure)
-     */
-    public void post(final URIAndCtx uriAndCtx, final InputStream body,
-            final Closure<URIFetcherResponse> closure) {
-        fetchInternal(new PostHttpMethodCommand(fetcher, uriAndCtx, body),
-                uriAndCtx, closure);
-    }
-    
-    /** @see AsyncUriFetcher#post(URIFetcherResponse.URIAndCtx, Map, Closure) */
-    public void post(final URIAndCtx uriAndCtx, final Map<String, String> body,
-            final Closure<URIFetcherResponse> closure) {
-        fetchInternal(new PostHttpMethodCommand(fetcher, uriAndCtx, body),
-                uriAndCtx, closure);
-    }
-    
-    /** Actual fetching */
-    private void fetchInternal(final FetchingTask methodCommand,
-            final URIAndCtx uriAndCtx, 
-            final Closure<URIFetcherResponse> closure) {
-        observer.newFetch(uriAndCtx);
+    @Override
+    public void scheduleFetch(final FetchingTask methodCommand, final Closure<URIFetcherResponse> closure) {
+        observer.newFetch(methodCommand.getURIAndCtx());
         incrementActiveJobs();
          
         try {
             fetcherQueue.add(new Job() {
                 /** @see Job#getUriAndCtx() */
                 public URIAndCtx getUriAndCtx() {
-                    return uriAndCtx;
+                    return methodCommand.getURIAndCtx();
                 }
                 
                 public void run() {
+                    final URIAndCtx uriAndCtx = methodCommand.getURIAndCtx();
                     observer.beginFetch(uriAndCtx);
                     final long t1 = System.currentTimeMillis();
-                    URIFetcherResponse rr = null;
-                    try {
-                        rr = methodCommand.execute();
-                    } catch(final Throwable t) {
-                        // esto jamas deberia pasar. fetch() nunca tira
-                        // excepciones
-                        logger.warn("fetcher " + fetcher 
-                          + " no respeta el contrato!. está tirando excepciones");
-                        rr = new InmutableURIFetcherResponse(uriAndCtx, t);
-                    }
+                    final URIFetcherResponse rr = execute(methodCommand);
                     final URIFetcherResponse r = rr;    
                     final long t2 = System.currentTimeMillis();
                     
@@ -236,7 +191,7 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
                                         logger.error("error while processing using "
                                                 + closure.toString() 
                                                 + " with URI: "
-                                                + uriAndCtx.getURI(), t);
+                                                + uriAndCtx, t);
                                     }
                                 } finally {
                                     if(null == t1) {
@@ -264,13 +219,14 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
                     // TODO notificar a la fetcherQueue que ya se 
                     // fetcheo el elemento. 
                 }
+
             });
         } catch(final Throwable e) {
             decrementActiveJobs();   
             logger.error("error adding job to the fetch queue "
                     + closure.toString() 
                     + " with URI: "
-                    + uriAndCtx.getURI(), e);
+                    + methodCommand.getURIAndCtx().getURI(), e);
         }
     }
 
@@ -300,12 +256,5 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
     public void setObserver(final AsyncUriFetcherObserver o) {
         Validate.notNull(observer);
         this.observer = o;
-    }
-
-    /** @see AsyncUriFetcher#post(URIAndCtx, UrlEncodedPostBody, Closure) */
-    public void post(final URIAndCtx uriAndCtx, final UrlEncodedPostBody body,
-            final Closure<URIFetcherResponse> closure) {
-        fetchInternal(new PostHttpMethodCommand(fetcher, uriAndCtx, body),
-                uriAndCtx, closure);        
     }
 }

@@ -104,7 +104,7 @@ public class RedirectClosureTest {
         
         final AtomicInteger i = new AtomicInteger();
         final Closure<URIFetcherResponse> ret = new RedirectClosure(
-                new NotsoAsyncUriFetcher(fetcher),
+                new NotsoAsyncUriFetcher(), fetcher,
                 new Closure<URIFetcherResponse>() {
                     @Override
                     public void execute(final URIFetcherResponse t) {
@@ -131,20 +131,29 @@ public class RedirectClosureTest {
     @Test
     public final void testErrorResponse() {
         final URIFetcher fetcher = new AbstractRedirectMockFetcher() {
-            @SuppressWarnings("unchecked")
             @Override
-            public URIFetcherResponse get(final URIAndCtx uriAndCtx) {
-                return new InmutableURIFetcherResponse(
-                        uriAndCtx,
-                        new InmutableURIFetcherHttpResponse("", 200, 
-                                Collections.EMPTY_MAP));
+            public FetchingTask createGet(final URIAndCtx uriAndCtx) {
+                return new FetchingTask() {
+                    @Override
+                    public URIAndCtx getURIAndCtx() {
+                        return uriAndCtx;
+                    }
+                    
+                    @Override
+                    public URIFetcherResponse execute() {
+                        return new InmutableURIFetcherResponse(
+                                uriAndCtx,
+                                new InmutableURIFetcherHttpResponse("", 200, 
+                                        Collections.EMPTY_MAP));
+                    }
+                };
             }
         };
         
         final AtomicInteger i = new AtomicInteger();
         final AtomicInteger j = new AtomicInteger();
         final Closure<URIFetcherResponse> ret = new RedirectClosure(
-                new NotsoAsyncUriFetcher(fetcher),
+                new NotsoAsyncUriFetcher(), fetcher,
                 new Closure<URIFetcherResponse>() {
                     @Override
                     public void execute(final URIFetcherResponse t) {
@@ -203,7 +212,7 @@ public class RedirectClosureTest {
         final MutableClosure<URIFetcherResponse> root = 
             new MutableClosure<URIFetcherResponse>();
         final Closure<URIFetcherResponse> ret = new RedirectClosure(
-                new NotsoAsyncUriFetcher(fetcher),
+                new NotsoAsyncUriFetcher(), fetcher,
                 new Closure<URIFetcherResponse>() {
                     @Override
                     public void execute(final URIFetcherResponse t) {
@@ -235,24 +244,33 @@ public class RedirectClosureTest {
         final AtomicInteger i = new AtomicInteger();
         final URIFetcher fetcher = new AbstractRedirectMockFetcher() {
             @Override
-            public URIFetcherResponse get(final URIAndCtx uriAndCtx) {
-                System.out.println("Redirect number: " 
-                        + i.incrementAndGet());
-                final Map<String, List<String>> headers = 
-                    new HashMap<String, List<String>>();
-                headers.put("locAtiOn", Arrays.asList("http://www.foo2.com"));
-                return new InmutableURIFetcherResponse(
-                        uriAndCtx,
-                        new InmutableURIFetcherHttpResponse("", 301, 
-                                headers));
+            public FetchingTask createGet(final URIAndCtx uriAndCtx) {
+                return new FetchingTask() {
+                    @Override
+                    public URIAndCtx getURIAndCtx() {
+                        return uriAndCtx;
+                    }
+                    
+                    @Override
+                    public URIFetcherResponse execute() {
+                        System.out.println("Redirect number: " 
+                                + i.incrementAndGet());
+                        final Map<String, List<String>> headers = 
+                            new HashMap<String, List<String>>();
+                        headers.put("locAtiOn", Arrays.asList("http://www.foo2.com"));
+                        return new InmutableURIFetcherResponse(
+                                uriAndCtx,
+                                new InmutableURIFetcherHttpResponse("", 301, 
+                                        headers));
+                    }
+                };
             }
         };
         
         final MutableClosure<URIFetcherResponse> root = 
             new MutableClosure<URIFetcherResponse>();
-        final Closure<URIFetcherResponse> ret = new RedirectClosure(
-                new NotsoAsyncUriFetcher(fetcher), failClousure, failClousure, 
-                root, 5);
+        final Closure<URIFetcherResponse> ret = new RedirectClosure(new NotsoAsyncUriFetcher(), fetcher,
+                failClousure, failClousure, root, 5);
         root.setTarget(ret);
 
 
@@ -277,20 +295,14 @@ public class RedirectClosureTest {
 abstract class AbstractRedirectMockFetcher extends AbstractURIFetcher {
 
     @Override
-    public URIFetcherResponse fetch(final URIAndCtx uri) {
-        return get(uri);
+    public final FetchingTask createPost(final URIAndCtx uriAndCtx, final InputStream body) {
+        throw new NotImplementedException("POST not implemented");
     }
 
     @Override
-    public URIFetcherResponse post(final URIAndCtx uri, final InputStream body) {
-        throw new NotImplementedException("Post to classpath not implemented");
+    public final FetchingTask createPost(final URIAndCtx uriAndCtx, final UrlEncodedPostBody body) {
+        throw new NotImplementedException("POST not implemented");
     }
 
-    @Override
-    public final URIFetcherResponse post(
-            final URIAndCtx uriAndCtx, 
-            final UrlEncodedPostBody body) {
-        throw new NotImplementedException("Post to classpath not implemented");
-    }
 
 }

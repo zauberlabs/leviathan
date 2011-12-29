@@ -36,6 +36,7 @@ import org.junit.Test;
 
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
+import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.common.async.impl.BlockingQueueJobQueue;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
@@ -59,7 +60,6 @@ public class FetchQueueAsyncUriFetcherTest {
                 new LinkedBlockingQueue<Job>());
         
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
-                new FixedURIFetcher(new HashMap<URI, String>()), 
                 new JobScheduler(fetcherQueue, Executors.newSingleThreadExecutor()),
                 new JobScheduler(processingQueue, 
                         Executors.newSingleThreadExecutor())
@@ -77,9 +77,8 @@ public class FetchQueueAsyncUriFetcherTest {
                 new LinkedBlockingQueue<Job>());
         final JobQueue<Job> processingQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
-        
+        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());        
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
-              new FixedURIFetcher(new HashMap<URI, String>()), 
               new JobScheduler(processingQueue, Executors.newSingleThreadExecutor()),
               new JobScheduler(fetcherQueue, Executors.newSingleThreadExecutor()));
         
@@ -93,7 +92,7 @@ public class FetchQueueAsyncUriFetcherTest {
         };
         
         for(int j = 0; j < 100; j++) {
-            fetcher.get(new URI("http://foo"), closure);
+            fetcher.scheduleFetch(f.createGet(new URI("http://foo")), closure);
         }
         fetcher.shutdown();
         Assert.assertEquals(100, i.get());
@@ -124,7 +123,7 @@ public class FetchQueueAsyncUriFetcherTest {
         final AtomicBoolean firstTaskDone = new AtomicBoolean(false);
         final AtomicInteger tasksAfterFirstTask = new AtomicInteger(0);
 
-        
+        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());
         final List<AsyncUriFetcher> fetcherHolder = 
             new ArrayList<AsyncUriFetcher>(1);
         final URI uri = new URI("http://123");
@@ -143,7 +142,7 @@ public class FetchQueueAsyncUriFetcherTest {
                         // de procesar la tarea primera.
                         waitForEndTask1.await();
                         for(int i = 0; i < cantTasks; i++) {
-                            fetcherHolder.iterator().next().get(uri, 
+                            fetcherHolder.iterator().next().scheduleFetch(f.createGet(uri), 
                                     new Closure<URIFetcherResponse>() {
                                 public void execute(final URIFetcherResponse t) {
                                     tasksAfterFirstTask.addAndGet(1);
@@ -159,13 +158,12 @@ public class FetchQueueAsyncUriFetcherTest {
         };
         final JobQueue<Job> processingQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
-        
+
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
-            new FixedURIFetcher(new HashMap<URI, String>()), 
             new JobScheduler(queue, Executors.newSingleThreadExecutor()),
             new JobScheduler(processingQueue, Executors.newSingleThreadExecutor()));
         fetcherHolder.add(fetcher);
-        fetcher.get(uri, new Closure<URIFetcherResponse>() {
+        fetcher.scheduleFetch(f.createGet(uri), new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {
                 firstTaskDone.set(true);
                 Assert.assertTrue(queue.isEmpty());
@@ -203,6 +201,7 @@ public class FetchQueueAsyncUriFetcherTest {
         final AtomicInteger tasksAfterFirstTask = new AtomicInteger(0);
 
         
+        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());
         final List<AsyncUriFetcher> fetcherHolder = 
             new ArrayList<AsyncUriFetcher>(1);
         final URI uri = new URI("http://123");
@@ -221,7 +220,7 @@ public class FetchQueueAsyncUriFetcherTest {
                         // de procesar la tarea primera.
                         waitForEndTask1.await();
                         for(int i = 0; i < cantTasks; i++) {
-                            fetcherHolder.iterator().next().get(uri, 
+                            fetcherHolder.iterator().next().scheduleFetch(f.createGet(uri), 
                                     new Closure<URIFetcherResponse>() {
                                 public void execute(final URIFetcherResponse t) {
                                     tasksAfterFirstTask.addAndGet(1);
@@ -239,11 +238,10 @@ public class FetchQueueAsyncUriFetcherTest {
                 new LinkedBlockingQueue<Job>());
         
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
-           new FixedURIFetcher(new HashMap<URI, String>()), 
            new JobScheduler(queue, Executors.newSingleThreadExecutor()),
            new JobScheduler(processingQueue, Executors.newSingleThreadExecutor()));
         fetcherHolder.add(fetcher);
-        fetcher.get(uri, new Closure<URIFetcherResponse>() {
+        fetcher.scheduleFetch(f.createGet(uri), new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {
                 firstTaskDone.set(true);
                 Assert.assertTrue(queue.isEmpty());
@@ -266,7 +264,6 @@ public class FetchQueueAsyncUriFetcherTest {
         
         try {
             new FetchQueueAsyncUriFetcher(
-                    new FixedURIFetcher(new HashMap<URI, String>()), 
                     new JobScheduler(queue, Executors.newSingleThreadExecutor()),
                     new JobScheduler(queue, Executors.newSingleThreadExecutor()));
             Assert.fail();
@@ -286,8 +283,9 @@ public class FetchQueueAsyncUriFetcherTest {
                 new LinkedBlockingQueue<Job>());
         final JobQueue<Job> processingQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
+        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());
+        
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
-                new FixedURIFetcher(new HashMap<URI, String>()), 
                 new JobScheduler(fetchQueue, new DirectExecutorService()),
                 new JobScheduler(processingQueue, new DirectExecutorService()));
         final URI uri = new URI("http://foo");
@@ -297,10 +295,10 @@ public class FetchQueueAsyncUriFetcherTest {
         
         final int n = 10000; 
         
-        fetcher.get(uri, new Closure<URIFetcherResponse>() {
+        fetcher.scheduleFetch(f.createGet(uri), new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {
                 for(int j = 0; j < n; j++) {
-                    fetcher.get(uri, new Closure<URIFetcherResponse>() {
+                    fetcher.scheduleFetch(f.createGet(uri), new Closure<URIFetcherResponse>() {
                         /** @see Closure#execute(Object) */
                         public void execute(final URIFetcherResponse t) {
                             i.incrementAndGet();
@@ -331,8 +329,8 @@ public class FetchQueueAsyncUriFetcherTest {
                 new LinkedBlockingQueue<Job>());
         final JobQueue<Job> processingQueue = new BlockingQueueJobQueue<Job>(
                 new LinkedBlockingQueue<Job>());
+        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
-                new FixedURIFetcher(new HashMap<URI, String>()), 
                 new JobScheduler(fetchQueue, new DirectExecutorService()),
                 new JobScheduler(processingQueue, new DirectExecutorService()));
         final URI uri = new URI("http://foo");
@@ -344,10 +342,10 @@ public class FetchQueueAsyncUriFetcherTest {
         
         Logger.getLogger(FetchQueueAsyncUriFetcher.class).setLevel(Level.FATAL);
         
-        fetcher.get(uri, new Closure<URIFetcherResponse>() {
+        fetcher.scheduleFetch(f.createGet(uri), new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {
                 for(int j = 0; j < n; j++) {
-                    fetcher.get(uri, new Closure<URIFetcherResponse>() {
+                    fetcher.scheduleFetch(f.createGet(uri), new Closure<URIFetcherResponse>() {
                         /** @see Closure#execute(Object) */
                         public void execute(final URIFetcherResponse t) {
                             i.incrementAndGet();
@@ -378,15 +376,15 @@ public class FetchQueueAsyncUriFetcherTest {
                 new SynchronousQueue<Job>());
         
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
-                    new FixedURIFetcher(new HashMap<URI, String>()), 
                     new JobScheduler(fetchQueue, new DirectExecutorService()),
                     new JobScheduler(processingQueue, 
                             Executors.newSingleThreadExecutor(),
                             new Timer(), 1000));
+        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());
         
         final URI uri = new URI("http://foo");
         final List<String> l = new ArrayList<String>(1); 
-        fetcher.get(uri, new Closure<URIFetcherResponse>() {
+        fetcher.scheduleFetch(f.createGet(uri), new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {
                 while(true) {
                     if(Thread.interrupted()) {
@@ -415,16 +413,16 @@ public class FetchQueueAsyncUriFetcherTest {
                 new SynchronousQueue<Job>());
         
         final AsyncUriFetcher fetcher = new FetchQueueAsyncUriFetcher(
-                    new FixedURIFetcher(new HashMap<URI, String>()), 
                     new JobScheduler(fetchQueue, new DirectExecutorService()),
                     new JobScheduler(processingQueue, new DirectExecutorService()));
+        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());
         
         final CountDownLatch latch = new CountDownLatch(1);
         final URI uri = new URI("http://foo");
         
         final CountDownLatch finish = new CountDownLatch(1);
         final List<String> store = new ArrayList<String>(1);
-        fetcher.get(uri, new Closure<URIFetcherResponse>() {
+        fetcher.scheduleFetch(f.createGet(uri), new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {
                 try {
                     latch.await();

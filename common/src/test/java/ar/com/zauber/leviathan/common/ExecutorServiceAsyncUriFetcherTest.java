@@ -127,10 +127,10 @@ public class ExecutorServiceAsyncUriFetcherTest {
             }
         };
         
-        fetcher.get(foo, closure);
-        fetcher.get(foo1, closure);
-        fetcher.get(foo2, closure);
-        fetcher.get(foo3, closure);
+        fetcher.scheduleFetch(f.createGet(foo), closure);
+        fetcher.scheduleFetch(f.createGet(foo1), closure);
+        fetcher.scheduleFetch(f.createGet(foo2), closure);
+        fetcher.scheduleFetch(f.createGet(foo3), closure);
         
         available.countDown();
         done.await(2, TimeUnit.SECONDS);
@@ -143,9 +143,9 @@ public class ExecutorServiceAsyncUriFetcherTest {
     @Test(timeout = 2000)
     public final void waitIdlenesss() 
         throws URISyntaxException, InterruptedException {
-        final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(
-                new DirectExecutorService(), 
-                new FixedURIFetcher(new HashMap<URI, String>()));
+        final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(new DirectExecutorService());
+        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());
+        
         final URI uri = new URI("http://foo");
         
         final CountDownLatch latch = new CountDownLatch(1);
@@ -153,10 +153,10 @@ public class ExecutorServiceAsyncUriFetcherTest {
         
         final int n = 10000; 
         
-        fetcher.get(uri, new Closure<URIFetcherResponse>() {
+        fetcher.scheduleFetch(f.createGet(uri), new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {
                 for(int j = 0; j < n; j++) {
-                    fetcher.get(uri, new Closure<URIFetcherResponse>() {
+                    fetcher.scheduleFetch(f.createGet(uri), new Closure<URIFetcherResponse>() {
                         /** @see Closure#execute(Object) */
                         public void execute(final URIFetcherResponse t) {
                             i.incrementAndGet();
@@ -181,8 +181,8 @@ public class ExecutorServiceAsyncUriFetcherTest {
     public final void waitIdlenesssWithExceptions() 
         throws URISyntaxException, InterruptedException {
         final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(
-                new DirectExecutorService(), 
-                new FixedURIFetcher(new HashMap<URI, String>()));
+                new DirectExecutorService());
+        final URIFetcher f = new FixedURIFetcher(new HashMap<URI, String>());
         final URI uri = new URI("http://foo");
         
         final CountDownLatch latch = new CountDownLatch(1);
@@ -193,10 +193,10 @@ public class ExecutorServiceAsyncUriFetcherTest {
         org.apache.log4j.Logger.getLogger(ExecutorServiceAsyncUriFetcher.class
                 ).setLevel(org.apache.log4j.Level.FATAL);
         
-        fetcher.get(uri, new Closure<URIFetcherResponse>() {
+        fetcher.scheduleFetch(f.createGet(uri), new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {
                 for(int j = 0; j < n; j++) {
-                    fetcher.get(uri, new Closure<URIFetcherResponse>() {
+                    fetcher.scheduleFetch(f.createGet(uri), new Closure<URIFetcherResponse>() {
                         /** @see Closure#execute(Object) */
                         public void execute(final URIFetcherResponse t) {
                             i.incrementAndGet();

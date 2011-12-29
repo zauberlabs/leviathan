@@ -25,6 +25,7 @@ import org.apache.commons.lang.UnhandledException;
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.commons.validate.Validate;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
+import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherHttpResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 
@@ -55,6 +56,8 @@ public final class RedirectClosure implements Closure<URIFetcherResponse> {
     private final Closure<URIFetcherResponse> onErrorTarget;
     private final Closure<URIFetcherResponse> onRedirectTarget;
     private final int maxHops;
+
+    private final URIFetcher f;
     
     /**
      * Creates the RedirectClosure.
@@ -70,12 +73,14 @@ public final class RedirectClosure implements Closure<URIFetcherResponse> {
      * @param maxHops the maximum anount of redirect hops. Must be a positive
      * number.
      */
-    public RedirectClosure(final AsyncUriFetcher uriFetcher, 
+    public RedirectClosure(final AsyncUriFetcher uriFetcher,
+                           final URIFetcher f,
                            final Closure<URIFetcherResponse> onSuccessTarget, 
                            final Closure<URIFetcherResponse> onErrorTarget,
                            final Closure<URIFetcherResponse> onRedirectTarget,
                            final int maxHops) {
         Validate.notNull(uriFetcher);
+        Validate.notNull(f);
         Validate.notNull(onSuccessTarget);
         Validate.notNull(onErrorTarget);
         Validate.notNull(onRedirectTarget);
@@ -86,6 +91,7 @@ public final class RedirectClosure implements Closure<URIFetcherResponse> {
         }
         
         this.uriFetcher = uriFetcher;
+        this.f = f;
         this.onSuccessTarget = onSuccessTarget;
         this.maxHops = maxHops;
         this.onErrorTarget  = onErrorTarget;
@@ -136,7 +142,8 @@ public final class RedirectClosure implements Closure<URIFetcherResponse> {
                     }
                     
                     ctx.put(KEY_HOPS, hops);
-                    uriFetcher.get(new InmutableURIAndCtx(uri, ctx), 
+                    // TODO: falta implementar el RedirectClosure de forma mejor
+                    uriFetcher.scheduleFetch(f.createGet(new InmutableURIAndCtx(uri, ctx)), 
                             onRedirectTarget);
                 } catch (final URISyntaxException e) {
                     throw new UnhandledException(e);

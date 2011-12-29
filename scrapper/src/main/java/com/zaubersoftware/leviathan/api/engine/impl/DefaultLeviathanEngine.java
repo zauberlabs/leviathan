@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.commons.validate.Validate;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
+import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.InmutableURIAndCtx;
@@ -51,14 +52,9 @@ public class DefaultLeviathanEngine extends DefaultEngine implements FetchingEng
     }
 
     @Override
-    public final FetchingEngine doGet(final URI uri, final ProcessingFlow flow) {
-        return doGet(new InmutableURIAndCtx(uri), flow);
-    }
-
-    @Override
-    public final FetchingEngine doGet(final URIAndCtx uriAndCtx, final ProcessingFlow flow) {
-        Validate.notNull(uriAndCtx, "The URI for which a GET request will be done cannot be null");
-        this.fetcher.get(uriAndCtx, adaptProcessingFlowToClosure(flow));
+    public final FetchingEngine fetch(final FetchingTask task, final ProcessingFlow flow) {
+        Validate.notNull(task, "The URI for which a GET request will be done cannot be null");
+        this.fetcher.scheduleFetch(task, adaptProcessingFlowToClosure(flow));
         return this;
     }
 

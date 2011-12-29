@@ -15,13 +15,9 @@
  */
 package ar.com.zauber.leviathan.api;
 
-import java.io.InputStream;
-import java.net.URI;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import ar.com.zauber.commons.dao.Closure;
-import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 /**
  * Obtención de una página de manera asincrónica
@@ -32,58 +28,15 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
  */
 public interface AsyncUriFetcher {
 
-    
     /**
      * Busca la página deda por la uri indicada y al terminar llama al closure
      * con la respuesta
      * 
-     * @param uri URIs to retrieve
+     * @param task fetching
      * @param closure closure donde se publica el resultado (el contenido de 
      *        la pagina, los errores; etc).
      */
-    void get(URI uri, Closure<URIFetcherResponse> closure);
-    
-    /**
-     * Busca la página deda por la uri indicada y al terminar llama al closure
-     * con la respuesta
-     * 
-     * @param uriAndCtx URIs to retrieve
-     * @param closure closure donde se publica el resultado (el contenido de 
-     *        la pagina, los errores; etc).
-     */
-    void get(URIAndCtx uriAndCtx, Closure<URIFetcherResponse> closure);
-
-    /**
-     * Realiza un post a la uri indicada, enviando el contenido indicado en
-     * <em>body</em> y al terminar llama al closure con la respuesta
-     * 
-     * @param uriAndCtx
-     *            URIs to retrieve
-     * @param body
-     *            contenido a postear
-     * @param closure
-     *            closure donde se publica el resultado (el contenido de la
-     *            pagina, los errores; etc).
-     */
-    void post(URIAndCtx uriAndCtx, InputStream body,
-            Closure<URIFetcherResponse> closure);
-    
-    /**
-     * Realiza un post a la uri indicada, enviando los pares clave/valor
-     * indicados en <em>body</em> en forma de
-     * "application/x-www-form-urlencoded", y al terminar llama al closure con
-     * la respuesta
-     * 
-     * @param uriAndCtx
-     *            URIs to retrieve
-     * @param body
-     *            contenido a postear (parametros simples y colecciones)
-     * @param closure
-     *            closure donde se publica el resultado (el contenido de la
-     *            pagina, los errores; etc).
-     */
-    void post(URIAndCtx uriAndCtx, UrlEncodedPostBody body,
-            Closure<URIFetcherResponse> closure);      
+    void scheduleFetch(FetchingTask task, Closure<URIFetcherResponse> closure);
     
     
     /**
