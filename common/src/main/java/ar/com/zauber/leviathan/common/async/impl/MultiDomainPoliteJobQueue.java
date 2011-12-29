@@ -112,7 +112,7 @@ public class MultiDomainPoliteJobQueue implements JobQueue<Job> {
         String domain = fetchJob.getUriAndCtx().getURI().getHost();
         long nanoDelay;
         if (domain == null
-        		|| this.excludedDomains.contains(domain) 
+                || this.excludedDomains.contains(domain) 
                 || !this.lastPolls.containsKey(domain)) {
             nanoDelay = 0;
         } else {
@@ -173,13 +173,13 @@ public class MultiDomainPoliteJobQueue implements JobQueue<Job> {
         }
         String host = fetchJob.getUriAndCtx().getURI().getHost();
         if(host != null) {
-			this.lastPolls.put(host, 
-	                System.nanoTime());
+            this.lastPolls.put(host, System.nanoTime());
         }
         return fetchJob;
     }
 
-    public int size() {
+    @Override
+    public final int size() {
         return this.queue.size();
     }
 
