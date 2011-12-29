@@ -17,6 +17,9 @@ package ar.com.zauber.leviathan.api;
 
 import java.util.concurrent.TimeUnit;
 
+import com.zaubersoftware.leviathan.api.engine.Pipe;
+import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
+
 import ar.com.zauber.commons.dao.Closure;
 
 /**
@@ -35,8 +38,10 @@ public interface AsyncUriFetcher {
      * @param task fetching
      * @param closure closure donde se publica el resultado (el contenido de 
      *        la pagina, los errores; etc).
+     *        
+     * @return a reference to it self to help chaining methods.
      */
-    void scheduleFetch(FetchingTask task, Closure<URIFetcherResponse> closure);
+    AsyncUriFetcher scheduleFetch(FetchingTask task, Closure<URIFetcherResponse> closure);
     
     
     /**

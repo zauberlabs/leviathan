@@ -158,7 +158,7 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
     }
     
     @Override
-    public void scheduleFetch(final FetchingTask methodCommand, final Closure<URIFetcherResponse> closure) {
+    public AsyncUriFetcher scheduleFetch(final FetchingTask methodCommand, final Closure<URIFetcherResponse> closure) {
         observer.newFetch(methodCommand.getURIAndCtx());
         incrementActiveJobs();
          
@@ -228,6 +228,8 @@ public final class FetchQueueAsyncUriFetcher extends AbstractAsyncUriFetcher {
                     + " with URI: "
                     + methodCommand.getURIAndCtx().getURI(), e);
         }
+        
+        return this;
     }
 
 

@@ -29,8 +29,10 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse;
 public class NotsoAsyncUriFetcher extends AbstractAsyncUriFetcher {
 
     @Override
-    public final void scheduleFetch(final FetchingTask task, final Closure<URIFetcherResponse> closure) {
+    public final AsyncUriFetcher scheduleFetch(final FetchingTask task, 
+                                               final Closure<URIFetcherResponse> closure) {
         closure.execute(execute(task));
+        return this;
     }
     
 
