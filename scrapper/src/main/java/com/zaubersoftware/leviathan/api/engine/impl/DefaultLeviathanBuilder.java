@@ -15,11 +15,7 @@
  */
 package com.zaubersoftware.leviathan.api.engine.impl;
 
-import org.apache.commons.lang.Validate;
-
-import ar.com.zauber.leviathan.api.AsyncUriFetcher;
-
-import com.zaubersoftware.leviathan.api.engine.FetchingEngine;
+import com.zaubersoftware.leviathan.api.engine.Engine;
 import com.zaubersoftware.leviathan.api.engine.LeviathanBuilder;
 
 /**
@@ -30,18 +26,9 @@ import com.zaubersoftware.leviathan.api.engine.LeviathanBuilder;
  */
 public final class DefaultLeviathanBuilder implements LeviathanBuilder {
 
-    private AsyncUriFetcher fetcher;
-
     @Override
-    public LeviathanBuilder withAsyncURIFetcher(final AsyncUriFetcher f) {
-        Validate.notNull(f, "The fetcher cannot be null");
-        this.fetcher = f;
-        return this;
-    }
-
-    @Override
-    public FetchingEngine build() {
-        return new DefaultLeviathanEngine(this.fetcher);
+    public Engine build() {
+        return new DefaultEngine();
     }
 
 }

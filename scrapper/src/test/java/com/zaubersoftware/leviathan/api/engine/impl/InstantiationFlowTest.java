@@ -42,7 +42,6 @@ import com.zaubersoftware.leviathan.api.engine.Action;
 import com.zaubersoftware.leviathan.api.engine.ContextAwareClosure;
 import com.zaubersoftware.leviathan.api.engine.Engine;
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
-import com.zaubersoftware.leviathan.api.engine.FetchingEngine;
 import com.zaubersoftware.leviathan.api.engine.LeviathanBuilder;
 import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
 import com.zaubersoftware.leviathan.api.engine.impl.dto.Link;
@@ -57,7 +56,7 @@ public final class InstantiationFlowTest {
     private final URI mlhome = URI.create("http://www.mercadolibre.com.ar/");
     private LeviathanBuilder leviathan;
     private AsyncUriFetcher fetcher;
-    private FetchingEngine engine;
+    private Engine engine;
     private URIFetcher f;
 
     @Before
@@ -69,9 +68,7 @@ public final class InstantiationFlowTest {
         this.fetcher = new ExecutorServiceAsyncUriFetcher(executor);
 
         this.leviathan = new DefaultLeviathanBuilder();
-        this.engine = this.leviathan
-            .withAsyncURIFetcher(this.fetcher)
-            .build();
+        this.engine = this.leviathan.build();
     }
 
 
@@ -88,7 +85,7 @@ public final class InstantiationFlowTest {
             }
         }).pack();
 
-        this.engine.fetch(f.createGet(this.mlhome), flow).awaitIdleness();
+        this.fetcher.scheduleFetch(f.createGet(this.mlhome), flow).awaitIdleness();
         assertTrue("Did not fetch!", fetchPerformed.get());
 
     }
@@ -110,7 +107,7 @@ public final class InstantiationFlowTest {
                 assertEquals(exception, trowable);
             }
         }).pack();
-        this.engine.fetch(f.createGet(mlhome), flow).awaitIdleness();
+        fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness();
         assertTrue("Did not hadle the exception", exceptionHandled.get());
     }
 
@@ -137,7 +134,7 @@ public final class InstantiationFlowTest {
                         + " Look above!!!");
             }
         }).pack();
-        this.engine.fetch(f.createGet(mlhome), pack).awaitIdleness();
+        this.fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness();
         assertTrue("Did not hadle the exception", exceptionHandled.get());
     }
 
@@ -155,7 +152,7 @@ public final class InstantiationFlowTest {
             })
             .pack();
 
-        this.engine.fetch(f.createGet(mlhome), flow).awaitIdleness();
+        fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness();
         assertTrue("Did not fetch!", fetchPerformed.get());
     }
 
@@ -179,7 +176,7 @@ public final class InstantiationFlowTest {
 
         final Map<String, Object> ctx = new HashMap<String, Object>();
         ctx.put(key, val);
-        this.engine.fetch(f.createGet(new InmutableURIAndCtx(this.mlhome, ctx)), flow).awaitIdleness();
+        fetcher.scheduleFetch(f.createGet(new InmutableURIAndCtx(this.mlhome, ctx)), flow).awaitIdleness();
         assertTrue("Did not fetch!", fetchPerformed.get());
     }
 
@@ -203,7 +200,7 @@ public final class InstantiationFlowTest {
 
         final Map<String, Object> ctx = new HashMap<String, Object>();
         ctx.put(KEY, VAL);
-        this.engine.fetch(f.createGet(new InmutableURIAndCtx(this.mlhome, ctx)), flow).awaitIdleness();
+        fetcher.scheduleFetch(f.createGet(new InmutableURIAndCtx(this.mlhome, ctx)), flow).awaitIdleness();
         assertTrue("Did not fetch!", fetchPerformed.get());
     }
 
@@ -231,7 +228,7 @@ public final class InstantiationFlowTest {
                 }
             })
             .pack();
-        this.engine.fetch(f.createGet(mlhome), pack).awaitIdleness();
+        fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness();
         assertTrue("Did not hadle the exception", actionPerformed.get());
     }
 
@@ -267,7 +264,7 @@ public final class InstantiationFlowTest {
                 }
             })
             .pack();
-        this.engine.fetch(f.createGet(mlhome), pack).awaitIdleness();
+        fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness();
         assertTrue("Did not hadle the exception", actionPerformed.get());
     }
 }

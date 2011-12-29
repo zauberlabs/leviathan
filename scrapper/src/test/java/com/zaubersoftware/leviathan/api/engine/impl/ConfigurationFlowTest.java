@@ -39,6 +39,7 @@ import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.common.ExecutorServiceAsyncUriFetcher;
+import ar.com.zauber.leviathan.common.FetcherResponsePipeAdapterClosure;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
 import com.zaubersoftware.leviathan.api.engine.Action;

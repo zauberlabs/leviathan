@@ -19,9 +19,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ar.com.zauber.commons.async.AbstractAsyncTaskExecutor;
+import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+
+import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
 
 /**
  * Clase base para los {@link AsyncUriFetcher}.
@@ -52,5 +55,22 @@ public abstract class AbstractAsyncUriFetcher extends AbstractAsyncTaskExecutor
             rr = new InmutableURIFetcherResponse(task.getURIAndCtx(), t);
         }
         return rr;
+    }
+    
+    @Override
+    public final AsyncUriFetcher scheduleFetch(final FetchingTask task, final ProcessingFlow processingFlow) {
+        scheduleFetch(task, adaptProcessingFlowToClosure(processingFlow));
+        return this;
+    }
+    
+
+    /**
+     * Adapts a {@link ProcessingFlow} to a {@link Closure}&lt;{@link URIFetcherResponse}&gt;
+     *
+     * @param uri
+     * @return
+     */
+    private FetcherResponsePipeAdapterClosure<Void> adaptProcessingFlowToClosure(final ProcessingFlow flow) {
+        return new FetcherResponsePipeAdapterClosure<Void>(flow.toPipe());
     }
 }

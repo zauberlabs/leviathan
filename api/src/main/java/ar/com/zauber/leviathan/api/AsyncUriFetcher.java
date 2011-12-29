@@ -17,7 +17,6 @@ package ar.com.zauber.leviathan.api;
 
 import java.util.concurrent.TimeUnit;
 
-import com.zaubersoftware.leviathan.api.engine.Pipe;
 import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
 
 import ar.com.zauber.commons.dao.Closure;
@@ -43,6 +42,8 @@ public interface AsyncUriFetcher {
      */
     AsyncUriFetcher scheduleFetch(FetchingTask task, Closure<URIFetcherResponse> closure);
     
+    /** similar to {@link #scheduleFetch(FetchingTask, Closure)} */
+    AsyncUriFetcher scheduleFetch(FetchingTask task, ProcessingFlow processingFlow);
     
     /**
      * Initiates an orderly shutdown in which previously submitted

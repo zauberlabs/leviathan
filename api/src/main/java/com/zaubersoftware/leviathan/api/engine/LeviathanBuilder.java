@@ -15,7 +15,6 @@
  */
 package com.zaubersoftware.leviathan.api.engine;
 
-import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 
 /**
  * TODO: Description of the class, Comments in english by default
@@ -26,7 +25,6 @@ import ar.com.zauber.leviathan.api.AsyncUriFetcher;
  */
 public interface LeviathanBuilder {
 
-    LeviathanBuilder withAsyncURIFetcher(AsyncUriFetcher fetcher);
-    FetchingEngine build();
+    Engine build();
 
 }

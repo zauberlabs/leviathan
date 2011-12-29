@@ -51,7 +51,7 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
 
     
     @Override
-    public final void scheduleFetch(final FetchingTask methodCommand, 
+    public final AsyncUriFetcher scheduleFetch(final FetchingTask methodCommand, 
                                                final Closure<URIFetcherResponse> closure) {
         Validate.notNull(methodCommand);
         Validate.notNull(closure);
@@ -77,6 +77,7 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
         } catch(final Throwable e) {
             decrementActiveJobs();   
         }
+        return this;
     }
     
     
