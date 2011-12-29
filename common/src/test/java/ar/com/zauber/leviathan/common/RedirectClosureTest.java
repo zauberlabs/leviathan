@@ -33,6 +33,7 @@ import org.junit.Test;
 
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.commons.dao.closure.MutableClosure;
+import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
@@ -82,13 +83,22 @@ public class RedirectClosureTest {
     @Test
     public final void testNoRedirect() {
         final URIFetcher fetcher = new AbstractRedirectMockFetcher() {
-            @SuppressWarnings("unchecked")
             @Override
-            public URIFetcherResponse get(final URIAndCtx uriAndCtx) {
-                return new InmutableURIFetcherResponse(
-                        uriAndCtx,
-                        new InmutableURIFetcherHttpResponse("", 301, 
-                                Collections.EMPTY_MAP));
+            public FetchingTask createGet(final URIAndCtx uriAndCtx) {
+                return new FetchingTask() {
+                    @Override
+                    public URIAndCtx getURIAndCtx() {
+                        return uriAndCtx;
+                    }
+                    
+                    @Override
+                    public URIFetcherResponse execute() {
+                        return new InmutableURIFetcherResponse(
+                                uriAndCtx,
+                                new InmutableURIFetcherHttpResponse("", 301, 
+                                        Collections.EMPTY_MAP));
+                    }
+                };
             }
         };
         
@@ -168,14 +178,24 @@ public class RedirectClosureTest {
     public final void testRedirect() {
         final URIFetcher fetcher = new AbstractRedirectMockFetcher() {
             @Override
-            public URIFetcherResponse get(final URIAndCtx uriAndCtx) {
-                final Map<String, List<String>> headers = 
-                    new HashMap<String, List<String>>();
-                headers.put("locAtiOn", Arrays.asList("http://www.foo2.com"));
-                return new InmutableURIFetcherResponse(
-                        uriAndCtx,
-                        new InmutableURIFetcherHttpResponse("", 200, 
-                                headers));
+            public FetchingTask createGet(final URIAndCtx uriAndCtx) {
+                return new FetchingTask() {
+                    @Override
+                    public URIAndCtx getURIAndCtx() {
+                        return uriAndCtx;
+                    }
+                    
+                    @Override
+                    public URIFetcherResponse execute() {
+                        final Map<String, List<String>> headers = 
+                                new HashMap<String, List<String>>();
+                            headers.put("locAtiOn", Arrays.asList("http://www.foo2.com"));
+                            return new InmutableURIFetcherResponse(
+                                    uriAndCtx,
+                                    new InmutableURIFetcherHttpResponse("", 200, 
+                                            headers));
+                    }
+                };
             }
         };
         

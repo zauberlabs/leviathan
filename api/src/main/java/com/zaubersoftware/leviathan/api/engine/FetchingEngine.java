@@ -19,6 +19,7 @@ import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
+import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 
@@ -30,17 +31,13 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
  * @since Dec 28, 2011
  */
 public interface FetchingEngine extends Engine {
-
     /**
      * Performs the GET request for the given {@link URI}.
      *
      * @param uri The {@link URI} to be fetched.
      * @return The {@link Engine}
      */
-    FetchingEngine doGet(URI uri, ProcessingFlow flow);
-
-    /** @see #doGet(URI) */
-    FetchingEngine doGet(URIAndCtx uriAndCtx, ProcessingFlow flow);
+    FetchingEngine fetch(FetchingTask task, ProcessingFlow flow);
 
     /**
      * Blocks until all tasks have completed execution

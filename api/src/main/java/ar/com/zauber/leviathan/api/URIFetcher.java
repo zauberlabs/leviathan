@@ -17,7 +17,6 @@ package ar.com.zauber.leviathan.api;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Map;
 
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 /**
@@ -27,25 +26,56 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
  * @since Oct 12, 2009
  */
 public interface URIFetcher {
-    /**
-     * fetch uri
-     *
-     * @deprecated Use {@link #get(URIAndCtx)} instead. This method will be
-     *             deleted on next version.
-     */
-    @Deprecated
-    URIFetcherResponse fetch(URIAndCtx uri);
 
-    /** get from uri */
+    /**  @deprecated use {@link #createGet(URI)}.execute() */
+    @Deprecated
     URIFetcherResponse get(URI uri);
 
-    /** get from uri */
+    /** @deprecated use {@link #createGet(URIAndCtx)}.execute() */
+    @Deprecated
     URIFetcherResponse get(URIAndCtx uri);
 
-    /** post to uri */
+    /** @deprecated use {@link #post(URIAndCtx, InputStream)} */
+    @Deprecated
     URIFetcherResponse post(URIAndCtx uri, InputStream body);
 
-    /** post to uri, body (with collections also as parameters)
-     * as "application/x-www-form-urlencoded "*/
+    /** @deprecated use {@link #post(URIAndCtx, UrlEncodedPostBody)} */
+    @Deprecated
     URIFetcherResponse post(URIAndCtx uriAndCtx, UrlEncodedPostBody body);
+    
+    /** 
+     * creates a GET task bound to this fetcher
+     * <p>
+     * This is a helper if you want to use fetchers (you can use directly your
+     * {@link FetchingTask} implementation.
+     * </p>
+     */
+    FetchingTask createGet(URI uri);
+    
+    /** 
+     * creates a GET task bound to this fetcher
+     * <p>
+     * This is a helper if you want to use fetchers (you can use directly your
+     * {@link FetchingTask} implementation.
+     * </p>
+     */
+    FetchingTask createGet(URIAndCtx uriAndCtx);
+    
+    /** 
+     * creates a POST task bound to this fetcher
+     * <p>
+     * This is a helper if you want to use fetchers (you can use directly your
+     * {@link FetchingTask} implementation.
+     * </p>
+     */
+    FetchingTask createPost(URIAndCtx uriAndCtx, InputStream body);
+    
+    /** 
+     * creates a POST task bound to this fetcher
+     * <p>
+     * This is a helper if you want to use fetchers (you can use directly your
+     * {@link FetchingTask} implementation.
+     * </p>
+     */
+    FetchingTask createPost(URIAndCtx uriAndCtx, UrlEncodedPostBody body);
 }

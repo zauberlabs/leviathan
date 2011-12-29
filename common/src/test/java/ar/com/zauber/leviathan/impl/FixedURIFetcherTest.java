@@ -52,7 +52,7 @@ public class FixedURIFetcherTest {
     /** test found  */
     @Test
     public final void found() throws URISyntaxException, IOException {
-        final URIFetcherResponse r = fetcher.get(new URI("http://noexiste"));
+        final URIFetcherResponse r = fetcher.createGet(new URI("http://noexiste")).execute();
         Assert.assertNotNull(r);
         Assert.assertEquals(200, r.getHttpResponse().getStatusCode());
         Assert.assertEquals("ñoño", 
@@ -64,7 +64,7 @@ public class FixedURIFetcherTest {
     /** test found  */
     @Test
     public final void notfound() throws URISyntaxException, IOException {
-        final URIFetcherResponse r = fetcher.get(new URI("http://lalarara"));
+        final URIFetcherResponse r = fetcher.createGet(new URI("http://lalarara")).execute();
         Assert.assertNotNull(r);
         Assert.assertFalse(r.isSucceeded());
         Assert.assertEquals(UnknownHostException.class, r.getError().getClass());

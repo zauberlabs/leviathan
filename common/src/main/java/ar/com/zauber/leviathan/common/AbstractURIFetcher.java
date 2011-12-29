@@ -15,11 +15,14 @@
  */
 package ar.com.zauber.leviathan.common;
 
+import java.io.InputStream;
 import java.net.URI;
 
+import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
-
+import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
+import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 /**
  * Clase base para los  {@link URIFetcher}
  * 
@@ -28,9 +31,30 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse;
  */
 public abstract class AbstractURIFetcher implements URIFetcher {
 
+    @Override
+    public final FetchingTask createGet(final URI uri) {
+        return createGet(new InmutableURIAndCtx(uri));
+    }
+    
     /** @see URIFetcher#get(URI) */
     public final URIFetcherResponse get(final URI uri) {
-        return get(new InmutableURIAndCtx(uri));
+        return createGet(new InmutableURIAndCtx(uri)).execute();
+    }
+    
+    @Override
+    public final URIFetcherResponse get(final URIAndCtx uriAndCtx) {
+        return createGet(uriAndCtx).execute();
+    }
+    
+    @Override
+    public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
+            final InputStream body) {
+        return createPost(uriAndCtx, body).execute();
     }
 
+
+    @Override
+    public final URIFetcherResponse post(final URIAndCtx uriAndCtx, final UrlEncodedPostBody body) {
+        return createPost(uriAndCtx, body).execute();
+    }
 }

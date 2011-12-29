@@ -108,9 +108,9 @@ public class PostHttpMethodCommand implements FetchingTask {
         URIFetcherResponse ret;
         
         if (encodedBody != null) {
-            ret = fetcher.post(uri, encodedBody);
+            ret = fetcher.createPost(uriAndCtx, encodedBody).execute();
         } else if (body != null) {
-            ret = fetcher.post(uri, body);
+            ret = fetcher.createPost(uriAndCtx, body).execute();
         } else {
             ret = new InmutableURIFetcherResponse(uriAndCtx, 
                     new IllegalStateException("Nothing to post!"));

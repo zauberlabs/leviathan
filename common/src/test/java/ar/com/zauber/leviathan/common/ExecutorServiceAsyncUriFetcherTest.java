@@ -36,6 +36,7 @@ import org.junit.Test;
 
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
+import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
@@ -80,42 +81,40 @@ public class ExecutorServiceAsyncUriFetcherTest {
 
         final CountDownLatch available = new CountDownLatch(1);
         final Random random = new Random();
-        final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(
-            Executors.newScheduledThreadPool(2), 
-            new AbstractURIFetcher() {
-                public URIFetcherResponse get(final URIAndCtx uri) {
-                    try {
-                        available.await();
-                        Thread.sleep(random.nextInt(500));
-                        return fixedUriFetcher.get(uri);
-                    } catch (final InterruptedException e) {
-                        throw new RuntimeException(e);
+        final URIFetcher f = new AbstractURIFetcher() {
+            @Override
+            public FetchingTask createGet(final URIAndCtx uriAndCtx) {
+                return new FetchingTask() {
+                    @Override
+                    public URIAndCtx getURIAndCtx() {
+                        return uriAndCtx;
                     }
-                }
-                
-                public URIFetcherResponse fetch(final URI uri) {
-                    return get(uri);
-                }
-                
-                public URIFetcherResponse fetch(final URIAndCtx uri) {
-                    return get(uri);
-                }
-                
-                public URIFetcherResponse post(final URIAndCtx uri,
-                        final InputStream body) {
-                    throw new NotImplementedException();
-                }
-                
-                public URIFetcherResponse post(final URIAndCtx uri,
-                        final Map<String, String> body) {
-                    throw new NotImplementedException();
-                }
+                    
+                    @Override
+                    public URIFetcherResponse execute() {
+                        try {
+                            available.await();
+                            Thread.sleep(random.nextInt(500));
+                            return fixedUriFetcher.createGet(uriAndCtx.getURI()).execute();
+                        } catch (final InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                };
+            }
 
-                public URIFetcherResponse post(final URIAndCtx uriAndCtx,
-                        final UrlEncodedPostBody body) {
-                    throw new NotImplementedException();
-                }
-            });
+            @Override
+            public FetchingTask createPost(final URIAndCtx uriAndCtx, final InputStream body) {
+                throw new NotImplementedException();
+            }
+
+            @Override
+            public FetchingTask createPost(final URIAndCtx uriAndCtx, final UrlEncodedPostBody body) {
+                throw new NotImplementedException();
+            }
+        };
+        final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(
+            Executors.newScheduledThreadPool(2));
         final List<URIFetcherResponse> responses = 
             new CopyOnWriteArrayList<URIFetcherResponse>();
         

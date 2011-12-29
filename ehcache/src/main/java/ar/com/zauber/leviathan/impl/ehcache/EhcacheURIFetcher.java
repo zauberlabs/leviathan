@@ -26,6 +26,7 @@ import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
@@ -117,48 +118,60 @@ public class EhcacheURIFetcher extends AbstractURIFetcher {
         return get(uri);
     }
     
-    /** @see URIFetcher#get(URI) */
-    public final URIFetcherResponse get(final URIAndCtx uriAndCtx) {
-        final Element e = cache.get(uriAndCtx.getURI());
-        URIFetcherResponse ret;
-        if (e == null) {
-            ret = fetcher.get(uriAndCtx);
-
-            switch (cachingBehavior) {
-                case OK:
-                    if(ret.isSucceeded() && ret.getHttpResponse().getStatusCode() >= 200 
-                            && ret.getHttpResponse().getStatusCode() < 300) {
-                        cache.put(new Element(uriAndCtx.getURI(), ret));
-                    }
-                    break;
-                case SUCCEEDED:
-                    if(ret.isSucceeded()) {
-                        cache.put(new Element(uriAndCtx.getURI(), ret));
-                    }
-                    break;
-                case ALL:
-                    cache.put(new Element(uriAndCtx.getURI(), ret));
-                    break;
-                default:
-                    throw new IllegalStateException("CachingBehavior no manejado");
+    @Override
+    public final FetchingTask createGet(final URIAndCtx uriAndCtx) {
+        return new FetchingTask() {
+            
+            @Override
+            public URIAndCtx getURIAndCtx() {
+                return uriAndCtx;
             }
-        } else {
-            ret = new CtxDecorableURIFetcherResponse(
-                    (URIFetcherResponse) e.getValue(), uriAndCtx);
-            hits++;
-        }
-        total++;
-        return ret;
+            
+            @Override
+            public URIFetcherResponse execute() {
+                final Element e = cache.get(uriAndCtx.getURI());
+                URIFetcherResponse ret;
+                if (e == null) {
+                    ret = fetcher.get(uriAndCtx);
+
+                    switch (cachingBehavior) {
+                        case OK:
+                            if(ret.isSucceeded() && ret.getHttpResponse().getStatusCode() >= 200 
+                                    && ret.getHttpResponse().getStatusCode() < 300) {
+                                cache.put(new Element(uriAndCtx.getURI(), ret));
+                            }
+                            break;
+                        case SUCCEEDED:
+                            if(ret.isSucceeded()) {
+                                cache.put(new Element(uriAndCtx.getURI(), ret));
+                            }
+                            break;
+                        case ALL:
+                            cache.put(new Element(uriAndCtx.getURI(), ret));
+                            break;
+                        default:
+                            throw new IllegalStateException("CachingBehavior no manejado");
+                    }
+                } else {
+                    ret = new CtxDecorableURIFetcherResponse(
+                            (URIFetcherResponse) e.getValue(), uriAndCtx);
+                    hits++;
+                }
+                total++;
+                return ret;
+            }
+        };
+    }
+
+    
+    @Override
+    public final FetchingTask createPost(final URIAndCtx uriAndCtx, final InputStream body) {
+        return fetcher.createPost(uriAndCtx, body);
     }
     
-    /**
-     * Doesn't cache.
-     * 
-     * @see URIFetcher#post(URIFetcherResponse.URIAndCtx, InputStream)
-     */
-    public final URIFetcherResponse post(final URIAndCtx uri,
-            final InputStream body) {
-        return fetcher.post(uri, body);
+    @Override
+    public final FetchingTask createPost(final URIAndCtx uriAndCtx, final UrlEncodedPostBody body) {
+        return fetcher.createPost(uriAndCtx, body);
     }
     
     public final long getHits() {
@@ -179,10 +192,4 @@ public class EhcacheURIFetcher extends AbstractURIFetcher {
         }
     }
 
-
-    /** @see URIFetcher#post(URIAndCtx, UrlEncodedPostBody) */
-    public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
-                final UrlEncodedPostBody body) {
-        return fetcher.post(uriAndCtx, body);
-    }
 }
