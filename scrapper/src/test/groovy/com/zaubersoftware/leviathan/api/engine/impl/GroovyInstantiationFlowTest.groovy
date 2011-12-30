@@ -39,6 +39,7 @@ import ar.com.zauber.leviathan.common.InmutableURIAndCtx;
 import ar.com.zauber.leviathan.common.fluent.Fetchers;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
+import com.sun.xml.internal.txw2.output.StreamSerializer;
 import com.zaubersoftware.leviathan.api.engine.Action;
 import com.zaubersoftware.leviathan.api.engine.ContextAwareClosure;
 import com.zaubersoftware.leviathan.api.engine.Engine;
@@ -215,7 +216,7 @@ final class GroovyInstantiationFlowTest {
                 @Override
                 String execute(final Link link) {
                     actionPerformed.set(true)
-                    return link.title
+                    link.title
                 }
             })
             .then(new ContextAwareClosure<String>() {
@@ -243,7 +244,7 @@ final class GroovyInstantiationFlowTest {
                 @Override
                 Link execute(final Link link) {
                     actionPerformed.set(true)
-                    return link
+                    link
                 }
             })
             .forEach(String.class).in("categories")
