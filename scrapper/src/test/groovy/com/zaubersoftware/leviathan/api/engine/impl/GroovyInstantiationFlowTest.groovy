@@ -71,8 +71,6 @@ final class GroovyInstantiationFlowTest {
     }
 
 
-
-
     @Test
     void shouldFetchAndDoSomethingWithAClosure() {
         final AtomicBoolean fetchPerformed = new AtomicBoolean(false)
@@ -205,7 +203,7 @@ final class GroovyInstantiationFlowTest {
 
     @Test
     void shouldFlow() {
-        final Source xsltSource = new StreamSource(getClass().getClassLoader().getResourceAsStream(
+        final Source xsltSource = new StreamSource(getClass().classLoader.getResourceAsStream(
         "com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl"))
         final AtomicBoolean actionPerformed = new AtomicBoolean(false)
         final ProcessingFlow pack = this.engine
@@ -217,7 +215,7 @@ final class GroovyInstantiationFlowTest {
                 @Override
                 String execute(final Link link) {
                     actionPerformed.set(true)
-                    return link.getTitle()
+                    return link.title
                 }
             })
             .then(new ContextAwareClosure<String>() {
@@ -233,7 +231,7 @@ final class GroovyInstantiationFlowTest {
 
     @Test
     void shouldForEachFlow() {
-        final Source xsltSource = new StreamSource(getClass().getClassLoader().getResourceAsStream(
+        final Source xsltSource = new StreamSource(getClass().classLoader.getResourceAsStream(
         "com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl"))
         final AtomicBoolean actionPerformed = new AtomicBoolean(false)
         final AtomicInteger count = new AtomicInteger(0)
