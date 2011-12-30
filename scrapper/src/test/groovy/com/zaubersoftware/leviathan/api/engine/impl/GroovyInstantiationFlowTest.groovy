@@ -14,7 +14,7 @@ package com.zaubersoftware.leviathan.api.engine.impl
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import static ActionHandlerCategory.*;
 import static org.junit.Assert.*;
 
 import java.net.URI;
@@ -41,6 +41,7 @@ import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
 import com.sun.xml.internal.txw2.output.StreamSerializer;
 import com.zaubersoftware.leviathan.api.engine.Action;
+import com.zaubersoftware.leviathan.api.engine.ActionHandler;
 import com.zaubersoftware.leviathan.api.engine.ContextAwareClosure;
 import com.zaubersoftware.leviathan.api.engine.Engine;
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
@@ -60,11 +61,6 @@ final class GroovyInstantiationFlowTest {
     Engine engine
     URIFetcher f
 	
-	def contextAware(aBlock) {
-		new ContextAwareClosure(){
-			void execute(arg0) { aBlock(arg0) }
-		}
-	}
 	
 	def exceptionHandler(aBlock) {
 		new ExceptionHandler() {
@@ -87,6 +83,7 @@ final class GroovyInstantiationFlowTest {
         this.fetcher = new ExecutorServiceAsyncUriFetcher(executor)
 
         this.engine = Leviathan.flowBuilder()
+		ActionHandler.mixin(ActionHandlerCategory);
     }
 
 
@@ -95,10 +92,10 @@ final class GroovyInstantiationFlowTest {
         final fetchPerformed = new AtomicBoolean(false)
         final flow = this.engine
 			.afterFetch()
-			.then( contextAware { URIFetcherResponse response ->
+			.then { URIFetcherResponse response ->
                 assertTrue(response.isSucceeded())
                 fetchPerformed.set(true)
-			})
+			}
 			.pack()
 
         this.fetcher.scheduleFetch(f.createGet(this.mlhome), flow).awaitIdleness()
@@ -112,7 +109,7 @@ final class GroovyInstantiationFlowTest {
         final exception = new MockException("an exception was thrown while processing the response!")
         ProcessingFlow flow = this.engine
 			.afterFetch()
-			.then( contextAware { _ -> throw exception})
+			.then { _ -> throw exception}
 			.onAnyExceptionDo( exceptionHandler { 
 				exceptionHandled.set(true)
                 assertEquals(exception, it )
@@ -127,8 +124,8 @@ final class GroovyInstantiationFlowTest {
         final exception = new MockException("an exception was thrown while processing the response!")
         ProcessingFlow pack = this.engine
 			.afterFetch()
-			.then( contextAware { _ -> throw exception } )
-			.on(MockException.class)
+			.then  { _ -> throw exception } 
+			.on(MockException)
 			.handleWith( exceptionHandler { throwable ->
                 exceptionHandled.set(true)
                 assertEquals(exception, throwable)
@@ -147,11 +144,11 @@ final class GroovyInstantiationFlowTest {
         final fetchPerformed = new AtomicBoolean(false)
         final ProcessingFlow flow = this.engine
             .afterFetch()
-            .then(contextAware { 
+            .then { 
 				URIFetcherResponse response ->
                     assertTrue(response.succeeded)
                     fetchPerformed.set(true)
-            })
+            }
             .pack()
 
         fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
@@ -166,7 +163,7 @@ final class GroovyInstantiationFlowTest {
         final fetchPerformed = new AtomicBoolean(false)
         final flow = this.engine
             .afterFetch()
-            .then(new ContextAwareClosure<URIFetcherResponse>() {
+            .then( new ContextAwareClosure<URIFetcherResponse>() {
                 @Override
                 void execute(final URIFetcherResponse response) {
                     assertTrue(response.succeeded)
@@ -215,9 +212,9 @@ final class GroovyInstantiationFlowTest {
             .afterFetch()
             .sanitizeHTML()
             .transformXML(xsltSource)
-            .toJavaObject(Link.class)
+            .toJavaObject(Link)
             .then(action { Link link -> actionPerformed.set(true);  link.title })
-            .then(contextAware { assertEquals("MercadoLibre Argentina - Donde comprar y vender de todo.", it ) })
+            .then { assertEquals("MercadoLibre Argentina - Donde comprar y vender de todo.", it ) }
             .pack()
         fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
         assertTrue("Did not hadle the exception", actionPerformed.get())
@@ -232,12 +229,12 @@ final class GroovyInstantiationFlowTest {
         final ProcessingFlow pack = this.engine.afterFetch()
             .sanitizeHTML()
             .transformXML(xsltSource)
-            .toJavaObject(Link.class)
+            .toJavaObject(Link)
             .then(action { actionPerformed.set(true); it })
-            .forEach(String.class).in("categories")
+            .forEach(String).in("categories")
                 .then( contextAware { _ -> count.incrementAndGet() })
             .endFor()
-            .then(contextAware { _ -> assertEquals(4, count.get()) })
+            .then { _ -> assertEquals(4, count.get()) }
             .pack()
         fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
         assertTrue("Did not hadle the exception", actionPerformed.get())
