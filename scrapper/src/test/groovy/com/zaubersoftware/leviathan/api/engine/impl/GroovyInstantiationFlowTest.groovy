@@ -74,7 +74,7 @@ final class GroovyInstantiationFlowTest {
 
 
     @Test
-    void shouldFetchAndDoSomethingWithAClosure() throws Exception {
+    void shouldFetchAndDoSomethingWithAClosure() {
         final AtomicBoolean fetchPerformed = new AtomicBoolean(false)
         final ProcessingFlow flow = this.engine.afterFetch().then(new ContextAwareClosure<URIFetcherResponse>() {
             @Override
@@ -90,7 +90,7 @@ final class GroovyInstantiationFlowTest {
     }
 
     @Test
-    void shouldFetchDoSomethingAndHandleTheExceptionWithoutConfiguredHandlers() throws Exception {
+    void shouldFetchDoSomethingAndHandleTheExceptionWithoutConfiguredHandlers() {
         final AtomicBoolean exceptionHandled = new AtomicBoolean(false)
         final RuntimeException exception = 
                 new MockException("an exception was thrown while processing the response!")
@@ -111,7 +111,7 @@ final class GroovyInstantiationFlowTest {
     }
 
     @Test
-    void shouldFetchDoSomethingAndHandleTheExceptionWithAnSpecificHandler() throws Exception {
+    void shouldFetchDoSomethingAndHandleTheExceptionWithAnSpecificHandler() {
         final AtomicBoolean exceptionHandled = new AtomicBoolean(false)
         final RuntimeException exception = 
                 new MockException("an exception was thrown while processing the response!")
@@ -138,7 +138,7 @@ final class GroovyInstantiationFlowTest {
     }
 
     @Test
-    void shouldBindUriToAFlow() throws Exception {
+    void shouldBindUriToAFlow() {
         final AtomicBoolean fetchPerformed = new AtomicBoolean(false)
         final ProcessingFlow flow = this.engine
             .afterFetch()
@@ -156,7 +156,7 @@ final class GroovyInstantiationFlowTest {
     }
 
     @Test
-    void shouldHaveContext() throws Exception {
+    void shouldHaveContext() {
         final String key = "FOO"
         final String val = "VAL"
 
@@ -180,7 +180,7 @@ final class GroovyInstantiationFlowTest {
     }
 
     @Test
-    void shouldHaveContextAndCanBeShareBetweenActions() throws Exception {
+    void shouldHaveContextAndCanBeShareBetweenActions() {
         final String KEY = "FOO"
         final String VAL = "VAL"
 
@@ -204,7 +204,7 @@ final class GroovyInstantiationFlowTest {
     }
 
     @Test
-    void shouldFlow() throws Exception {
+    void shouldFlow() {
         final Source xsltSource = new StreamSource(getClass().getClassLoader().getResourceAsStream(
         "com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl"))
         final AtomicBoolean actionPerformed = new AtomicBoolean(false)
@@ -232,7 +232,7 @@ final class GroovyInstantiationFlowTest {
     }
 
     @Test
-    void shouldForEachFlow() throws Exception {
+    void shouldForEachFlow() {
         final Source xsltSource = new StreamSource(getClass().getClassLoader().getResourceAsStream(
         "com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl"))
         final AtomicBoolean actionPerformed = new AtomicBoolean(false)
