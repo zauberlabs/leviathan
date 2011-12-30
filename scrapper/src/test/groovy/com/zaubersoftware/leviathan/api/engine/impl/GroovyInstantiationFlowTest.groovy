@@ -80,7 +80,7 @@ final class GroovyInstantiationFlowTest {
 
     @Before
     void setUp() {
-        final Map<URI, String> pages = new HashMap<URI, String>()
+        final pages = new HashMap<URI, String>()
         f = Fetchers.createFixed().register(mlhome, 
                 "com/zaubersoftware/leviathan/api/engine/pages/homeml.html").build()
         final ExecutorService executor = Executors.newSingleThreadExecutor()
@@ -92,8 +92,8 @@ final class GroovyInstantiationFlowTest {
 
     @Test
     void shouldFetchAndDoSomethingWithAClosure() {
-        final AtomicBoolean fetchPerformed = new AtomicBoolean(false)
-        final ProcessingFlow flow = this.engine
+        final fetchPerformed = new AtomicBoolean(false)
+        final flow = this.engine
 			.afterFetch()
 			.then( contextAware { URIFetcherResponse response ->
                 assertTrue(response.isSucceeded())
@@ -108,15 +108,14 @@ final class GroovyInstantiationFlowTest {
 
     @Test
     void shouldFetchDoSomethingAndHandleTheExceptionWithoutConfiguredHandlers() {
-        final AtomicBoolean exceptionHandled = new AtomicBoolean(false)
-        final RuntimeException exception = 
-                new MockException("an exception was thrown while processing the response!")
+        final exceptionHandled = new AtomicBoolean(false)
+        final exception = new MockException("an exception was thrown while processing the response!")
         ProcessingFlow flow = this.engine
 			.afterFetch()
 			.then( contextAware { _ -> throw exception})
-			.onAnyExceptionDo( exceptionHandler { Throwable trowable ->
-                exceptionHandled.set(true)
-                assertEquals(exception, trowable)
+			.onAnyExceptionDo( exceptionHandler { 
+				exceptionHandled.set(true)
+                assertEquals(exception, it )
 	        }).pack()
         fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
         assertTrue("Did not hadle the exception", exceptionHandled.get())
@@ -124,9 +123,8 @@ final class GroovyInstantiationFlowTest {
 
     @Test
     void shouldFetchDoSomethingAndHandleTheExceptionWithAnSpecificHandler() {
-        final AtomicBoolean exceptionHandled = new AtomicBoolean(false)
-        final RuntimeException exception = 
-                new MockException("an exception was thrown while processing the response!")
+        final exceptionHandled = new AtomicBoolean(false)
+        final exception = new MockException("an exception was thrown while processing the response!")
         ProcessingFlow pack = this.engine
 			.afterFetch()
 			.then( contextAware { _ -> throw exception } )
@@ -146,12 +144,12 @@ final class GroovyInstantiationFlowTest {
 
     @Test
     void shouldBindUriToAFlow() {
-        final AtomicBoolean fetchPerformed = new AtomicBoolean(false)
+        final fetchPerformed = new AtomicBoolean(false)
         final ProcessingFlow flow = this.engine
             .afterFetch()
             .then(contextAware { 
 				URIFetcherResponse response ->
-                    assertTrue(response.isSucceeded())
+                    assertTrue(response.succeeded)
                     fetchPerformed.set(true)
             })
             .pack()
@@ -162,23 +160,23 @@ final class GroovyInstantiationFlowTest {
 
     @Test
     void shouldHaveContext() {
-        final String key = "FOO"
-        final String val = "VAL"
+        final key = "FOO"
+        final val = "VAL"
 
-        final AtomicBoolean fetchPerformed = new AtomicBoolean(false)
-        final ProcessingFlow flow = this.engine
+        final fetchPerformed = new AtomicBoolean(false)
+        final flow = this.engine
             .afterFetch()
             .then(new ContextAwareClosure<URIFetcherResponse>() {
                 @Override
                 void execute(final URIFetcherResponse response) {
-                    assertTrue(response.isSucceeded())
+                    assertTrue(response.succeeded)
                     assertEquals(val, get(key))
                     fetchPerformed.set(true)
                 }
             })
             .pack()
 
-        final Map<String, Object> ctx = new HashMap<String, Object>()
+        final ctx = new HashMap<String, Object>()
         ctx.put(key, val)
         fetcher.scheduleFetch(f.createGet(new InmutableURIAndCtx(this.mlhome, ctx)), flow).awaitIdleness()
         assertTrue("Did not fetch!", fetchPerformed.get())
@@ -186,11 +184,11 @@ final class GroovyInstantiationFlowTest {
 
     @Test
     void shouldHaveContextAndCanBeShareBetweenActions() {
-        final String KEY = "FOO"
-        final String VAL = "VAL"
+        final KEY = "FOO"
+        final VAL = "VAL"
 
-        final AtomicBoolean fetchPerformed = new AtomicBoolean(false)
-        final ProcessingFlow flow = this.engine
+        final fetchPerformed = new AtomicBoolean(false)
+        final flow = this.engine
             .afterFetch()
             .then(new ContextAwareClosure<URIFetcherResponse>() {
                 @Override
@@ -202,7 +200,7 @@ final class GroovyInstantiationFlowTest {
             })
             .pack()
 
-        final Map<String, Object> ctx = new HashMap<String, Object>()
+        final ctx = new HashMap<String, Object>()
         ctx.put(KEY, VAL)
         fetcher.scheduleFetch(f.createGet(new InmutableURIAndCtx(this.mlhome, ctx)), flow).awaitIdleness()
         assertTrue("Did not fetch!", fetchPerformed.get())
@@ -210,9 +208,9 @@ final class GroovyInstantiationFlowTest {
 
     @Test
     void shouldFlow() {
-        final Source xsltSource = new StreamSource(getClass().classLoader.getResourceAsStream(
+        final xsltSource = new StreamSource(getClass().classLoader.getResourceAsStream(
         "com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl"))
-        final AtomicBoolean actionPerformed = new AtomicBoolean(false)
+        final actionPerformed = new AtomicBoolean(false)
         final ProcessingFlow pack = this.engine
             .afterFetch()
             .sanitizeHTML()
@@ -227,15 +225,15 @@ final class GroovyInstantiationFlowTest {
 
     @Test
     void shouldForEachFlow() {
-        final Source xsltSource = new StreamSource(getClass().classLoader.getResourceAsStream(
+        final xsltSource = new StreamSource(getClass().classLoader.getResourceAsStream(
         "com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl"))
-        final AtomicBoolean actionPerformed = new AtomicBoolean(false)
-        final AtomicInteger count = new AtomicInteger(0)
+        final actionPerformed = new AtomicBoolean(false)
+        final count = new AtomicInteger(0)
         final ProcessingFlow pack = this.engine.afterFetch()
             .sanitizeHTML()
             .transformXML(xsltSource)
             .toJavaObject(Link.class)
-            .then(action { Link link -> actionPerformed.set(true); link })
+            .then(action { actionPerformed.set(true); it })
             .forEach(String.class).in("categories")
                 .then( contextAware { _ -> count.incrementAndGet() })
             .endFor()
