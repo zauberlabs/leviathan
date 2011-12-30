@@ -59,6 +59,24 @@ final class GroovyInstantiationFlowTest {
     AsyncUriFetcher fetcher
     Engine engine
     URIFetcher f
+	
+	def contextAware(aBlock) {
+		new ContextAwareClosure(){
+			void execute(arg0) { aBlock(arg0) }
+		}
+	}
+	
+	def exceptionHandler(aBlock) {
+		new ExceptionHandler() {
+			void handle(Throwable arg0) { aBlock(arg0) }
+		}
+	}
+	
+	def action(aBlock) {
+		new Action() {
+			def execute( arg0) { aBlock(arg0) }
+		}
+	}
 
     @Before
     void setUp() {
@@ -75,13 +93,13 @@ final class GroovyInstantiationFlowTest {
     @Test
     void shouldFetchAndDoSomethingWithAClosure() {
         final AtomicBoolean fetchPerformed = new AtomicBoolean(false)
-        final ProcessingFlow flow = this.engine.afterFetch().then(new ContextAwareClosure<URIFetcherResponse>() {
-            @Override
-            void execute(final URIFetcherResponse response) {
+        final ProcessingFlow flow = this.engine
+			.afterFetch()
+			.then( contextAware { URIFetcherResponse response ->
                 assertTrue(response.isSucceeded())
                 fetchPerformed.set(true)
-            }
-        }).pack()
+			})
+			.pack()
 
         this.fetcher.scheduleFetch(f.createGet(this.mlhome), flow).awaitIdleness()
         assertTrue("Did not fetch!", fetchPerformed.get())
@@ -93,18 +111,13 @@ final class GroovyInstantiationFlowTest {
         final AtomicBoolean exceptionHandled = new AtomicBoolean(false)
         final RuntimeException exception = 
                 new MockException("an exception was thrown while processing the response!")
-        ProcessingFlow flow = this.engine.afterFetch().then(new ContextAwareClosure<URIFetcherResponse>() {
-            @Override
-            void execute(final URIFetcherResponse response) {
-                throw exception
-            }
-        }).onAnyExceptionDo(new ExceptionHandler() {
-            @Override
-            void handle(final Throwable trowable) {
+        ProcessingFlow flow = this.engine
+			.afterFetch()
+			.then( contextAware { _ -> throw exception})
+			.onAnyExceptionDo( exceptionHandler { Throwable trowable ->
                 exceptionHandled.set(true)
                 assertEquals(exception, trowable)
-            }
-        }).pack()
+	        }).pack()
         fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
         assertTrue("Did not hadle the exception", exceptionHandled.get())
     }
@@ -114,24 +127,19 @@ final class GroovyInstantiationFlowTest {
         final AtomicBoolean exceptionHandled = new AtomicBoolean(false)
         final RuntimeException exception = 
                 new MockException("an exception was thrown while processing the response!")
-        ProcessingFlow pack = this.engine.afterFetch().then(new ContextAwareClosure<URIFetcherResponse>() {
-            @Override
-            void execute(final URIFetcherResponse response) {
-                throw exception
-            }
-        }).on(MockException.class).handleWith(new ExceptionHandler() {
-            @Override
-            void handle(final Throwable trowable) {
+        ProcessingFlow pack = this.engine
+			.afterFetch()
+			.then( contextAware { _ -> throw exception } )
+			.on(MockException.class)
+			.handleWith( exceptionHandler { throwable ->
                 exceptionHandled.set(true)
-                assertEquals(exception, trowable)
-            }
-        }).otherwiseHandleWith(new ExceptionHandler() {
-            @Override
-            void handle(final Throwable trowable) {
+                assertEquals(exception, throwable)
+			})
+			.otherwiseHandleWith(exceptionHandler { _ -> 
                 fail("It should never reach here, the exception should be handled by the configured handler."
                         + " Look above!!!")
-            }
-        }).pack()
+            })
+			.pack()
         this.fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
         assertTrue("Did not hadle the exception", exceptionHandled.get())
     }
@@ -141,12 +149,10 @@ final class GroovyInstantiationFlowTest {
         final AtomicBoolean fetchPerformed = new AtomicBoolean(false)
         final ProcessingFlow flow = this.engine
             .afterFetch()
-            .then(new ContextAwareClosure<URIFetcherResponse>() {
-                @Override
-                void execute(final URIFetcherResponse response) {
+            .then(contextAware { 
+				URIFetcherResponse response ->
                     assertTrue(response.isSucceeded())
                     fetchPerformed.set(true)
-                }
             })
             .pack()
 
@@ -212,19 +218,8 @@ final class GroovyInstantiationFlowTest {
             .sanitizeHTML()
             .transformXML(xsltSource)
             .toJavaObject(Link.class)
-            .then(new Action<Link, String>() {
-                @Override
-                String execute(final Link link) {
-                    actionPerformed.set(true)
-                    link.title
-                }
-            })
-            .then(new ContextAwareClosure<String>() {
-                @Override
-                void execute(final String input) {
-                    assertEquals("MercadoLibre Argentina - Donde comprar y vender de todo.", input)
-                }
-            })
+            .then(action { Link link -> actionPerformed.set(true);  link.title })
+            .then(contextAware { assertEquals("MercadoLibre Argentina - Donde comprar y vender de todo.", it ) })
             .pack()
         fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
         assertTrue("Did not hadle the exception", actionPerformed.get())
@@ -240,27 +235,11 @@ final class GroovyInstantiationFlowTest {
             .sanitizeHTML()
             .transformXML(xsltSource)
             .toJavaObject(Link.class)
-            .then(new Action<Link, Link>() {
-                @Override
-                Link execute(final Link link) {
-                    actionPerformed.set(true)
-                    link
-                }
-            })
+            .then(action { Link link -> actionPerformed.set(true); link })
             .forEach(String.class).in("categories")
-                .then(new ContextAwareClosure<String>() {
-                    @Override
-                    void execute(final String category) {
-                        count.incrementAndGet()
-                    }
-                })
+                .then( contextAware { _ -> count.incrementAndGet() })
             .endFor()
-            .then(new ContextAwareClosure<Link>() {
-                @Override
-                void execute(final Link link) {
-                    assertEquals(4, count.get())
-                }
-            })
+            .then(contextAware { _ -> assertEquals(4, count.get()) })
             .pack()
         fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
         assertTrue("Did not hadle the exception", actionPerformed.get())
