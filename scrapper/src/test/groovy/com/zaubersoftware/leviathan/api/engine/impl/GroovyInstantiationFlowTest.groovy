@@ -42,8 +42,12 @@ import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 import com.sun.xml.internal.txw2.output.StreamSerializer;
 import com.zaubersoftware.leviathan.api.engine.Action;
 import com.zaubersoftware.leviathan.api.engine.ActionHandler;
+import com.zaubersoftware.leviathan.api.engine.AfterExceptionCatchDefinition;
+import com.zaubersoftware.leviathan.api.engine.AfterFetchingHandler;
+import com.zaubersoftware.leviathan.api.engine.AfterHandleWith;
 import com.zaubersoftware.leviathan.api.engine.ContextAwareClosure;
 import com.zaubersoftware.leviathan.api.engine.Engine;
+import com.zaubersoftware.leviathan.api.engine.ErrorTolerant;
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
 import com.zaubersoftware.leviathan.api.engine.Leviathan;
 import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
@@ -60,30 +64,23 @@ final class GroovyInstantiationFlowTest {
     AsyncUriFetcher fetcher
     Engine engine
     URIFetcher f
-	
-	
-	def exceptionHandler(aBlock) {
-		new ExceptionHandler() {
-			void handle(Throwable arg0) { aBlock(arg0) }
-		}
-	}
-	
-	def action(aBlock) {
-		new Action() {
-			def execute( arg0) { aBlock(arg0) }
-		}
-	}
+   
+   def action(aBlock) {
+      new Action() {
+         def execute( arg0) { aBlock(arg0) }
+      }
+   }
 
     @Before
     void setUp() {
-        final pages = new HashMap<URI, String>()
-        f = Fetchers.createFixed().register(mlhome, 
+        f = Fetchers.createFixed().register(mlhome,
                 "com/zaubersoftware/leviathan/api/engine/pages/homeml.html").build()
         final ExecutorService executor = Executors.newSingleThreadExecutor()
         this.fetcher = new ExecutorServiceAsyncUriFetcher(executor)
 
         this.engine = Leviathan.flowBuilder()
-		ActionHandler.mixin(ActionHandlerCategory);
+        ActionHandler.mixin(ActionHandlerCategory)
+        ErrorTolerant.mixin(ErrorTolerantCategory)
     }
 
 
@@ -108,12 +105,12 @@ final class GroovyInstantiationFlowTest {
         final exceptionHandled = new AtomicBoolean(false)
         final exception = new MockException("an exception was thrown while processing the response!")
         ProcessingFlow flow = this.engine
-			.afterFetch()
-			.then { _ -> throw exception}
-			.onAnyExceptionDo( exceptionHandler { 
-				exceptionHandled.set(true)
+         .afterFetch()
+         .then { _ -> throw exception }
+         .onAnyExceptionDo { 
+            exceptionHandled.set(true)
                 assertEquals(exception, it )
-	        }).pack()
+           }.pack()
         fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
         assertTrue("Did not hadle the exception", exceptionHandled.get())
     }
@@ -123,18 +120,16 @@ final class GroovyInstantiationFlowTest {
         final exceptionHandled = new AtomicBoolean(false)
         final exception = new MockException("an exception was thrown while processing the response!")
         ProcessingFlow pack = this.engine
-			.afterFetch()
-			.then  { _ -> throw exception } 
-			.on(MockException)
-			.handleWith( exceptionHandler { throwable ->
+         .afterFetch()
+         .then  { _ -> throw exception } 
+         .on(MockException)
+         .handleWith { throwable ->
                 exceptionHandled.set(true)
-                assertEquals(exception, throwable)
-			})
-			.otherwiseHandleWith(exceptionHandler { _ -> 
+                assertEquals(exception, throwable) }
+         .otherwiseHandleWith { _ -> 
                 fail("It should never reach here, the exception should be handled by the configured handler."
-                        + " Look above!!!")
-            })
-			.pack()
+                        + " Look above!!!") }
+         .pack()
         this.fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
         assertTrue("Did not hadle the exception", exceptionHandled.get())
     }
