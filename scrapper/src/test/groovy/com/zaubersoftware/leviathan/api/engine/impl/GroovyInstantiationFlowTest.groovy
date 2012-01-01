@@ -95,7 +95,7 @@ final class GroovyInstantiationFlowTest {
       }.pack()
 
     this.fetcher.scheduleFetch(f.createGet(this.mlhome), flow).awaitIdleness()
-    assertTrue("Did not fetch!", fetchPerformed.get())
+    assert fetchPerformed.get(), "Did not fetch!"
   }
 
   @Test
@@ -106,11 +106,11 @@ final class GroovyInstantiationFlowTest {
       .afterFetch()
       .then { _ -> throw exception }
       .onAnyExceptionDo {
+        assert exception == it
         exceptionHandled.set(true)
-        assertEquals(exception, it )
       }.pack()
     fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
-    assertTrue("Did not hadle the exception", exceptionHandled.get())
+    assert exceptionHandled.get(), "Did not hadle the exception"
   }
 
   @Test
@@ -121,14 +121,14 @@ final class GroovyInstantiationFlowTest {
       .afterFetch()
       .then { _ -> throw exception } 
       .onExceptionHandleWith(MockException) { throwable ->
+        assert exception == throwable
         exceptionHandled.set(true)
-        assertEquals(exception, throwable)
       }.otherwiseHandleWith { _ ->
         fail("It should never reach here, the exception should be handled by the configured handler."
           + " Look above!!!")
       }.pack()
     this.fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
-    assertTrue("Did not hadle the exception", exceptionHandled.get())
+    assert exceptionHandled.get(), "Did not hadle the exception"
   }
 
   @Test
@@ -137,12 +137,12 @@ final class GroovyInstantiationFlowTest {
     final ProcessingFlow flow = this.engine
       .afterFetch()
       .then { URIFetcherResponse response ->
-        assertTrue(response.succeeded)
+        assert response.succeeded
         fetchPerformed.set(true)
       }.pack()
 
     fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
-    assertTrue("Did not fetch!", fetchPerformed.get())
+    assert fetchPerformed.get(), "Did not fetch!"
   }
 
   @Test
@@ -154,14 +154,14 @@ final class GroovyInstantiationFlowTest {
     final flow = this.engine
       .afterFetch()
       .then { URIFetcherResponse response ->
-        assertTrue(response.succeeded)
+        assert response.succeeded
         assertEquals(val, get(key))
         fetchPerformed.set(true)
       }.pack()
 
     final ctx = [(key): val]
     fetcher.scheduleFetch(f.createGet(new InmutableURIAndCtx(this.mlhome, ctx)), flow).awaitIdleness()
-    assertTrue("Did not fetch!", fetchPerformed.get())
+    assert fetchPerformed.get(), "Did not fetch!"
   }
 
   @Test
@@ -173,14 +173,14 @@ final class GroovyInstantiationFlowTest {
     final flow = this.engine
       .afterFetch()
       .then { URIFetcherResponse response ->
-        assertTrue(response.isSucceeded())
+        assert response.succeeded
         assertEquals(VAL, get(KEY))
         fetchPerformed.set(true)
       }.pack()
 
     final ctx = [(KEY):VAL]
     fetcher.scheduleFetch(f.createGet(new InmutableURIAndCtx(this.mlhome, ctx)), flow).awaitIdleness()
-    assertTrue("Did not fetch!", fetchPerformed.get())
+    assert fetchPerformed.get(), "Did not fetch!"
   }
 
   @Test
@@ -194,10 +194,10 @@ final class GroovyInstantiationFlowTest {
       .transformXML(xsltSource)
       .toJavaObject(Link)
       .thenDo { Link link -> actionPerformed.set(true);  link.title }
-      .then { assertEquals("MercadoLibre Argentina - Donde comprar y vender de todo.", it ) }
+      .then { assertEquals("MercadoLibre Argentina - Donde comprar y vender de todo.", it)  }
       .pack()
     fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
-    assertTrue("Did not hadle the exception", actionPerformed.get())
+    assert actionPerformed.get(), "Did not hadle the exception"
   }
 
   @Test
@@ -212,9 +212,9 @@ final class GroovyInstantiationFlowTest {
       .toJavaObject(Link)
       .thenDo { actionPerformed.set(true); it } 
       .forEachIn("categories") { _ -> count.incrementAndGet() }
-      .then { _ -> assertEquals(4, count.get()) }
+      .then { _ -> assert 4 == count.get() }
       .pack()
     fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
-    assertTrue("Did not hadle the exception", actionPerformed.get())
+    assert actionPerformed.get(), "Did not hadle the exception"
   }
 }
