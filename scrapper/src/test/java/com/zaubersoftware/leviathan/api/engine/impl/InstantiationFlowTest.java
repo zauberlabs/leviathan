@@ -29,7 +29,6 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
@@ -38,7 +37,6 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.common.ExecutorServiceAsyncUriFetcher;
 import ar.com.zauber.leviathan.common.InmutableURIAndCtx;
 import ar.com.zauber.leviathan.common.fluent.Fetchers;
-import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
 import com.zaubersoftware.leviathan.api.engine.Action;
 import com.zaubersoftware.leviathan.api.engine.ContextAwareClosure;
@@ -46,7 +44,6 @@ import com.zaubersoftware.leviathan.api.engine.Engine;
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
 import com.zaubersoftware.leviathan.api.engine.Leviathan;
 import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
-import com.zaubersoftware.leviathan.api.engine.groovy.GLeviathan;
 import com.zaubersoftware.leviathan.api.engine.impl.dto.Link;
 
 
