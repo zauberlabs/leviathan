@@ -144,13 +144,13 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
     private final class DefaultActionAndControlStructureHandler<T> implements ErrorTolerantActionAndControlStructureHandler<T>, AfterJavaObjectHandler<T> {
 
         @Override
-        public <R> ActionAndControlStructureHandler<R> then(final Action<T, R> action) {
+        public <R> ActionAndControlStructureHandler<R> thenDo(final Action<T, R> action) {
             Validate.notNull(action, "The action cannot be null");
             DefaultAfterFetchingHandler.this.engine.appendPipe(new ActionPipe<T, R>(action));
             return new DefaultActionAndControlStructureHandler<R>();
         }
         @Override
-        public AfterFetchingHandler then(final ActionAndThenFetch<T> object) {
+        public AfterFetchingHandler thenDo(final ActionAndThenFetch<T> object) {
             throw new NotImplementedException();
         }
 
@@ -329,14 +329,14 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
     }
 
     @Override
-    public <R> ActionAndControlStructureHandler<R> then(final Action<URIFetcherResponse, R> object) {
+    public <R> ActionAndControlStructureHandler<R> thenDo(final Action<URIFetcherResponse, R> object) {
         Validate.notNull(object, "The action cannot be null");
         this.engine.appendPipe(new ActionPipe<URIFetcherResponse, R>(object));
         return new DefaultActionAndControlStructureHandler<R>();
     }
 
     @Override
-    public AfterFetchingHandler then(final ActionAndThenFetch<URIFetcherResponse> object) {
+    public AfterFetchingHandler thenDo(final ActionAndThenFetch<URIFetcherResponse> object) {
         throw new NotImplementedException();
     }
 

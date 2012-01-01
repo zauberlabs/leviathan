@@ -36,7 +36,7 @@ public interface ActionHandler<T>  extends AfterThen {
      * @return {@link AfterFetchingHandler} all the available actions to performed over a fetched resource.
      * @throws IllegalStateException if the object is null.
      */
-    <R> ActionAndControlStructureHandler<R> then(Action<T, R> object);
+    <R> ActionAndControlStructureHandler<R> thenDo(Action<T, R> object);
 
 
     /**
@@ -45,7 +45,7 @@ public interface ActionHandler<T>  extends AfterThen {
      * @return {@link AfterFetchingHandler} all the available actions to performed over a fetched resource.
      * @throws IllegalStateException if the object is null.
      */
-    AfterFetchingHandler then(ActionAndThenFetch<T> object);
+    AfterFetchingHandler thenDo(ActionAndThenFetch<T> object);
 
     /**
      * Configures the last processing closure in the chain.

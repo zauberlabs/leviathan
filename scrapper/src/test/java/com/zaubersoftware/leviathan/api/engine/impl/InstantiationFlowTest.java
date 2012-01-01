@@ -213,7 +213,7 @@ public final class InstantiationFlowTest {
             .sanitizeHTML()
             .transformXML(xsltSource)
             .toJavaObject(Link.class)
-            .then(new Action<Link, String>() {
+            .thenDo(new Action<Link, String>() {
                 @Override
                 public String execute(final Link link) {
                     actionPerformed.set(true);
@@ -241,7 +241,7 @@ public final class InstantiationFlowTest {
             .sanitizeHTML()
             .transformXML(xsltSource)
             .toJavaObject(Link.class)
-            .then(new Action<Link, Link>() {
+            .thenDo(new Action<Link, Link>() {
                 @Override
                 public Link execute(final Link link) {
                     actionPerformed.set(true);

@@ -28,6 +28,7 @@ import javax.xml.transform.Source
 import javax.xml.transform.stream.StreamSource
 
 import org.junit.Before
+import org.junit.BeforeClass;
 import org.junit.Test
 
 import ar.com.zauber.leviathan.api.AsyncUriFetcher
@@ -64,13 +65,12 @@ final class GroovyInstantiationFlowTest {
   AsyncUriFetcher fetcher
   Engine engine
   URIFetcher f
-
-  def action(aBlock) {
-    new Action() {
-        def execute( arg0) {
-          aBlock(arg0)
-        }
-      }
+  
+  @BeforeClass 
+  static void setUpGroovySupport() {
+      ActionHandler.mixin(ActionHandlerCategory)
+      ErrorTolerant.mixin(ErrorTolerantCategory)
+      ControlStructureHanlder.mixin(ControlStructureHanlderCategory)
   }
 
   @Before
@@ -81,10 +81,6 @@ final class GroovyInstantiationFlowTest {
     this.fetcher = new ExecutorServiceAsyncUriFetcher(executor)
 
     this.engine = Leviathan.flowBuilder()
-    ActionHandler.mixin(ActionHandlerCategory)
-    ErrorTolerant.mixin(ErrorTolerantCategory)
-    ControlStructureHanlder.mixin(ControlStructureHanlderCategory)
-    
   }
 
 
@@ -94,7 +90,7 @@ final class GroovyInstantiationFlowTest {
     final flow = this.engine
       .afterFetch()
       .then { URIFetcherResponse response ->
-        assertTrue(response.isSucceeded())
+        assertTrue(response.succeeded)
         fetchPerformed.set(true)
       }.pack()
 
@@ -123,7 +119,7 @@ final class GroovyInstantiationFlowTest {
     final exception = new MockException("an exception was thrown while processing the response!")
     ProcessingFlow pack = this.engine
       .afterFetch()
-      .then  { _ -> throw exception }
+      .then { _ -> throw exception }
       .on(MockException)
       .handleWith { throwable ->
         exceptionHandled.set(true)
@@ -141,7 +137,7 @@ final class GroovyInstantiationFlowTest {
     final fetchPerformed = new AtomicBoolean(false)
     final ProcessingFlow flow = this.engine
       .afterFetch()
-      .then {  URIFetcherResponse response ->
+      .then { URIFetcherResponse response ->
         assertTrue(response.succeeded)
         fetchPerformed.set(true)
       }.pack()
@@ -198,7 +194,7 @@ final class GroovyInstantiationFlowTest {
       .sanitizeHTML()
       .transformXML(xsltSource)
       .toJavaObject(Link)
-      .then(action { Link link -> actionPerformed.set(true);  link.title })
+      .thenDo { Link link -> actionPerformed.set(true);  link.title }
       .then { assertEquals("MercadoLibre Argentina - Donde comprar y vender de todo.", it ) }
       .pack()
     fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
@@ -215,7 +211,7 @@ final class GroovyInstantiationFlowTest {
       .sanitizeHTML()
       .transformXML(xsltSource)
       .toJavaObject(Link)
-      .then(action { actionPerformed.set(true); it })
+      .thenDo { actionPerformed.set(true); it } 
       .forEachIn("categories") { _ -> count.incrementAndGet() }
       .then { _ -> assertEquals(4, count.get()) }
       .pack()

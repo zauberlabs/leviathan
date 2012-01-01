@@ -46,7 +46,7 @@ public class NewApiTestDriver {
         engine.afterFetch().sanitizeHTML().transformXML("raiz.xsl")
                  .transformXML("otramas.xml")
                  .toJavaObject(Categories.class)
-                 .then(new Action<Categories, List<Category>>() {
+                 .thenDo(new Action<Categories, List<Category>>() {
                     @Override
                     public List<Category> execute(final Categories t) {
                         get("ContextVariable");
@@ -64,7 +64,7 @@ public class NewApiTestDriver {
         engine.afterFetch().sanitizeHTML().transformXML("raiz.xsl")
             .transformXML("otramas.xml")
             .toJavaObject(Categories.class)
-            .then(new Action<Categories, List<Category>>() {
+            .thenDo(new Action<Categories, List<Category>>() {
                 @Override
                 public List<Category> execute(final Categories t) {
                     get("ContextVariable");
@@ -85,7 +85,7 @@ public class NewApiTestDriver {
             .transformXML("raiz.xsl")
             .transformXML("otramas.xml")
             .toJavaObject(Categories.class)
-            .then(new Action<Categories, Categories>() {
+            .thenDo(new Action<Categories, Categories>() {
                 @Override
                 public Categories execute(final Categories t) {
                     // DO something with the categories
@@ -109,7 +109,7 @@ public class NewApiTestDriver {
         engine.afterFetch().sanitizeHTML().transformXML("raiz.xsl")
             .transformXML("otramas.xml")
             .toJavaObject(Categories.class)
-            .then(new ActionAndThenFetch<Categories>() {
+            .thenDo(new ActionAndThenFetch<Categories>() {
                 @Override
                 public FetchRequest execute(final Categories t) {
                     return null;
