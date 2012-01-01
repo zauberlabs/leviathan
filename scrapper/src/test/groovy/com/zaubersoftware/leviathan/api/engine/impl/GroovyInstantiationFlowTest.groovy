@@ -78,71 +78,70 @@ final class GroovyInstantiationFlowTest {
     f = Fetchers.createFixed().register(mlhome,
       "com/zaubersoftware/leviathan/api/engine/pages/homeml.html").build()
     final ExecutorService executor = Executors.newSingleThreadExecutor()
-    this.fetcher = new ExecutorServiceAsyncUriFetcher(executor)
-
-    this.engine = Leviathan.flowBuilder()
+    fetcher = new ExecutorServiceAsyncUriFetcher(executor)
+    engine = Leviathan.flowBuilder()
   }
 
 
   @Test
   void shouldFetchAndDoSomethingWithAClosure() {
-    final fetchPerformed = new AtomicBoolean(false)
-    final flow = this.engine
+    def fetchPerformed = false
+    def flow = engine
       .afterFetch()
       .then { URIFetcherResponse response ->
         assertTrue(response.succeeded)
-        fetchPerformed.set(true)
+        fetchPerformed = true
       }.pack()
 
-    this.fetcher.scheduleFetch(f.createGet(this.mlhome), flow).awaitIdleness()
-    assert fetchPerformed.get(), "Did not fetch!"
+    fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
+    assert fetchPerformed, "Did not fetch!"
   }
 
   @Test
   void shouldFetchDoSomethingAndHandleTheExceptionWithoutConfiguredHandlers() {
-    final exceptionHandled = new AtomicBoolean(false)
-    final exception = new MockException("an exception was thrown while processing the response!")
-    ProcessingFlow flow = this.engine
+    def exceptionHandled = false
+    def exception = new MockException("an exception was thrown while processing the response!")
+    def flow = engine
       .afterFetch()
-      .then { _ -> throw exception }
+      .then { throw exception }
       .onAnyExceptionDo {
         assert exception == it
-        exceptionHandled.set(true)
+        exceptionHandled = true
       }.pack()
     fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
-    assert exceptionHandled.get(), "Did not hadle the exception"
+    assert exceptionHandled, "Did not hadle the exception"
   }
 
   @Test
   void shouldFetchDoSomethingAndHandleTheExceptionWithAnSpecificHandler() {
-    final exceptionHandled = new AtomicBoolean(false)
-    final exception = new MockException("an exception was thrown while processing the response!")
-    ProcessingFlow pack = this.engine
+    def exceptionHandled = false
+    def exception = new MockException("an exception was thrown while processing the response!")
+    def pack = engine
       .afterFetch()
-      .then { _ -> throw exception } 
+      .then { throw exception } 
       .onExceptionHandleWith(MockException) { throwable ->
         assert exception == throwable
-        exceptionHandled.set(true)
-      }.otherwiseHandleWith { _ ->
+        exceptionHandled = true
+      }.otherwiseHandleWith {
         fail("It should never reach here, the exception should be handled by the configured handler."
           + " Look above!!!")
       }.pack()
-    this.fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
-    assert exceptionHandled.get(), "Did not hadle the exception"
+    fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
+    assert exceptionHandled, "Did not hadle the exception"
   }
 
   @Test
   void shouldBindUriToAFlow() {
-    final fetchPerformed = new AtomicBoolean(false)
-    final ProcessingFlow flow = this.engine
+    def fetchPerformed = false
+    def flow = engine
       .afterFetch()
       .then { URIFetcherResponse response ->
         assert response.succeeded
-        fetchPerformed.set(true)
+        fetchPerformed = true
       }.pack()
 
     fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
-    assert fetchPerformed.get(), "Did not fetch!"
+    assert fetchPerformed, "Did not fetch!"
   }
 
   @Test
@@ -150,18 +149,18 @@ final class GroovyInstantiationFlowTest {
     final key = "FOO"
     final val = "VAL"
 
-    final fetchPerformed = new AtomicBoolean(false)
-    final flow = this.engine
+    def fetchPerformed = false
+    def flow = engine
       .afterFetch()
       .then { URIFetcherResponse response ->
         assert response.succeeded
         assertEquals(val, get(key))
-        fetchPerformed.set(true)
+        fetchPerformed = true
       }.pack()
 
-    final ctx = [(key): val]
-    fetcher.scheduleFetch(f.createGet(new InmutableURIAndCtx(this.mlhome, ctx)), flow).awaitIdleness()
-    assert fetchPerformed.get(), "Did not fetch!"
+    def ctx = [(key): val]
+    fetcher.scheduleFetch(f.createGet(new InmutableURIAndCtx(mlhome, ctx)), flow).awaitIdleness()
+    assert fetchPerformed, "Did not fetch!"
   }
 
   @Test
@@ -169,52 +168,52 @@ final class GroovyInstantiationFlowTest {
     final KEY = "FOO"
     final VAL = "VAL"
 
-    final fetchPerformed = new AtomicBoolean(false)
-    final flow = this.engine
+    def fetchPerformed = false
+    def flow = engine
       .afterFetch()
       .then { URIFetcherResponse response ->
         assert response.succeeded
         assertEquals(VAL, get(KEY))
-        fetchPerformed.set(true)
+        fetchPerformed = true
       }.pack()
 
     final ctx = [(KEY):VAL]
-    fetcher.scheduleFetch(f.createGet(new InmutableURIAndCtx(this.mlhome, ctx)), flow).awaitIdleness()
-    assert fetchPerformed.get(), "Did not fetch!"
+    fetcher.scheduleFetch(f.createGet(new InmutableURIAndCtx(mlhome, ctx)), flow).awaitIdleness()
+    assert fetchPerformed, "Did not fetch!"
   }
 
   @Test
   void shouldFlow() {
     final xsltSource = new StreamSource(getClass().classLoader.getResourceAsStream(
       "com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl"))
-    final actionPerformed = new AtomicBoolean(false)
-    final ProcessingFlow pack = this.engine
+    def actionPerformed = false
+    def pack = engine
       .afterFetch()
       .sanitizeHTML()
       .transformXML(xsltSource)
       .toJavaObject(Link)
-      .thenDo { Link link -> actionPerformed.set(true);  link.title }
+      .thenDo { Link link -> actionPerformed = true;  link.title }
       .then { assertEquals("MercadoLibre Argentina - Donde comprar y vender de todo.", it)  }
       .pack()
     fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
-    assert actionPerformed.get(), "Did not hadle the exception"
+    assert actionPerformed, "Did not hadle the exception"
   }
 
   @Test
   void shouldForEachFlow() {
     final xsltSource = new StreamSource(getClass().classLoader.getResourceAsStream(
       "com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl"))
-    final actionPerformed = new AtomicBoolean(false)
-    final count = new AtomicInteger(0)
-    final ProcessingFlow pack = this.engine.afterFetch()
+    def actionPerformed = false
+    def timesRun = 0
+    def flow = engine.afterFetch()
       .sanitizeHTML()
       .transformXML(xsltSource)
       .toJavaObject(Link)
-      .thenDo { actionPerformed.set(true); it } 
-      .forEachIn("categories") { _ -> count.incrementAndGet() }
-      .then { _ -> assert 4 == count.get() }
+      .thenDo { actionPerformed = true; it } 
+      .forEachIn("categories") { ++timesRun }
+      .then { assert 4 == timesRun }
       .pack()
-    fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
-    assert actionPerformed.get(), "Did not hadle the exception"
+    fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
+    assert actionPerformed, "Did not hadle the exception"
   }
 }
