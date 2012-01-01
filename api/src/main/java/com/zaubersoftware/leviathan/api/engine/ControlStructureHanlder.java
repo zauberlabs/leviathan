@@ -36,5 +36,11 @@ public interface ControlStructureHanlder<T> {
      * @throws IllegalArgumentException if the elementClass is null.
      */
     <R> AfterForEachHandler<R,T> forEach(Class<R> elementClass);
+    
+    <R> ErrorTolerantActionAndControlStructureHandler<T> forEachIn(Class<R> elementClass,
+            String propertyName, ContextAwareClosure<R> object);
+
+    ErrorTolerantActionAndControlStructureHandler<T> forEachIn(String propertyName,
+            ContextAwareClosure<Object> object);
 
 }

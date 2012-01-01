@@ -14,7 +14,8 @@ package com.zaubersoftware.leviathan.api.engine.impl
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import static ActionHandlerCategory.*
+
+import static GContextAwareClosure.*
 import static org.junit.Assert.*
 
 import java.net.URI
@@ -44,6 +45,7 @@ import com.zaubersoftware.leviathan.api.engine.AfterExceptionCatchDefinition
 import com.zaubersoftware.leviathan.api.engine.AfterFetchingHandler
 import com.zaubersoftware.leviathan.api.engine.AfterHandleWith
 import com.zaubersoftware.leviathan.api.engine.ContextAwareClosure
+import com.zaubersoftware.leviathan.api.engine.ControlStructureHanlder;
 import com.zaubersoftware.leviathan.api.engine.Engine
 import com.zaubersoftware.leviathan.api.engine.ErrorTolerant
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler
@@ -81,6 +83,8 @@ final class GroovyInstantiationFlowTest {
     this.engine = Leviathan.flowBuilder()
     ActionHandler.mixin(ActionHandlerCategory)
     ErrorTolerant.mixin(ErrorTolerantCategory)
+    ControlStructureHanlder.mixin(ControlStructureHanlderCategory)
+    
   }
 
 
@@ -212,9 +216,7 @@ final class GroovyInstantiationFlowTest {
       .transformXML(xsltSource)
       .toJavaObject(Link)
       .then(action { actionPerformed.set(true); it })
-      .forEach(String).in("categories")
-      .then( contextAware { _ -> count.incrementAndGet() })
-      .endFor()
+      .forEachIn("categories") { _ -> count.incrementAndGet() }
       .then { _ -> assertEquals(4, count.get()) }
       .pack()
     fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()

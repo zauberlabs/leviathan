@@ -198,6 +198,18 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
         public <R> AfterForEachHandler<R, T> forEach(final Class<R> elementClass) {
             return new DefaultAfterForEachHandler<R, T>();
         }
+        
+        @Override
+        public <R> ErrorTolerantActionAndControlStructureHandler<T> forEachIn(Class<R> elementClass,
+                String propertyName, ContextAwareClosure<R> closure) {
+            return forEach(elementClass).in(propertyName).then(closure).endFor();
+        }
+        
+        @Override
+        public ErrorTolerantActionAndControlStructureHandler<T> forEachIn(String propertyName,
+                ContextAwareClosure<Object> closure) {
+            return forEachIn(Object.class, propertyName, closure);
+        }
 
     }
 
