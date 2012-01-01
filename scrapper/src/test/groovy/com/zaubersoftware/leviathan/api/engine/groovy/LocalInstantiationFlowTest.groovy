@@ -15,9 +15,6 @@ package com.zaubersoftware.leviathan.api.engine.groovy
  * limitations under the License.
  */
 
-import static com.zaubersoftware.leviathan.api.engine.groovy.GAction.*
-import static com.zaubersoftware.leviathan.api.engine.groovy.GContextAwareClosure.*
-import static com.zaubersoftware.leviathan.api.engine.groovy.GExceptionHandler.*
 import static com.zaubersoftware.leviathan.api.engine.groovy.GLeviathan.*
 import static org.junit.Assert.*
 

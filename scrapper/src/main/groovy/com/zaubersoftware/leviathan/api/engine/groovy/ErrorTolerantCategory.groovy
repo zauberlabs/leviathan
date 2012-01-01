@@ -11,21 +11,27 @@ import com.zaubersoftware.leviathan.api.engine.ContextAwareClosure
 import com.zaubersoftware.leviathan.api.engine.ErrorTolerant
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler
 
+/**
+ * Category for enabling passing {@link Closure}s as {@link ExceptionHandler}s
+ * within {@link ErrorTolerant}s
+ *
+ * @author flbulgarelli
+ */
 class ErrorTolerantCategory {
 
-    static def handleWith(ErrorTolerant handler,  Closure aBlock) {
-        handler.handleWith(exceptionHandler(aBlock))
-    }
+  static def handleWith(ErrorTolerant handler,  Closure aBlock) {
+    handler.handleWith(from(aBlock))
+  }
 
-    static def onExceptionHandleWith(ErrorTolerant handler,  Class throwableClass, Closure aBlock) {
-        handler.onExceptionHandleWith(throwableClass, exceptionHandler(aBlock))
-    }
+  static def onExceptionHandleWith(ErrorTolerant handler,  Class throwableClass, Closure aBlock) {
+    handler.onExceptionHandleWith(throwableClass, from(aBlock))
+  }
 
-    static def otherwiseHandleWith(ErrorTolerant handler, Closure aBlock) {
-        handler.otherwiseHandleWith(exceptionHandler(aBlock))
-    }
+  static def otherwiseHandleWith(ErrorTolerant handler, Closure aBlock) {
+    handler.otherwiseHandleWith(from(aBlock))
+  }
 
-    static def onAnyExceptionDo(ErrorTolerant handler, Closure aBlock) {
-        handler.onAnyExceptionDo(exceptionHandler(aBlock))
-    }
+  static def onAnyExceptionDo(ErrorTolerant handler, Closure aBlock) {
+    handler.onAnyExceptionDo(from(aBlock))
+  }
 }

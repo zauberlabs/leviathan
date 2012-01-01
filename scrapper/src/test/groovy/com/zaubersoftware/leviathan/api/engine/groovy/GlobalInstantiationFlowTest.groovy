@@ -50,16 +50,16 @@ final class GlobalInstantiationFlowTest {
   AsyncUriFetcher fetcher
   Engine engine
   URIFetcher f
-  
-  @BeforeClass 
+
+  @BeforeClass
   static void setUpGroovySupport() {
-     GLeviathan.enableGlobalSupport()
+    GLeviathan.enableGlobalSupport()
   }
 
   @Before
   void setUp() {
     f = Fetchers.createFixed().register(mlhome,
-      'com/zaubersoftware/leviathan/api/engine/pages/homeml.html').build()
+        'com/zaubersoftware/leviathan/api/engine/pages/homeml.html').build()
     def executor = Executors.newSingleThreadExecutor()
     fetcher = new ExecutorServiceAsyncUriFetcher(executor)
     engine = Leviathan.flowBuilder()
@@ -70,11 +70,11 @@ final class GlobalInstantiationFlowTest {
   void 'Should Fetch And DoSomething With A Closure'() {
     def fetchPerformed = false
     def flow = engine
-      .afterFetch()
-      .then { URIFetcherResponse response ->
-        assertTrue(response.succeeded)
-        fetchPerformed = true
-      }.pack()
+        .afterFetch()
+        .then { URIFetcherResponse response ->
+          assertTrue(response.succeeded)
+          fetchPerformed = true
+        }.pack()
 
     fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
     assert fetchPerformed, 'Did not fetch!'
@@ -85,12 +85,12 @@ final class GlobalInstantiationFlowTest {
     def exceptionHandled = false
     def exception = new MockException('an exception was thrown while processing the response!')
     def flow = engine
-      .afterFetch()
-      .then { throw exception }
-      .onAnyExceptionDo {
-        assert exception == it
-        exceptionHandled = true
-      }.pack()
+        .afterFetch()
+        .then { throw exception }
+        .onAnyExceptionDo {
+          assert exception == it
+          exceptionHandled = true
+        }.pack()
     fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
     assert exceptionHandled, 'Did not hadle the exception'
   }
@@ -100,15 +100,15 @@ final class GlobalInstantiationFlowTest {
     def exceptionHandled = false
     def exception = new MockException('an exception was thrown while processing the response!')
     def pack = engine
-      .afterFetch()
-      .then { throw exception } 
-      .onExceptionHandleWith(MockException) { throwable ->
-        assert exception == throwable
-        exceptionHandled = true
-      }.otherwiseHandleWith {
-        fail('It should never reach here, the exception should be handled by the configured handler.'
-          + ' Look above!!!')
-      }.pack()
+        .afterFetch()
+        .then { throw exception }
+        .onExceptionHandleWith(MockException) { throwable ->
+          assert exception == throwable
+          exceptionHandled = true
+        }.otherwiseHandleWith {
+          fail('It should never reach here, the exception should be handled by the configured handler.'
+              + ' Look above!!!')
+        }.pack()
     fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
     assert exceptionHandled, 'Did not hadle the exception'
   }
@@ -117,11 +117,11 @@ final class GlobalInstantiationFlowTest {
   void 'Should Bind Uri To A Flow'() {
     def fetchPerformed = false
     def flow = engine
-      .afterFetch()
-      .then { URIFetcherResponse response ->
-        assert response.succeeded
-        fetchPerformed = true
-      }.pack()
+        .afterFetch()
+        .then { URIFetcherResponse response ->
+          assert response.succeeded
+          fetchPerformed = true
+        }.pack()
 
     fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
     assert fetchPerformed, 'Did not fetch!'
@@ -134,12 +134,12 @@ final class GlobalInstantiationFlowTest {
 
     def fetchPerformed = false
     def flow = engine
-      .afterFetch()
-      .then { URIFetcherResponse response ->
-        assert response.succeeded
-        assertEquals(val, get(key))
-        fetchPerformed = true
-      }.pack()
+        .afterFetch()
+        .then { URIFetcherResponse response ->
+          assert response.succeeded
+          assertEquals(val, get(key))
+          fetchPerformed = true
+        }.pack()
 
     def ctx = [(key): val]
     fetcher.scheduleFetch(f.createGet(new InmutableURIAndCtx(mlhome, ctx)), flow).awaitIdleness()
@@ -153,12 +153,12 @@ final class GlobalInstantiationFlowTest {
 
     def fetchPerformed = false
     def flow = engine
-      .afterFetch()
-      .then { URIFetcherResponse response ->
-        assert response.succeeded
-        assertEquals(VAL, get(KEY))
-        fetchPerformed = true
-      }.pack()
+        .afterFetch()
+        .then { URIFetcherResponse response ->
+          assert response.succeeded
+          assertEquals(VAL, get(KEY))
+          fetchPerformed = true
+        }.pack()
 
     final ctx = [(KEY):VAL]
     fetcher.scheduleFetch(f.createGet(new InmutableURIAndCtx(mlhome, ctx)), flow).awaitIdleness()
@@ -170,13 +170,13 @@ final class GlobalInstantiationFlowTest {
     final xsltSource = classpathSource('com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl')
     def actionPerformed = false
     def pack = engine
-      .afterFetch()
-      .sanitizeHTML()
-      .transformXML(xsltSource)
-      .toJavaObject(Link)
-      .thenDo { Link link -> actionPerformed = true;  link.title }
-      .then { assertEquals('MercadoLibre Argentina - Donde comprar y vender de todo.', it)  }
-      .pack()
+        .afterFetch()
+        .sanitizeHTML()
+        .transformXML(xsltSource)
+        .toJavaObject(Link)
+        .thenDo { Link link -> actionPerformed = true;  link.title }
+        .then { assertEquals('MercadoLibre Argentina - Donde comprar y vender de todo.', it)  }
+        .pack()
     fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
     assert actionPerformed, 'Did not hadle the exception'
   }
@@ -187,16 +187,16 @@ final class GlobalInstantiationFlowTest {
     def actionPerformed = false
     def timesRun = 0
     def flow = engine.afterFetch()
-      .sanitizeHTML()
-      .transformXML(xsltSource)
-      .toJavaObject(Link)
-      .thenDo { actionPerformed = true; it } 
-      .forEachIn('categories') { ++timesRun }
-      .then { assert 4 == timesRun }
-      .pack()
+        .sanitizeHTML()
+        .transformXML(xsltSource)
+        .toJavaObject(Link)
+        .thenDo { actionPerformed = true; it }
+        .forEachIn('categories') { ++timesRun }
+        .then { assert 4 == timesRun }
+        .pack()
     fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
     assert actionPerformed, 'Did not hadle the exception'
   }
-  
+
   def classpathSource = {name -> new StreamSource(new ClassPathResource(name).inputStream )}
 }
