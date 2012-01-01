@@ -9,7 +9,7 @@ package com.zaubersoftware.leviathan.api.engine.impl
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -61,7 +61,7 @@ import com.zaubersoftware.leviathan.api.engine.impl.dto.Link
  */
 final class GroovyInstantiationFlowTest {
 
-  final URI mlhome = URI.create("http://www.mercadolibre.com.ar/")
+  final URI mlhome = URI.create('http://www.mercadolibre.com.ar/')
   AsyncUriFetcher fetcher
   Engine engine
   URIFetcher f
@@ -76,15 +76,15 @@ final class GroovyInstantiationFlowTest {
   @Before
   void setUp() {
     f = Fetchers.createFixed().register(mlhome,
-      "com/zaubersoftware/leviathan/api/engine/pages/homeml.html").build()
-    final ExecutorService executor = Executors.newSingleThreadExecutor()
+      'com/zaubersoftware/leviathan/api/engine/pages/homeml.html').build()
+    def executor = Executors.newSingleThreadExecutor()
     fetcher = new ExecutorServiceAsyncUriFetcher(executor)
     engine = Leviathan.flowBuilder()
   }
 
 
   @Test
-  void shouldFetchAndDoSomethingWithAClosure() {
+  void 'Should Fetch And DoSomething With A Closure'() {
     def fetchPerformed = false
     def flow = engine
       .afterFetch()
@@ -94,13 +94,13 @@ final class GroovyInstantiationFlowTest {
       }.pack()
 
     fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
-    assert fetchPerformed, "Did not fetch!"
+    assert fetchPerformed, 'Did not fetch!'
   }
 
   @Test
-  void shouldFetchDoSomethingAndHandleTheExceptionWithoutConfiguredHandlers() {
+  void 'Should Fetch Do Something And Handle The Exception Without Configured Handlers'() {
     def exceptionHandled = false
-    def exception = new MockException("an exception was thrown while processing the response!")
+    def exception = new MockException('an exception was thrown while processing the response!')
     def flow = engine
       .afterFetch()
       .then { throw exception }
@@ -109,13 +109,13 @@ final class GroovyInstantiationFlowTest {
         exceptionHandled = true
       }.pack()
     fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
-    assert exceptionHandled, "Did not hadle the exception"
+    assert exceptionHandled, 'Did not hadle the exception'
   }
 
   @Test
-  void shouldFetchDoSomethingAndHandleTheExceptionWithAnSpecificHandler() {
+  void 'Should Fetch Do Something And Handle The Exception With An Specific Handler'() {
     def exceptionHandled = false
-    def exception = new MockException("an exception was thrown while processing the response!")
+    def exception = new MockException('an exception was thrown while processing the response!')
     def pack = engine
       .afterFetch()
       .then { throw exception } 
@@ -123,15 +123,15 @@ final class GroovyInstantiationFlowTest {
         assert exception == throwable
         exceptionHandled = true
       }.otherwiseHandleWith {
-        fail("It should never reach here, the exception should be handled by the configured handler."
-          + " Look above!!!")
+        fail('It should never reach here, the exception should be handled by the configured handler.'
+          + ' Look above!!!')
       }.pack()
     fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
-    assert exceptionHandled, "Did not hadle the exception"
+    assert exceptionHandled, 'Did not hadle the exception'
   }
 
   @Test
-  void shouldBindUriToAFlow() {
+  void 'Should Bind Uri To A Flow'() {
     def fetchPerformed = false
     def flow = engine
       .afterFetch()
@@ -141,13 +141,13 @@ final class GroovyInstantiationFlowTest {
       }.pack()
 
     fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
-    assert fetchPerformed, "Did not fetch!"
+    assert fetchPerformed, 'Did not fetch!'
   }
 
   @Test
-  void shouldHaveContext() {
-    final key = "FOO"
-    final val = "VAL"
+  void 'Should Have Context'() {
+    final key = 'FOO'
+    final val = 'VAL'
 
     def fetchPerformed = false
     def flow = engine
@@ -160,13 +160,13 @@ final class GroovyInstantiationFlowTest {
 
     def ctx = [(key): val]
     fetcher.scheduleFetch(f.createGet(new InmutableURIAndCtx(mlhome, ctx)), flow).awaitIdleness()
-    assert fetchPerformed, "Did not fetch!"
+    assert fetchPerformed, 'Did not fetch!'
   }
 
   @Test
-  void shouldHaveContextAndCanBeShareBetweenActions() {
-    final KEY = "FOO"
-    final VAL = "VAL"
+  void 'Should Have Context And Can Be Share Between Actions'() {
+    final KEY = 'FOO'
+    final VAL = 'VAL'
 
     def fetchPerformed = false
     def flow = engine
@@ -179,13 +179,13 @@ final class GroovyInstantiationFlowTest {
 
     final ctx = [(KEY):VAL]
     fetcher.scheduleFetch(f.createGet(new InmutableURIAndCtx(mlhome, ctx)), flow).awaitIdleness()
-    assert fetchPerformed, "Did not fetch!"
+    assert fetchPerformed, 'Did not fetch!'
   }
 
   @Test
-  void shouldFlow() {
+  void 'Should Flow'() {
     final xsltSource = new StreamSource(getClass().classLoader.getResourceAsStream(
-      "com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl"))
+      'com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl'))
     def actionPerformed = false
     def pack = engine
       .afterFetch()
@@ -193,16 +193,16 @@ final class GroovyInstantiationFlowTest {
       .transformXML(xsltSource)
       .toJavaObject(Link)
       .thenDo { Link link -> actionPerformed = true;  link.title }
-      .then { assertEquals("MercadoLibre Argentina - Donde comprar y vender de todo.", it)  }
+      .then { assertEquals('MercadoLibre Argentina - Donde comprar y vender de todo.', it)  }
       .pack()
     fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
-    assert actionPerformed, "Did not hadle the exception"
+    assert actionPerformed, 'Did not hadle the exception'
   }
 
   @Test
-  void shouldForEachFlow() {
+  void 'Should For Each Flow'() {
     final xsltSource = new StreamSource(getClass().classLoader.getResourceAsStream(
-      "com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl"))
+      'com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl'))
     def actionPerformed = false
     def timesRun = 0
     def flow = engine.afterFetch()
@@ -210,10 +210,10 @@ final class GroovyInstantiationFlowTest {
       .transformXML(xsltSource)
       .toJavaObject(Link)
       .thenDo { actionPerformed = true; it } 
-      .forEachIn("categories") { ++timesRun }
+      .forEachIn('categories') { ++timesRun }
       .then { assert 4 == timesRun }
       .pack()
     fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
-    assert actionPerformed, "Did not hadle the exception"
+    assert actionPerformed, 'Did not hadle the exception'
   }
 }
