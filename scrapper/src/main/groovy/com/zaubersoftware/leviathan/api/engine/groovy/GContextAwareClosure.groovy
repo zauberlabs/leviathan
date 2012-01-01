@@ -1,4 +1,4 @@
-package com.zaubersoftware.leviathan.api.engine.impl;
+package com.zaubersoftware.leviathan.api.engine.groovy;
 
 import groovy.lang.Closure;
 
@@ -12,7 +12,7 @@ class GContextAwareClosure {
               aBlock(arg0)
             }
           }
-        aBlock.setDelegate(closure)
+        aBlock.delegate = closure
         closure
       }
 }

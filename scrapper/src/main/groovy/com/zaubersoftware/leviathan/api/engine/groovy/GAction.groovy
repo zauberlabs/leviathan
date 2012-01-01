@@ -1,4 +1,4 @@
-package com.zaubersoftware.leviathan.api.engine.impl;
+package com.zaubersoftware.leviathan.api.engine.groovy;
 
 import com.zaubersoftware.leviathan.api.engine.Action;
 

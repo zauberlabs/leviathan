@@ -1,6 +1,7 @@
-package com.zaubersoftware.leviathan.api.engine.impl
+package com.zaubersoftware.leviathan.api.engine.groovy
 
 import static GContextAwareClosure.*
+
 import com.zaubersoftware.leviathan.api.engine.ContextAwareClosure
 import com.zaubersoftware.leviathan.api.engine.ControlStructureHanlder
 import com.zaubersoftware.leviathan.api.engine.ErrorTolerantActionAndControlStructureHandler

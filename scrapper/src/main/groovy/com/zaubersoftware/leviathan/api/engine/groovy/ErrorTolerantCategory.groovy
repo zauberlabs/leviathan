@@ -1,4 +1,6 @@
-package com.zaubersoftware.leviathan.api.engine.impl
+package com.zaubersoftware.leviathan.api.engine.groovy
+
+import static GExceptionHandler.*
 
 import groovy.lang.Closure
 
@@ -19,20 +21,11 @@ class ErrorTolerantCategory {
         handler.onExceptionHandleWith(throwableClass, exceptionHandler(aBlock))
     }
 
-
     static def otherwiseHandleWith(ErrorTolerant handler, Closure aBlock) {
         handler.otherwiseHandleWith(exceptionHandler(aBlock))
     }
 
     static def onAnyExceptionDo(ErrorTolerant handler, Closure aBlock) {
         handler.onAnyExceptionDo(exceptionHandler(aBlock))
-    }
-
-    static def exceptionHandler(aBlock) {
-        new ExceptionHandler() {
-                    void handle(Throwable arg0) {
-                        aBlock(arg0)
-                    }
-                }
     }
 }

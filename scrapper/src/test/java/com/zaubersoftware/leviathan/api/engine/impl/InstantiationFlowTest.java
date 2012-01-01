@@ -29,6 +29,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
@@ -45,6 +46,7 @@ import com.zaubersoftware.leviathan.api.engine.Engine;
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
 import com.zaubersoftware.leviathan.api.engine.Leviathan;
 import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
+import com.zaubersoftware.leviathan.api.engine.groovy.GLeviathan;
 import com.zaubersoftware.leviathan.api.engine.impl.dto.Link;
 
 
@@ -58,7 +60,7 @@ public final class InstantiationFlowTest {
     private AsyncUriFetcher fetcher;
     private Engine engine;
     private URIFetcher f;
-
+    
     @Before
     public void setUp() {
         final Map<URI, String> pages = new HashMap<URI, String>();
@@ -205,8 +207,7 @@ public final class InstantiationFlowTest {
 
     @Test
     public void shouldFlow() throws Exception {
-        final Source xsltSource = new StreamSource(getClass().getClassLoader().getResourceAsStream(
-        "com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl"));
+        final Source xsltSource = classpathSource("com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl");
         final AtomicBoolean actionPerformed = new AtomicBoolean(false);
         final ProcessingFlow pack = this.engine
             .afterFetch()
@@ -233,8 +234,7 @@ public final class InstantiationFlowTest {
 
     @Test
     public void shouldForEachFlow() throws Exception {
-        final Source xsltSource = new StreamSource(getClass().getClassLoader().getResourceAsStream(
-        "com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl"));
+        final Source xsltSource = classpathSource("com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl");
         final AtomicBoolean actionPerformed = new AtomicBoolean(false);
         final AtomicInteger count = new AtomicInteger(0);
         final ProcessingFlow pack = this.engine.afterFetch()
@@ -265,5 +265,9 @@ public final class InstantiationFlowTest {
             .pack();
         fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness();
         assertTrue("Did not hadle the exception", actionPerformed.get());
+    }
+    
+    public Source classpathSource(String name) {
+      return new StreamSource(getClass().getClassLoader().getResourceAsStream(name));
     }
 }
