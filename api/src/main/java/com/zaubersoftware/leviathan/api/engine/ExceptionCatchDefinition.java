@@ -25,5 +25,7 @@ package com.zaubersoftware.leviathan.api.engine;
 public interface ExceptionCatchDefinition<T> {
 
     <E extends Throwable> AfterExceptionCatchDefinition<T> on(Class<E> throwableClass);
+    
+    <E extends Throwable> AfterHandleWith<T> onExceptionHandleWith(Class<E> throwableClass, ExceptionHandler handler);
 
 }

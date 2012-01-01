@@ -29,6 +29,7 @@ import com.zaubersoftware.leviathan.api.engine.AfterExceptionCatchDefinition;
 import com.zaubersoftware.leviathan.api.engine.AfterFetchingHandler;
 import com.zaubersoftware.leviathan.api.engine.AfterHandleWith;
 import com.zaubersoftware.leviathan.api.engine.Engine;
+import com.zaubersoftware.leviathan.api.engine.ExceptionCatchDefinition;
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
 import com.zaubersoftware.leviathan.api.engine.Pipe;
 import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
@@ -39,7 +40,7 @@ import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
  * @author Martin Silva
  * @since Sep 2, 2011
  */
-public class DefaultEngine implements Engine, AfterHandleWith<Engine> {
+public class DefaultEngine extends AbstractExceptionCatchDefinition<Engine> implements Engine, AfterHandleWith<Engine> {
 
     private static final ExceptionHandler DEFAULT_EXCEPTION_HANDLER = new ExceptionHandler() {
         @Override
@@ -99,6 +100,7 @@ public class DefaultEngine implements Engine, AfterHandleWith<Engine> {
         Validate.notNull(throwableClass, "The throwable class cannot be null");
         return new DefaultEngineAfterExceptionCatchDefinition<E>(throwableClass);
     }
+    
 
     @Override
     public final AfterFetchingHandler afterFetch() {

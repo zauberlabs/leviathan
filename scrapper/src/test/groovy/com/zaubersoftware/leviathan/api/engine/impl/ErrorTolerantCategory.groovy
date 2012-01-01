@@ -11,23 +11,28 @@ import com.zaubersoftware.leviathan.api.engine.ExceptionHandler
 
 class ErrorTolerantCategory {
 
-  static def handleWith(ErrorTolerant handler,  Closure aBlock) {
-    handler.handleWith(exceptionHandler(aBlock))
-  }
+    static def handleWith(ErrorTolerant handler,  Closure aBlock) {
+        handler.handleWith(exceptionHandler(aBlock))
+    }
 
-  static def otherwiseHandleWith(ErrorTolerant handler, Closure aBlock) {
-    handler.otherwiseHandleWith(exceptionHandler(aBlock))
-  }
+    static def onExceptionHandleWith(ErrorTolerant handler,  Class throwableClass, Closure aBlock) {
+        handler.onExceptionHandleWith(throwableClass, exceptionHandler(aBlock))
+    }
 
-  static def onAnyExceptionDo(ErrorTolerant handler, Closure aBlock) {
-    handler.onAnyExceptionDo(exceptionHandler(aBlock))
-  }
 
-  static def exceptionHandler(aBlock) {
-    new ExceptionHandler() {
-        void handle(Throwable arg0) {
-          aBlock(arg0)
-        }
-      }
-  }
+    static def otherwiseHandleWith(ErrorTolerant handler, Closure aBlock) {
+        handler.otherwiseHandleWith(exceptionHandler(aBlock))
+    }
+
+    static def onAnyExceptionDo(ErrorTolerant handler, Closure aBlock) {
+        handler.onAnyExceptionDo(exceptionHandler(aBlock))
+    }
+
+    static def exceptionHandler(aBlock) {
+        new ExceptionHandler() {
+                    void handle(Throwable arg0) {
+                        aBlock(arg0)
+                    }
+                }
+    }
 }

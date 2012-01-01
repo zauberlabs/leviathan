@@ -119,9 +119,8 @@ final class GroovyInstantiationFlowTest {
     final exception = new MockException("an exception was thrown while processing the response!")
     ProcessingFlow pack = this.engine
       .afterFetch()
-      .then { _ -> throw exception }
-      .on(MockException)
-      .handleWith { throwable ->
+      .then { _ -> throw exception } 
+      .onExceptionHandleWith(MockException) { throwable ->
         exceptionHandled.set(true)
         assertEquals(exception, throwable)
       }.otherwiseHandleWith { _ ->

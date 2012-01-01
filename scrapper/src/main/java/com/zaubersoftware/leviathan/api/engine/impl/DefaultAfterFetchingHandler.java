@@ -61,11 +61,11 @@ import com.zaubersoftware.leviathan.api.engine.impl.pipe.XMLPipe;
  * @author Martin Silva
  * @since Sep 2, 2011
  */
-public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
+public final class DefaultAfterFetchingHandler extends AbstractExceptionCatchDefinition<ActionHandler<URIFetcherResponse>> implements AfterFetchingHandler {
 
     private final DefaultEngine engine;
 
-    private final class DefaultErrorTolerantAfterThen implements ErrorTolerantAfterThen, AfterExceptionCatchDefinition<AfterThen>, AfterHandleWith<AfterThen> {
+    private final class DefaultErrorTolerantAfterThen extends AbstractExceptionCatchDefinition<AfterThen> implements ErrorTolerantAfterThen, AfterExceptionCatchDefinition<AfterThen>, AfterHandleWith<AfterThen> {
 
         private Class<? extends Throwable> throwableClass;
 
@@ -102,7 +102,7 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
 
     }
 
-    private final class DefaultErrorTolerant<T> implements AfterExceptionCatchDefinition<T>, AfterHandleWith<T> {
+    private final class DefaultErrorTolerant<T> extends AbstractExceptionCatchDefinition<T> implements AfterExceptionCatchDefinition<T>, AfterHandleWith<T> {
 
         private Class<? extends Throwable> throwableClass;
         private final T ret;
@@ -141,7 +141,7 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
 
     }
 
-    private final class DefaultActionAndControlStructureHandler<T> implements ErrorTolerantActionAndControlStructureHandler<T>, AfterJavaObjectHandler<T> {
+    private final class DefaultActionAndControlStructureHandler<T> extends AbstractExceptionCatchDefinition<ErrorTolerantActionAndControlStructureHandler<T>> implements ErrorTolerantActionAndControlStructureHandler<T>, AfterJavaObjectHandler<T> {
 
         @Override
         public <R> ActionAndControlStructureHandler<R> thenDo(final Action<T, R> action) {
