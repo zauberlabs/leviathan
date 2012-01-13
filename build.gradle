@@ -1,0 +1,23 @@
+description = """
+  Leviathan (pronounced /lɨˈvaɪ.əθən/; Hebrew: לִוְיָתָן, Modern Livyatan Tiberian
+  Liwyāṯān ; "twisted, coiled"), is a sea monster referred to in the Tanakh and
+  the Bible.
+
+  It surfs the web, and retrieves data :)
+"""
+
+dependsOnChildren()
+
+subprojects {
+   apply plugin: 'java'
+   apply plugin: 'eclipse'
+   
+   sourceCompatibility = 1.6   
+   version = '0.9-SNAPSHOT'
+   groupId = 'com.zaubersoftware' 
+ 
+  repositories {
+      mavenCentral()
+      mavenLocal()
+  }
+}
