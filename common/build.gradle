@@ -8,9 +8,6 @@ dependencies {
     exclude group: 'org.slf4j', module: 'jcl-over-slf4j'
   }
 
-  if(paraMolestar)
-    compile "net.sf.staccatocommons:commons-lang:1.2" //TODO esto es solo para molestar
-
 }
 
 
