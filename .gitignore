@@ -7,3 +7,5 @@ bin
 .springBeans
 velocity.log
 .DS_Store
+*/build/*
+.gradle/*
