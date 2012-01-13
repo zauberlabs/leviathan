@@ -3,16 +3,16 @@ artifactId = 'leviathan-api-httpclient'
 dependencies {
   compile project(':common')
 
-  compile "org.springframework:spring-beans:${springVersion}", 
-          "org.springframework:spring-oxm:${springVersion}", 
-  compile("org.springframework:spring-web:${springVersion}") {
+  compile "org.springframework:spring-beans", 
+          "org.springframework:spring-oxm", 
+  compile("org.springframework:spring-web") {
     exclude group: "aopalliance", module: "aopalliance"
     exclude group: "org.springframework", module: "spring-beans"
   }        
 
-  compile "com.zaubersoftware.commons.web:commons-web-transformation:${commonsVersion}"
+  compile "com.zaubersoftware.commons.web:commons-web-transformation"
 
-  testCompile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+  testCompile "org.slf4j:jcl-over-slf4j"
 }
 
 

@@ -2,9 +2,9 @@ artifactId = 'leviathan-api-common'
 
 dependencies {
   compile project(':api')
-  compile "commons-io:commons-io:${commonsIoVersion}"
-  compile "commons-lang:commons-lang:${commonsLangVersion}"
-  compile("com.zaubersoftware.commons.web:commons-web-proxy:${commonsVersion}") {
+  compile "commons-io:commons-io"
+  compile "commons-lang:commons-lang"
+  compile("com.zaubersoftware.commons.web:commons-web-proxy") {
     exclude group: 'commons-httpclient', module: 'commons-httpclient'
     exclude group: 'org.springframework', module: 'spring-core'
     exclude group: 'org.slf4j', module: 'jcl-over-slf4j'

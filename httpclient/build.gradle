@@ -5,16 +5,16 @@ dependencies {
 
   compile "com.googlecode.juniversalchardet:juniversalchardet:1.0.3"
 
-  compile "commons-lang:commons-lang:${commonsLangVersion}"
+  compile "commons-lang:commons-lang"
 
-  compile "org.apache.httpcomponents:httpcore:${httpClientVersion}"
-  compile("org.apache.httpcomponents:httpclient:${httpClientVersion}") {
+  compile "org.apache.httpcomponents:httpcore"
+  compile("org.apache.httpcomponents:httpclient") {
     exclude  group: 'org.apache.httpcomponents' , module: 'httpcode' //WTF?
   }
 
 
-  testCompile "org.springframework:spring-context:${springVersion}", 
-              "org.springframework:spring-test:${springVersion}"
+  testCompile "org.springframework:spring-context", 
+              "org.springframework:spring-test"
 }
 
 

@@ -1,5 +1,5 @@
 artifactId = 'leviathan-api'
 
 dependencies {
-  compile "com.zaubersoftware.commons:commons-base:${commonsVersion}"
+  compile "com.zaubersoftware.commons:commons-base"
 }
