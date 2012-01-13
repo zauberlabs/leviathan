@@ -1,3 +1,5 @@
+artifactId = 'leviathan-api-httpclient'
+
 dependencies {
   compile project(':common')
 

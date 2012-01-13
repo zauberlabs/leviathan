@@ -1,3 +1,5 @@
+artifactId = 'leviathan-api-common'
+
 dependencies {
   compile project(':api')
   compile "commons-io:commons-io:${commonsIoVersion}"
