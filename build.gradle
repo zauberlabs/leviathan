@@ -67,4 +67,8 @@ subprojects {
       mavenLocal()
   }
 
+  test {
+    exclude '**/*Driver*'
+  }
+
 }
