@@ -22,7 +22,6 @@ subprojects {
   commonsIoVersion  = '1.4'
   httpClientVersion = '4.1'
   springVersion  = '3.0.6.RELEASE'
-  paraMolestar = false
 
   version = '0.9-SNAPSHOT'
   groupId = 'com.zaubersoftware.leviathan' 
