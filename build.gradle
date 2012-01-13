@@ -9,15 +9,27 @@ description = """
 dependsOnChildren()
 
 subprojects {
-   apply plugin: 'java'
-   apply plugin: 'eclipse'
+  apply plugin: 'java'
+  apply plugin: 'eclipse'
    
-   sourceCompatibility = 1.6   
+  sourceCompatibility = 1.6   
+  junitVersion = '4.9'
+  mockitoVersion = '1.8.1' 
+  commonsVersion = '3.49'
+  ehcacheVersion = '2.1.0'
+  commonsLangVersion = '2.5' 
+  slf4jVersion = '1.6.1'
+  commonsIoVersion  = '1.4'
+  httpClientVersion = '4.1'
+  springVersion  = '3.0.6.RELEASE'
+  paraMolestar = false
 
-   version = '0.9-SNAPSHOT'
-   groupId = 'com.zaubersoftware' 
+  version = '0.9-SNAPSHOT'
+  groupId = 'com.zaubersoftware.leviathan' 
 
   [compileJava, compileTestJava]*.options*.encoding = 'ISO-8859-1'
+
+  configurations.compile.transitive = true
  
   repositories {
       mavenCentral()
@@ -25,5 +37,9 @@ subprojects {
   }
 
 
+  dependencies {
+    testCompile "junit:junit:${junitVersion}"
+    testCompile "org.mockito:mockito-all:${mockitoVersion}"
+  }
 
 }
