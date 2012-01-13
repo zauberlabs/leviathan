@@ -29,17 +29,23 @@ subprojects {
 
   [compileJava, compileTestJava]*.options*.encoding = 'ISO-8859-1'
 
-  configurations.compile.transitive = true
+  configurations {
+   [compile,testCompile]*.transitive = true
+   all*.exclude group: 'commons-logging'
+  } 
+
  
   repositories {
       mavenCentral()
       mavenLocal()
   }
 
-
   dependencies {
     testCompile "junit:junit:${junitVersion}"
     testCompile "org.mockito:mockito-all:${mockitoVersion}"
   }
+
+
+
 
 }
