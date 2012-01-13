@@ -1,3 +1,5 @@
+artifactId = 'leviathan-scrapper'
+
 dependencies {
   compile project(':common')
 
