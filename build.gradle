@@ -9,9 +9,27 @@ description = """
 dependsOnChildren()
 
 subprojects {
+  //========================//
+  //     Maven Config       //
+  //========================//  
+  version = '0.9-SNAPSHOT'
+  groupId = 'com.zaubersoftware.leviathan' 
+
+  //========================//
+  //       Plugins          //  
+  //========================//
   apply plugin: 'java'
   apply plugin: 'eclipse'
    
+  //========================//
+  //        Encoding        // 
+  //========================//
+  [compileJava, compileTestJava]*.options*.encoding = 'ISO-8859-1'
+
+
+  //========================//
+  // Dependency Management  //
+  //========================//
   sourceCompatibility = 1.6   
   junitVersion = '4.9'
   mockitoVersion = '1.8.1' 
@@ -23,20 +41,17 @@ subprojects {
   httpClientVersion = '4.1'
   springVersion  = '3.0.6.RELEASE'
 
-  version = '0.9-SNAPSHOT'
-  groupId = 'com.zaubersoftware.leviathan' 
+  configurations.all {
+    transitive = true
 
-  [compileJava, compileTestJava]*.options*.encoding = 'ISO-8859-1'
+    exclude group: 'commons-logging'
 
-  configurations {
-   [compile,testCompile]*.transitive = true
-   all*.exclude group: 'commons-logging'
-  } 
+    resolutionStrategy {
+      failOnVersionConflict()
 
- 
-  repositories {
-      mavenCentral()
-      mavenLocal()
+      force "commons-lang:commons-lang:${commonsLangVersion}"
+      force "org.slf4j:slf4j-api:${slf4jVersion}"
+    }
   }
 
   dependencies {
@@ -44,7 +59,12 @@ subprojects {
     testCompile "org.mockito:mockito-all:${mockitoVersion}"
   }
 
-
-
+  //========================//
+  //      Repositories      //
+  //========================//
+  repositories {
+      mavenCentral()
+      mavenLocal()
+  }
 
 }
