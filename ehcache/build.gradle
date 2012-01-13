@@ -1,0 +1,8 @@
+artifactId = 'leviathan-api-ehcache'
+
+dependencies {
+  compile project(':common')
+  compile "net.sf.ehcache:ehcache-core:${ehcacheVersion}"
+  compile "commons-lang:commons-lang:${commonsLangVersion}"
+  compile "org.slf4j:slf4j-api:${slf4jVersion}"
+}

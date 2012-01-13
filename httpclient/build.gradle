@@ -1,0 +1,20 @@
+artifactId = 'leviathan-scrapper'
+
+dependencies {
+  compile project(':common')
+
+  compile "com.googlecode.juniversalchardet:juniversalchardet:1.0.3"
+
+  compile "commons-lang:commons-lang:${commonsLangVersion}"
+
+  compile "org.apache.httpcomponents:httpcore:${httpClientVersion}"
+  compile("org.apache.httpcomponents:httpclient:${httpClientVersion}") {
+    exclude  group: 'org.apache.httpcomponents' , module: 'httpcode' //WTF?
+  }
+
+
+  testCompile "org.springframework:spring-context:${springVersion}", 
+              "org.springframework:spring-test:${springVersion}"
+}
+
+

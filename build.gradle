@@ -1,0 +1,82 @@
+description = """
+  Leviathan (pronounced /lɨˈvaɪ.əθən/; Hebrew: לִוְיָתָן, Modern Livyatan Tiberian
+  Liwyāṯān ; "twisted, coiled"), is a sea monster referred to in the Tanakh and
+  the Bible.
+
+  It surfs the web, and retrieves data :)
+"""
+
+dependsOnChildren()
+
+subprojects {
+  //========================//
+  //     Maven Config       //
+  //========================//  
+  version = '0.9-SNAPSHOT'
+  groupId = 'com.zaubersoftware.leviathan' 
+
+  //========================//
+  //       Plugins          //  
+  //========================//
+  apply plugin: 'java'
+  apply plugin: 'eclipse'
+   
+  //========================//
+  //        Compiler        // 
+  //========================//
+  [compileJava, compileTestJava]*.options*.encoding = 'ISO-8859-1'
+  sourceCompatibility = 1.6   
+
+  //========================//
+  // Dependency Management  //
+  //========================//
+  junitVersion = '4.9'
+  mockitoVersion = '1.8.1' 
+  commonsVersion = '3.49'
+  ehcacheVersion = '2.1.0'
+  commonsLangVersion = '2.5' 
+  slf4jVersion = '1.6.1'
+  commonsIoVersion  = '1.4'
+  httpClientVersion = '4.1'
+  springVersion  = '3.0.6.RELEASE'
+  log4jVersion = '1.2.15'
+
+  configurations.all {
+    transitive = true
+
+    exclude group: 'commons-logging'
+
+    resolutionStrategy {
+      failOnVersionConflict()
+
+      force "commons-lang:commons-lang:${commonsLangVersion}"
+      force "org.slf4j:slf4j-api:${slf4jVersion}"
+      force "log4j:log4j:${log4jVersion}"
+    }
+  }
+
+  dependencies {
+    testCompile "junit:junit:${junitVersion}"
+    testCompile "org.mockito:mockito-all:${mockitoVersion}"
+    testCompile "org.mockito:mockito-all:${mockitoVersion}"
+    testCompile "org.slf4j:slf4j-log4j12:${slf4jVersion}"
+    testCompile "log4j:log4j"
+  }
+
+  //========================//
+  //      Repositories      //
+  //========================//
+  repositories {
+      mavenCentral()
+      mavenLocal()
+  }
+
+
+  //========================//
+  //      Tests             //
+  //========================//
+  test {
+    exclude '**/*Driver*'
+  }
+
+}
