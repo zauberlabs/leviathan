@@ -13,11 +13,17 @@ subprojects {
    apply plugin: 'eclipse'
    
    sourceCompatibility = 1.6   
+
    version = '0.9-SNAPSHOT'
    groupId = 'com.zaubersoftware' 
+
+  [compileJava, compileTestJava]*.options*.encoding = 'ISO-8859-1'
  
   repositories {
       mavenCentral()
       mavenLocal()
   }
+
+
+
 }
