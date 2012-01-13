@@ -1,0 +1,16 @@
+dependencies {
+  compile project(':api')
+  compile "commons-io:commons-io:${commonsIoVersion}"
+  compile "commons-lang:commons-lang:${commonsLangVersion}"
+  compile("com.zaubersoftware.commons.web:commons-web-proxy:${commonsVersion}") {
+    exclude group: 'commons-httpclient', module: 'commons-httpclient'
+    exclude group: 'org.springframework', module: 'spring-core'
+    exclude group: 'org.slf4j', module: 'jcl-over-slf4j'
+  }
+
+  if(paraMolestar)
+    compile "net.sf.staccatocommons:commons-lang:1.2" //TODO esto es solo para molestar
+
+}
+
+

@@ -1,2 +1,2 @@
-include 'api', 'common', 'ehcache', 'http-client', 'scrapper'
+include 'api', 'common', 'ehcache', 'httpclient', 'scrapper'
 
