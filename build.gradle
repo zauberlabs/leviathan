@@ -46,6 +46,12 @@ subprojects {
 
     exclude group: 'commons-logging'
 
+    // exclusiones de log4j
+    exclude group: 'javax.mail', module: 'mail'
+    exclude group: 'javax.jms', module: 'jms'
+    exclude group: 'com.sun.jmx', module: 'jmxri'
+    exclude group: 'com.sun.jdmk', module: 'jmxtools'
+
     resolutionStrategy {
       failOnVersionConflict()
 
