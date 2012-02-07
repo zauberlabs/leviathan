@@ -4,7 +4,7 @@
   <parent>
      <artifactId>bare</artifactId>
      <groupId>com.zaubersoftware.maven.poms</groupId>
-     <version>1.0.10</version>
+     <version>1.0.11</version>
   </parent>
   <name>Leviathan::</name>
   <description>
@@ -20,9 +20,9 @@
   <packaging>pom</packaging>
 
   <scm>
-    <connection>scm:git:git@github.com:zaubersoftware/leviathan.git</connection>
-    <url>scm:git:git@github.com:zaubersoftware/leviathan.git</url>
-    <developerConnection>scm:git:git@github.com:zaubersoftware/leviathan.git</developerConnection>
+    <connection>scm:git:git@github.com:zauberlabs/leviathan.git</connection>
+    <url>scm:git:git@github.com:zauberlabs/leviathan.git</url>
+    <developerConnection>scm:git:git@github.com:zauberlabs/leviathan.git</developerConnection>
   </scm>
   <licenses>
      <license>
