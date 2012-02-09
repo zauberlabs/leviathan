@@ -13,27 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ar.com.zauber.leviathan.api;
-
-import java.net.URI;
-import java.util.Collection;
-import java.util.Map;
-
+package com.zaubersoftware.leviathan.api.engine;
 
 /**
- * {@link BulkURIFetcher#fetch(java.util.Collection)} result
+ * TODO: Description of the class, Comments in english by default  
+ * 
  * 
  * @author Juan F. Codagnone
- * @since Oct 12, 2009
+ * @since Dec 28, 2011
  */
-public interface BulkURIFetcherResponse {
-
-    /** the details of each retrieval */
-    Map<URI, URIFetcherResponse> getDetails();
+public interface FlowEngine extends ErrorTolerant<Engine> {
     
-    /** @return the successful uris */
-    Collection<URIFetcherResponse> getSuccessfulURIs();
+    /**
+     * Builder method which is the entry point to configure the engine behavior.
+     *
+     * @return An {@link AfterFetchingHandler} that let's the users configure what to do after
+     * the resource pointed by the URI template has been fetched.
+     */
+    AfterFetchingHandler afterFetch();
     
-    /** @return the successful uris */
-    Collection<URIFetcherResponse> getFailedURIs();
+    
 }

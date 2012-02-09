@@ -16,16 +16,16 @@
 package ar.com.zauber.leviathan.common;
 
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.Validate;
 
+import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
-import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
+import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 
 /**
  * Implementación de {@link HttpMethodCommand} para POST.
@@ -34,10 +34,10 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
  * @author Francisco J. González Costanzó
  * @since Apr 12, 2010
  */
-public class PostHttpMethodCommand implements HttpMethodCommand {
+public class PostHttpMethodCommand implements FetchingTask {
 
     private final URIFetcher fetcher;
-    private final URIFetcherResponse.URIAndCtx uri;
+    private final URIFetcherResponse.URIAndCtx uriAndCtx;
     private final InputStream body;
     private final UrlEncodedPostBody encodedBody;
 
@@ -49,7 +49,7 @@ public class PostHttpMethodCommand implements HttpMethodCommand {
         Validate.notNull(body);
         
         this.fetcher = fetcher;
-        this.uri = uri;
+        this.uriAndCtx = uri;
         this.body = body;
         this.encodedBody = null;
     }
@@ -62,7 +62,7 @@ public class PostHttpMethodCommand implements HttpMethodCommand {
         Validate.notNull(formBody);
         
         this.fetcher = fetcher;
-        this.uri = uri;
+        this.uriAndCtx = uri;
         this.body = null;
         this.encodedBody = createEncodedBody(formBody);
     }    
@@ -85,43 +85,43 @@ public class PostHttpMethodCommand implements HttpMethodCommand {
      * Creates the PostHttpMethodCommand.
      *
      * @param fetcher
-     * @param uri
+     * @param uriAndCtx
      * @param body
      */
     
     public PostHttpMethodCommand(final URIFetcher fetcher, 
-            final URIAndCtx uri,
+            final URIAndCtx uriAndCtx,
             final UrlEncodedPostBody body) {
         
         Validate.notNull(fetcher);
-        Validate.notNull(uri);
+        Validate.notNull(uriAndCtx);
         Validate.notNull(body);
         
         this.fetcher = fetcher;
-        this.uri = uri;
+        this.uriAndCtx = uriAndCtx;
         this.body = null;
         this.encodedBody = body;
     }
 
-    /** @see HttpMethodCommand#execute() */
+    @Override
     public final URIFetcherResponse execute() {
         URIFetcherResponse ret;
         
         if (encodedBody != null) {
-            ret = fetcher.post(uri, encodedBody);
+            ret = fetcher.createPost(uriAndCtx, encodedBody).execute();
         } else if (body != null) {
-            ret = fetcher.post(uri, body);
+            ret = fetcher.createPost(uriAndCtx, body).execute();
         } else {
-            ret = new InmutableURIFetcherResponse(uri, 
+            ret = new InmutableURIFetcherResponse(uriAndCtx, 
                     new IllegalStateException("Nothing to post!"));
         }
         
         return ret;
     }
     
-    /** @see HttpMethodCommand#getURI() */
-    public final URI getURI() {
-        return uri.getURI();
+    @Override
+    public final URIAndCtx getURIAndCtx() {
+        return uriAndCtx;
     }
 
 }

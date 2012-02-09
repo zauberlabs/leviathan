@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zaubersoftware.leviathan.api.engine.impl;
+package ar.com.zauber.leviathan.common;
 
 import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;

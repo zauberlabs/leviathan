@@ -36,11 +36,13 @@ import org.junit.Test;
 
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
+import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.async.FetchQueueAsyncUriFetcher;
+import ar.com.zauber.leviathan.common.fluent.Fetchers;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 import ar.com.zauber.leviathan.common.utils.DirectExecutorService;
 
@@ -71,51 +73,47 @@ public class ExecutorServiceAsyncUriFetcherTest {
         final URI foo2 = new URI("http://foo2");
         final URI foo3 = new URI("http://foo3");
 
-        final Map<URI, String> map = new HashMap<URI, String>();
-        final String resource =
-            "ar/com/zauber/leviathan/impl/mock/noexiste.txt";
-        map.put(foo, resource);
-        map.put(foo2, resource);
-        final URIFetcher fixedUriFetcher = new FixedURIFetcher(map);
-
+        final String resource = "ar/com/zauber/leviathan/impl/mock/noexiste.txt";
+        final URIFetcher fixedUriFetcher = Fetchers.createFixed()
+                .when(foo).then(resource)
+                .when(foo2).then(resource)
+                .build();
         final CountDownLatch available = new CountDownLatch(1);
         final Random random = new Random();
-        final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(
-            Executors.newScheduledThreadPool(2), 
-            new AbstractURIFetcher() {
-                public URIFetcherResponse get(final URIAndCtx uri) {
-                    try {
-                        available.await();
-                        Thread.sleep(random.nextInt(500));
-                        return fixedUriFetcher.get(uri);
-                    } catch (final InterruptedException e) {
-                        throw new RuntimeException(e);
+        final URIFetcher f = new AbstractURIFetcher() {
+            @Override
+            public FetchingTask createGet(final URIAndCtx uriAndCtx) {
+                return new FetchingTask() {
+                    @Override
+                    public URIAndCtx getURIAndCtx() {
+                        return uriAndCtx;
                     }
-                }
-                
-                public URIFetcherResponse fetch(final URI uri) {
-                    return get(uri);
-                }
-                
-                public URIFetcherResponse fetch(final URIAndCtx uri) {
-                    return get(uri);
-                }
-                
-                public URIFetcherResponse post(final URIAndCtx uri,
-                        final InputStream body) {
-                    throw new NotImplementedException();
-                }
-                
-                public URIFetcherResponse post(final URIAndCtx uri,
-                        final Map<String, String> body) {
-                    throw new NotImplementedException();
-                }
+                    
+                    @Override
+                    public URIFetcherResponse execute() {
+                        try {
+                            available.await();
+                            Thread.sleep(random.nextInt(500));
+                            return fixedUriFetcher.createGet(uriAndCtx.getURI()).execute();
+                        } catch (final InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                };
+            }
 
-                public URIFetcherResponse post(final URIAndCtx uriAndCtx,
-                        final UrlEncodedPostBody body) {
-                    throw new NotImplementedException();
-                }
-            });
+            @Override
+            public FetchingTask createPost(final URIAndCtx uriAndCtx, final InputStream body) {
+                throw new NotImplementedException();
+            }
+
+            @Override
+            public FetchingTask createPost(final URIAndCtx uriAndCtx, final UrlEncodedPostBody body) {
+                throw new NotImplementedException();
+            }
+        };
+        final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(
+            Executors.newScheduledThreadPool(2));
         final List<URIFetcherResponse> responses = 
             new CopyOnWriteArrayList<URIFetcherResponse>();
         
@@ -128,10 +126,10 @@ public class ExecutorServiceAsyncUriFetcherTest {
             }
         };
         
-        fetcher.get(foo, closure);
-        fetcher.get(foo1, closure);
-        fetcher.get(foo2, closure);
-        fetcher.get(foo3, closure);
+        fetcher.scheduleFetch(f.createGet(foo), closure);
+        fetcher.scheduleFetch(f.createGet(foo1), closure);
+        fetcher.scheduleFetch(f.createGet(foo2), closure);
+        fetcher.scheduleFetch(f.createGet(foo3), closure);
         
         available.countDown();
         done.await(2, TimeUnit.SECONDS);
@@ -144,9 +142,9 @@ public class ExecutorServiceAsyncUriFetcherTest {
     @Test(timeout = 2000)
     public final void waitIdlenesss() 
         throws URISyntaxException, InterruptedException {
-        final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(
-                new DirectExecutorService(), 
-                new FixedURIFetcher(new HashMap<URI, String>()));
+        final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(new DirectExecutorService());
+        final URIFetcher f = Fetchers.createFixed().build();
+        
         final URI uri = new URI("http://foo");
         
         final CountDownLatch latch = new CountDownLatch(1);
@@ -154,10 +152,10 @@ public class ExecutorServiceAsyncUriFetcherTest {
         
         final int n = 10000; 
         
-        fetcher.get(uri, new Closure<URIFetcherResponse>() {
+        fetcher.scheduleFetch(f.createGet(uri), new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {
                 for(int j = 0; j < n; j++) {
-                    fetcher.get(uri, new Closure<URIFetcherResponse>() {
+                    fetcher.scheduleFetch(f.createGet(uri), new Closure<URIFetcherResponse>() {
                         /** @see Closure#execute(Object) */
                         public void execute(final URIFetcherResponse t) {
                             i.incrementAndGet();
@@ -182,8 +180,8 @@ public class ExecutorServiceAsyncUriFetcherTest {
     public final void waitIdlenesssWithExceptions() 
         throws URISyntaxException, InterruptedException {
         final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(
-                new DirectExecutorService(), 
-                new FixedURIFetcher(new HashMap<URI, String>()));
+                new DirectExecutorService());
+        final URIFetcher f = Fetchers.createFixed().build();
         final URI uri = new URI("http://foo");
         
         final CountDownLatch latch = new CountDownLatch(1);
@@ -194,10 +192,10 @@ public class ExecutorServiceAsyncUriFetcherTest {
         org.apache.log4j.Logger.getLogger(ExecutorServiceAsyncUriFetcher.class
                 ).setLevel(org.apache.log4j.Level.FATAL);
         
-        fetcher.get(uri, new Closure<URIFetcherResponse>() {
+        fetcher.scheduleFetch(f.createGet(uri), new Closure<URIFetcherResponse>() {
             public void execute(final URIFetcherResponse t) {
                 for(int j = 0; j < n; j++) {
-                    fetcher.get(uri, new Closure<URIFetcherResponse>() {
+                    fetcher.scheduleFetch(f.createGet(uri), new Closure<URIFetcherResponse>() {
                         /** @see Closure#execute(Object) */
                         public void execute(final URIFetcherResponse t) {
                             i.incrementAndGet();

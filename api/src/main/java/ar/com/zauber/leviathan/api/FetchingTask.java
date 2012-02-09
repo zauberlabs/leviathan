@@ -13,20 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zaubersoftware.leviathan.api.engine;
+package ar.com.zauber.leviathan.api;
 
-import ar.com.zauber.leviathan.api.AsyncUriFetcher;
+import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 /**
- * TODO: Description of the class, Comments in english by default
- *
- *
- * @author Guido Marucci Blas
- * @since Jul 22, 2011
+ * A Task that does the fetching of information 
+ * 
+ * @author Juan F. Codagnone
+ * @since Dec 28, 2011
  */
-public interface LeviathanBuilder {
+public interface FetchingTask {
+    
+    /** 
+     * @return minimal information about the fetching task. The URI MAY be used
+     * for politeness queues and other things.
+     */
+    URIAndCtx getURIAndCtx();
 
-    LeviathanBuilder withAsyncURIFetcher(AsyncUriFetcher fetcher);
-    Engine build();
-
+    /** do the actual fetching */
+    URIFetcherResponse execute();
 }

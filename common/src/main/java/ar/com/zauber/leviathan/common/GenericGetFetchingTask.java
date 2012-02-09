@@ -15,12 +15,12 @@
  */
 package ar.com.zauber.leviathan.common;
 
-import java.net.URI;
-
 import org.apache.commons.lang.Validate;
 
+import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 /**
  * Implementación de {@link HttpMethodCommand} para GET.
@@ -29,28 +29,28 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse;
  * @author Francisco J. González Costanzó
  * @since Apr 12, 2010
  */
-public class GetHttpMethodCommand implements HttpMethodCommand {
+public class GenericGetFetchingTask implements FetchingTask {
 
     private final URIFetcher fetcher;
-    private final URIFetcherResponse.URIAndCtx uri;
+    private final URIFetcherResponse.URIAndCtx uriAndCtx;
 
     /** Creates the GetHttpMethodCommand. */
-    public GetHttpMethodCommand(final URIFetcher fetcher,
-            final URIFetcherResponse.URIAndCtx uri) {
+    public GenericGetFetchingTask(final URIFetcher fetcher,
+            final URIFetcherResponse.URIAndCtx uriAndCtx) {
         Validate.notNull(fetcher);
-        Validate.notNull(uri);
+        Validate.notNull(uriAndCtx);
         this.fetcher = fetcher;
-        this.uri = uri;
+        this.uriAndCtx = uriAndCtx;
     }
 
-    /** @see ar.com.zauber.leviathan.common.HttpMethodCommand#execute() */
+    @Override
     public final URIFetcherResponse execute() {
-        return fetcher.get(uri);
+        return fetcher.createGet(uriAndCtx).execute();
     }
 
-    /** @see ar.com.zauber.leviathan.common.HttpMethodCommand#getURI() */
-    public final URI getURI() {
-        return uri.getURI();
+    @Override
+    public final URIAndCtx getURIAndCtx() {
+        return uriAndCtx;
     }
 
 }

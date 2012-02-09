@@ -15,12 +15,16 @@
  */
 package ar.com.zauber.leviathan.common;
 
-import java.net.URI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ar.com.zauber.commons.async.AbstractAsyncTaskExecutor;
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
+import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+
+import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
 
 /**
  * Clase base para los {@link AsyncUriFetcher}.
@@ -35,10 +39,38 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse;
  */
 public abstract class AbstractAsyncUriFetcher extends AbstractAsyncTaskExecutor
                                            implements AsyncUriFetcher {
+    private Logger logger  = LoggerFactory.getLogger(getClass());
     
-    /** @see AsyncUriFetcher#get(URI, Closure) */
-    public final void get(final URI uri, 
-            final Closure<URIFetcherResponse> closure) {
-        get(new InmutableURIAndCtx(uri), closure);
+    
+    /** execute a {@link FetchingTask} watching out for exceptions */
+    protected final URIFetcherResponse execute(final FetchingTask task) {
+        URIFetcherResponse rr = null;
+        try {
+            rr = task.execute();
+        } catch(final Throwable t) {
+            // esto jamas deberia pasar. fetch() nunca tira
+            // excepciones
+            logger.warn("fetching task " + task 
+              + " no respeta el contrato!. está tirando excepciones");
+            rr = new InmutableURIFetcherResponse(task.getURIAndCtx(), t);
+        }
+        return rr;
+    }
+    
+    @Override
+    public final AsyncUriFetcher scheduleFetch(final FetchingTask task, final ProcessingFlow processingFlow) {
+        scheduleFetch(task, adaptProcessingFlowToClosure(processingFlow));
+        return this;
+    }
+    
+
+    /**
+     * Adapts a {@link ProcessingFlow} to a {@link Closure}&lt;{@link URIFetcherResponse}&gt;
+     *
+     * @param uri
+     * @return
+     */
+    private FetcherResponsePipeAdapterClosure<Void> adaptProcessingFlowToClosure(final ProcessingFlow flow) {
+        return new FetcherResponsePipeAdapterClosure<Void>(flow.toPipe());
     }
 }

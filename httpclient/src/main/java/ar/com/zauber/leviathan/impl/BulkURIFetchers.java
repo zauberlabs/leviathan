@@ -17,11 +17,9 @@ package ar.com.zauber.leviathan.impl;
 
 import static java.util.Arrays.*;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -47,17 +45,14 @@ import org.apache.http.params.HttpProtocolParamBean;
 import org.apache.http.params.HttpProtocolParams;
 
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
-import ar.com.zauber.leviathan.api.BulkURIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.common.CharsetStrategy;
-import ar.com.zauber.leviathan.common.ExecutorServiceBulkURIFetcher;
 import ar.com.zauber.leviathan.common.async.FetchQueueAsyncUriFetcher;
 import ar.com.zauber.leviathan.common.async.Job;
 import ar.com.zauber.leviathan.common.async.JobScheduler;
 import ar.com.zauber.leviathan.common.async.impl.BlockingQueueJobQueue;
 import ar.com.zauber.leviathan.common.async.impl.MultiDomainPoliteJobQueue;
 import ar.com.zauber.leviathan.common.async.impl.OutputStreamAsyncUriFetcherObserver;
-import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 import ar.com.zauber.leviathan.common.utils.BlockingRejectedExecutionHandler;
 import ar.com.zauber.leviathan.impl.httpclient.HTTPClientURIFetcher;
 import ar.com.zauber.leviathan.impl.httpclient.charset.ChainedCharsetStrategy;
@@ -81,30 +76,6 @@ public final class BulkURIFetchers {
     /** utility class */
     private BulkURIFetchers() {
         // void
-    }
-
-
-    /** create a single threaded {@link BulkURIFetcher} */
-    public static BulkURIFetcher createHttpSingleThreaded() {
-        return new ExecutorServiceBulkURIFetcher(
-                Executors.newSingleThreadExecutor(),
-                new HTTPClientURIFetcher(new DefaultHttpClient(PARAMS))
-        );
-    }
-
-    /** @return un {@link BulkURIFetchers} usando un uriFetcher especifico */
-    public static BulkURIFetcher createBulkURIFetcher(final int nThreads,
-            final URIFetcher uriFetcher) {
-
-        return new ExecutorServiceBulkURIFetcher(
-                Executors.newFixedThreadPool(nThreads), uriFetcher);
-    }
-
-    /** @return an offline {@link BulkURIFetcher} */
-    public static BulkURIFetcher createFixed(final Map<URI, String> map) {
-        return new ExecutorServiceBulkURIFetcher(
-                Executors.newSingleThreadExecutor(),
-                new FixedURIFetcher(map));
     }
     
     /** create a safe {@link URIFetcher} */
@@ -162,28 +133,4 @@ public final class BulkURIFetchers {
         return params;
     }
     
-    /** builds a safe default {@link AsyncUriFetcher} */
-    public static AsyncUriFetcher createAsyncUriFetcher() {
-        return createAsyncUriFetcher(createSafeHttpClientURIFetcher());
-
-    }
-    
-    /** builds a safe default {@link AsyncUriFetcher} */
-    public static AsyncUriFetcher createAsyncUriFetcher(final URIFetcher fetcher) {
-        final JobScheduler fecherScheduler = new JobScheduler(
-                new MultiDomainPoliteJobQueue(500L, TimeUnit.MILLISECONDS), 
-                new ThreadPoolExecutor(1, 20, 10, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), 
-                        new BlockingRejectedExecutionHandler()));
-        
-        final JobScheduler procesessingScheduler = new JobScheduler(
-                new BlockingQueueJobQueue<Job>(new LinkedBlockingQueue<Job>()), 
-                new ThreadPoolExecutor(2, 2, 0, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), 
-                        new BlockingRejectedExecutionHandler()), new Timer(true), 10000);
-        
-        final FetchQueueAsyncUriFetcher f = new FetchQueueAsyncUriFetcher(fetcher,
-                fecherScheduler, 
-                procesessingScheduler);
-        f.setObserver(new OutputStreamAsyncUriFetcherObserver(System.err));
-        return f;
-    }
 }

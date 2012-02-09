@@ -41,6 +41,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
@@ -77,90 +78,86 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
         this.httpClient = httpClient;
     }
     
-    /**
-     * @see URIFetcher#fetch(URI)
-     * @deprecated Use {@link #get(URI)}
-     * */
-    @Deprecated
-    public final URIFetcherResponse fetch(final URI uri) {
-        return get(uri);
-    }
-
-    /**
-     * @see URIFetcher#fetch(URIFetcherResponse.URIAndCtx)
-     * @deprecated Use {@link #get(URIAndCtx)}
-     */
-    @Deprecated
-    public final URIFetcherResponse fetch(final URIAndCtx uri) {
-        return get(uri);
-    }
-
-    /** @see URIFetcher#fetch(URIFetcherResponse.URIAndCtx) */
-    public final URIFetcherResponse get(final URIAndCtx uriAndCtx) {
-        return fetchInternal(uriAndCtx, new HttpGet(uriAndCtx.getURI()));
-    }
     
-    /** @see URIFetcher#post(URIFetcherResponse.URIAndCtx, InputStream) */
-    public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
-            final InputStream body) {
-        try {
-            final HttpPost httpPost = new HttpPost(uriAndCtx.getURI());
-            httpPost.setEntity(new ByteArrayEntity(IOUtils.toByteArray(body)));
-            return fetchInternal(uriAndCtx, httpPost);
-        } catch (final Throwable e) {
-            return new InmutableURIFetcherResponse(uriAndCtx, 
-                    new UnhandledException("reading post entity", e));
-        }
-    }
     
-    /** @see URIFetcher#post(URIFetcherResponse.URIAndCtx, java.util.Map) */
-    public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
-            final Map<String, String> body) {
-        try {
-            final HttpPost httpPost = new HttpPost(uriAndCtx.getURI());
+    
+    @Override
+    public final FetchingTask createGet(final URIAndCtx uriAndCtx) {
+        return new FetchingTask() {
             
-            final List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-            for (String key : body.keySet()) {
-                pairs.add(new BasicNameValuePair(key, body.get(key)));
-            }
-            final String content = URLEncodedUtils.format(pairs, "UTF-8");
-            final ByteArrayEntity entity = new ByteArrayEntity(content.getBytes());
-            entity.setContentType("application/x-www-form-urlencoded");
-            httpPost.setEntity(entity);
-            return fetchInternal(uriAndCtx, httpPost);
-        } catch(Throwable t) {
-            return new InmutableURIFetcherResponse(uriAndCtx, t);
-        }
-    }
-
-    /** Post with List parameters also */
-    public final URIFetcherResponse post(final URIAndCtx uriAndCtx,
-            final UrlEncodedPostBody body) {
-        try {
-            final HttpPost httpPost = new HttpPost(uriAndCtx.getURI());
-
-            final List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-            
-            for (String simpleParam : body.getSimpleParameters()) {
-                pairs.add(new BasicNameValuePair(simpleParam,
-                          body.getSimpleParameter(simpleParam)));
+            @Override
+            public URIAndCtx getURIAndCtx() {
+                return uriAndCtx;
             }
             
-            for (String collectionParam : body.getCollectionParameters()) {
-                for (String value : body.getCollectionParameter(collectionParam)) {
-                    pairs.add(new BasicNameValuePair(collectionParam, value));
+            @Override
+            public URIFetcherResponse execute() {
+                return fetchInternal(uriAndCtx, new HttpGet(uriAndCtx.getURI()));
+            }
+        };
+    }
+    
+    @Override
+    public final FetchingTask createPost(final URIAndCtx uriAndCtx, final InputStream body) {
+        return new FetchingTask() {
+            @Override
+            public URIAndCtx getURIAndCtx() {
+                return uriAndCtx;
+            }
+            
+            @Override
+            public URIFetcherResponse execute() {
+                try {
+                    final HttpPost httpPost = new HttpPost(uriAndCtx.getURI());
+                    httpPost.setEntity(new ByteArrayEntity(IOUtils.toByteArray(body)));
+                    return fetchInternal(uriAndCtx, httpPost);
+                } catch (final Throwable e) {
+                    return new InmutableURIFetcherResponse(uriAndCtx, 
+                            new UnhandledException("reading post entity", e));
                 }
             }
-            
-            final String content = URLEncodedUtils.format(pairs, "UTF-8");
-            final ByteArrayEntity entity = new ByteArrayEntity(content.getBytes());
-            entity.setContentType("application/x-www-form-urlencoded");
-            httpPost.setEntity(entity);
-            return fetchInternal(uriAndCtx, httpPost);
-        } catch(Throwable t) {
-            return new InmutableURIFetcherResponse(uriAndCtx, t);
-        }
+        };
     }
+
+
+        @Override
+    public final FetchingTask createPost(final URIAndCtx uriAndCtx, final UrlEncodedPostBody body) {
+        return new FetchingTask() {
+            @Override
+            public URIAndCtx getURIAndCtx() {
+                return uriAndCtx;
+            }
+            
+            @Override
+            public URIFetcherResponse execute() {
+                try {
+                    final HttpPost httpPost = new HttpPost(uriAndCtx.getURI());
+
+                    final List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+                    
+                    for (String simpleParam : body.getSimpleParameters()) {
+                        pairs.add(new BasicNameValuePair(simpleParam,
+                                  body.getSimpleParameter(simpleParam)));
+                    }
+                    
+                    for (String collectionParam : body.getCollectionParameters()) {
+                        for (String value : body.getCollectionParameter(collectionParam)) {
+                            pairs.add(new BasicNameValuePair(collectionParam, value));
+                        }
+                    }
+                    
+                    final String content = URLEncodedUtils.format(pairs, "UTF-8");
+                    final ByteArrayEntity entity = new ByteArrayEntity(content.getBytes());
+                    entity.setContentType("application/x-www-form-urlencoded");
+                    httpPost.setEntity(entity);
+                    return fetchInternal(uriAndCtx, httpPost);
+                } catch(Throwable t) {
+                    return new InmutableURIFetcherResponse(uriAndCtx, t);
+                }
+            }
+        };
+    }
+    
 
     /**
      * Actual fetching.
@@ -267,4 +264,5 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
     public final void shutdown() {
         httpClient.getConnectionManager().shutdown();
     }
+
 }

@@ -39,6 +39,8 @@ import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.common.ExecutorServiceAsyncUriFetcher;
+import ar.com.zauber.leviathan.common.FetcherResponsePipeAdapterClosure;
+import ar.com.zauber.leviathan.common.fluent.Fetchers;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
 import com.zaubersoftware.leviathan.api.engine.Action;
@@ -275,12 +277,10 @@ public final class ConfigurationFlowTest {
             final Map<Class<? extends Throwable>, ExceptionHandler> handlers,
             final ExceptionHandler defaultExceptionHandler) {
         // Fetcher Configuration
-        final Map<URI, String> pages = new HashMap<URI, String>();
-        pages.put(this.mlhome, "com/zaubersoftware/leviathan/api/engine/pages/homeml.html");
-
-        final URIFetcher httpClientFetcher = new FixedURIFetcher(pages);
+        final URIFetcher httpClientFetcher = Fetchers.createFixed().register(mlhome, 
+                "com/zaubersoftware/leviathan/api/engine/pages/homeml.html").build();
         final ExecutorService executor = Executors.newSingleThreadExecutor();
-        final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(executor, httpClientFetcher);
+        final AsyncUriFetcher fetcher = new ExecutorServiceAsyncUriFetcher(executor);
 
         // Pipe chain
         final FlowBuilderPipe<URIFetcherResponse, Object> rootPipe =
@@ -292,7 +292,7 @@ public final class ConfigurationFlowTest {
 
         final Closure<URIFetcherResponse> rootClosure = new FetcherResponsePipeAdapterClosure<Object>(rootPipe);
 
-        fetcher.get(this.mlhome, rootClosure);
+        fetcher.scheduleFetch(httpClientFetcher.createGet(mlhome), rootClosure);
         try {
             fetcher.awaitIdleness();
         } catch (final InterruptedException e) {

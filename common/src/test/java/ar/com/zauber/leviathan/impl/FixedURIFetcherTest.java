@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.common.fluent.Fetchers;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 
 
@@ -43,16 +44,15 @@ public class FixedURIFetcherTest {
 
     /** constructor */
     public FixedURIFetcherTest() throws URISyntaxException {
-        final Map<URI, String> map = new HashMap<URI, String>();
-        map.put(new URI("http://noexiste"), 
-               "ar/com/zauber/leviathan/impl/mock/noexiste.txt");
-        fetcher = new FixedURIFetcher(map, Charset.forName("iso-8859-1"));
+        fetcher = Fetchers.createFixed().withCharset("iso-8859-1")
+                 .when("http://noexiste").then("ar/com/zauber/leviathan/impl/mock/noexiste.txt")
+                 .build();
     }
 
     /** test found  */
     @Test
     public final void found() throws URISyntaxException, IOException {
-        final URIFetcherResponse r = fetcher.get(new URI("http://noexiste"));
+        final URIFetcherResponse r = fetcher.createGet(new URI("http://noexiste")).execute();
         Assert.assertNotNull(r);
         Assert.assertEquals(200, r.getHttpResponse().getStatusCode());
         Assert.assertEquals("ñoño", 
@@ -64,7 +64,7 @@ public class FixedURIFetcherTest {
     /** test found  */
     @Test
     public final void notfound() throws URISyntaxException, IOException {
-        final URIFetcherResponse r = fetcher.get(new URI("http://lalarara"));
+        final URIFetcherResponse r = fetcher.createGet(new URI("http://lalarara")).execute();
         Assert.assertNotNull(r);
         Assert.assertFalse(r.isSucceeded());
         Assert.assertEquals(UnknownHostException.class, r.getError().getClass());

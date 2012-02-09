@@ -39,6 +39,7 @@ import ar.com.zauber.leviathan.api.URIFetcherHttpResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 import ar.com.zauber.leviathan.common.InmutableURIAndCtx;
+import ar.com.zauber.leviathan.common.fluent.Fetchers;
 import ar.com.zauber.leviathan.common.mock.FixedURIFetcher;
 import ar.com.zauber.leviathan.impl.ehcache.EhcacheURIFetcher;
 import ar.com.zauber.leviathan.impl.ehcache.EhcacheURIFetcher.CACHING_BEHAVIOR;
@@ -70,8 +71,7 @@ public class EhcacheURIFetcherDriverTest {
     /** testCaching */
     @Test
     public final void testCaching() throws URISyntaxException {
-        final Map<URI, String> map = new TreeMap<URI, String>();
-        URIFetcher fetcher = new EhcacheURIFetcher(new FixedURIFetcher(map), cache);
+        URIFetcher fetcher = new EhcacheURIFetcher(Fetchers.createFixed().build(), cache);
         final URI uri = new URI("http://www.club.lanacion.com.ar");
         fetcher.get(uri);
     }

@@ -15,9 +15,6 @@
  */
 package ar.com.zauber.leviathan.common;
 
-import java.io.InputStream;
-import java.net.URI;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -28,10 +25,8 @@ import org.slf4j.LoggerFactory;
 
 import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
-import ar.com.zauber.leviathan.api.URIFetcher;
+import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
-import ar.com.zauber.leviathan.api.UrlEncodedPostBody;
-import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
 
 /**
  * {@link AsyncUriFetcher} que utiliza un {@link ExecutorService} para no 
@@ -43,48 +38,21 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse.URIAndCtx;
  */
 public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
     private final ExecutorService executorService;
-    private final URIFetcher fetcher;
     
     private final Logger logger = LoggerFactory.getLogger(
             ExecutorServiceAsyncUriFetcher.class);
     
     /** Creates the ExecutorServiceAsyncUriFetcher. */
-    public ExecutorServiceAsyncUriFetcher(final ExecutorService executorService,
-            final URIFetcher fetcher) {
+    public ExecutorServiceAsyncUriFetcher(final ExecutorService executorService) {
         Validate.notNull(executorService);
-        Validate.notNull(fetcher);
         
         this.executorService = executorService;
-        this.fetcher = fetcher;
-    }
-    
-    /** @see AsyncUriFetcher#fetch(URIFetcherResponse.URIAndCtx, Closure) */
-    public final void get(final URIAndCtx uriAndCtx, 
-            final Closure<URIFetcherResponse> closure) {
-        fetchInternal(new GetHttpMethodCommand(fetcher, uriAndCtx), closure);
-    }
-    
-    /**
-     * @see AsyncUriFetcher#post(URIFetcherResponse.URIAndCtx, InputStream,
-     *      Closure)
-     */
-    public final void post(final URIAndCtx uriAndCtx, final InputStream body,
-            final Closure<URIFetcherResponse> closure) {
-        fetchInternal(new PostHttpMethodCommand(fetcher, uriAndCtx, body),
-                closure);
     }
 
-    /** @see AsyncUriFetcher#post(URIFetcherResponse.URIAndCtx, Map, Closure) */
-    public final void post(final URIAndCtx uriAndCtx,
-            final Map<String, String> body,
-            final Closure<URIFetcherResponse> closure) {
-        fetchInternal(new PostHttpMethodCommand(fetcher, uriAndCtx, body),
-                closure);
-    }
     
-    /** Actual fetching */
-    private void fetchInternal(final HttpMethodCommand methodCommand,
-            final Closure<URIFetcherResponse> closure) {
+    @Override
+    public final AsyncUriFetcher scheduleFetch(final FetchingTask methodCommand, 
+                                               final Closure<URIFetcherResponse> closure) {
         Validate.notNull(methodCommand);
         Validate.notNull(closure);
         
@@ -99,7 +67,7 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
                             logger.error("error while processing using "
                                     + closure.toString() 
                                     + " with URI: "
-                                    + methodCommand.getURI(), t);
+                                    + methodCommand.getURIAndCtx(), t);
                         }
                     } finally {
                         decrementActiveJobs();
@@ -109,27 +77,9 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
         } catch(final Throwable e) {
             decrementActiveJobs();   
         }
+        return this;
     }
     
-    /**
-     * @see AsyncUriFetcher#fetch(URI, Closure)
-     * @deprecated Use {@link #get(URI, Closure)}. *
-     */
-    @Deprecated
-    public final void fetch(final URI uri,
-            final Closure<URIFetcherResponse> closure) {
-        get(uri, closure);
-    }
-    
-    /**
-     * @see AsyncUriFetcher#fetch(URIAndCtx, Closure)
-     * @deprecated Use {@link #get(URIAndCtx, Closure)}. *
-     */
-    @Deprecated
-    public final void fetch(final URIAndCtx uriAndCtx,
-            final Closure<URIFetcherResponse> closure) {
-        get(uriAndCtx, closure);
-    }
     
     /** @see AsyncUriFetcher#shutdown() */
     public final void shutdown() {
@@ -147,9 +97,4 @@ public class ExecutorServiceAsyncUriFetcher extends AbstractAsyncUriFetcher {
         throw new NotImplementedException("TODO");
     }
 
-    /** @see AsyncUriFetcher#post(URIAndCtx, UrlEncodedPostBody, Closure) */
-    public final void post(final URIAndCtx uriAndCtx, final UrlEncodedPostBody body,
-            final Closure<URIFetcherResponse> closure) {
-        throw new NotImplementedException("TODO");
-    }
 }
