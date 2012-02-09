@@ -390,5 +390,12 @@
      <module>ehcache</module>
      <module>scrapper</module>
   </modules>
-
+ 
+  <distributionManagement> 
+           <snapshotRepository>
+             <id>zauber-code-snapshots</id>
+             <name>Zauber Code Snapshots</name>
+             <url>https://repo1.zauberlabs.com/content/repositories/zauber-code-snapshots</url>
+           </snapshotRepository>
+   </distributionManagement> 
 </project>
