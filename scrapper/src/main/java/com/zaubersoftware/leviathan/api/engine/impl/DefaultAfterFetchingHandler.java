@@ -17,8 +17,11 @@ package com.zaubersoftware.leviathan.api.engine.impl;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.stream.StreamSource;
@@ -26,7 +29,10 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
+import org.w3c.dom.Node;
 
+import ar.com.zauber.commons.web.transformation.processors.DocumentProvider;
+import ar.com.zauber.commons.web.transformation.processors.impl.DocumentBuilderFactoryDocumentProvider;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 
 import com.zaubersoftware.leviathan.api.engine.Action;
@@ -47,6 +53,7 @@ import com.zaubersoftware.leviathan.api.engine.Engine;
 import com.zaubersoftware.leviathan.api.engine.ErrorTolerantActionAndControlStructureHandler;
 import com.zaubersoftware.leviathan.api.engine.ErrorTolerantAfterThen;
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
+import com.zaubersoftware.leviathan.api.engine.Pipe;
 import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
 import com.zaubersoftware.leviathan.api.engine.impl.pipe.ActionPipe;
 import com.zaubersoftware.leviathan.api.engine.impl.pipe.ClosureAdapterPipe;
@@ -354,7 +361,25 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
         this.engine.appendPipe(new HTMLSanitizerPipe());
         return new DefaultAfterXMLTransformer();
     }
-
+    {
+    }
+    @Override
+    public AfterXMLTransformer isXML() {
+        this.engine.appendPipe(new Pipe<URIFetcherResponse, Node>() {
+            @Override
+            public Node execute(final URIFetcherResponse input) {
+                final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                try {
+                    final DocumentBuilder db = dbf.newDocumentBuilder();
+                    return db.parse(input.getHttpResponse().getRawContent());
+                } catch(Exception e) {
+                    throw new UnhandledException(e);
+                }
+            }
+        });
+        return new DefaultAfterXMLTransformer();
+    }
+    
     @Override
     public ProcessingFlow pack() {
         return this.engine.packCurrentFlow();

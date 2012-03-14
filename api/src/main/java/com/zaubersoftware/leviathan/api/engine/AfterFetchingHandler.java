@@ -38,5 +38,10 @@ public interface AfterFetchingHandler extends AfterXMLTransformer,
      * @throws IllegalStateException if the fetched resource is not an HTML document.
      */
     AfterXMLTransformer sanitizeHTML();
+    
+    /**
+     * The request body is an XML 
+     */
+    AfterXMLTransformer isXML();
 
 }
