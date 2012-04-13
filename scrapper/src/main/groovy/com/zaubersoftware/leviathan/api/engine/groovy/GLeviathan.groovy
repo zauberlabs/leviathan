@@ -1,9 +1,12 @@
 package com.zaubersoftware.leviathan.api.engine.groovy
 
+import org.springframework.core.io.ClassPathResource
+
+import com.zaubersoftware.leviathan.api.engine.Action
 import com.zaubersoftware.leviathan.api.engine.ActionHandler
-import com.zaubersoftware.leviathan.api.engine.AfterThen
 import com.zaubersoftware.leviathan.api.engine.ControlStructureHanlder
 import com.zaubersoftware.leviathan.api.engine.ErrorTolerant
+import com.zaubersoftware.leviathan.api.engine.FetchRequest;
 import com.zaubersoftware.leviathan.api.engine.Leviathan
 import com.zaubersoftware.leviathan.api.engine.ProcessingFlow
 
@@ -23,16 +26,43 @@ import com.zaubersoftware.leviathan.api.engine.ProcessingFlow
  */
 class GLeviathan {
 
-  static def enableGlobalSupport() {
-    ActionHandler.mixin(ActionHandlerCategory)
-    ErrorTolerant.mixin(ErrorTolerantCategory)
-    ControlStructureHanlder.mixin(ControlStructureHanlderCategory)
-  }
+   static def enableGlobalSupport() {
+      ActionHandler.mixin(ActionHandlerCategory)
+      ErrorTolerant.mixin(ErrorTolerantCategory)
+      ControlStructureHanlder.mixin(ControlStructureHanlderCategory)
+   }
 
 
-  static ProcessingFlow withEngine(closure) {
-    use(ActionHandlerCategory, ErrorTolerantCategory, ControlStructureHanlderCategory) {
-      closure(Leviathan.flowBuilder()).pack()
-    }
-  }
+   static ProcessingFlow flow(closure) {
+      def engine = Leviathan.flowBuilder().afterFetch();
+      closure.delegate = new Object(){
+         def then(it) {
+            engine = engine.thenDo(GAction.from(it))
+         }
+         def exec(block) {
+            then {
+               block(it)
+               it
+            }
+         }
+         def onException(it) {
+            engine = engine.onAnyExceptionDo(GExceptionHandler.from(it))
+         }
+         def parse(block) {
+            then { response -> 
+               block(new XmlSlurper().parse(response.content))
+            }
+         }
+         def sanitize() {
+            engine = engine.sanitizeHTML()
+         }
+         def follow(it) {
+            def uriLike, flow = it()
+            engine = engine.thenDoAndFetch(GAction.from { new FetchRequest  })
+         }
+         
+      }
+      closure()
+      engine.pack()
+   }
 }

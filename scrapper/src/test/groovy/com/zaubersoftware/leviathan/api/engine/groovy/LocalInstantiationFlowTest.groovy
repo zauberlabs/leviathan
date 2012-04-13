@@ -60,10 +60,9 @@ final class LocalInstantiationFlowTest {
   @Test
   void 'Should Fetch And DoSomething With A Closure'() {
     def fetchPerformed = false
-    def flow = withEngine { Engine e -> e
-      .afterFetch()
-      .then { URIFetcherResponse response ->
-        assertTrue(response.succeeded)
+    def flow = flow { 
+       then {
+        assertTrue(it.succeeded)
         fetchPerformed = true
       }
     }
@@ -75,10 +74,9 @@ final class LocalInstantiationFlowTest {
   void 'Should Fetch Do Something And Handle The Exception Without Configured Handlers'() {
     def exceptionHandled = false
     def exception = new MockException('an exception was thrown while processing the response!')
-    def flow = withEngine { Engine e -> e
-      .afterFetch()
-      .then { throw exception } 
-      .onAnyExceptionDo {
+    def flow = flow { 
+       then { throw exception } 
+       onException {
         assert exception == it
         exceptionHandled = true
       }
@@ -91,15 +89,11 @@ final class LocalInstantiationFlowTest {
   void 'Should Fetch Do Something And Handle The Exception With An Specific Handler'() {
       def exceptionHandled = false
       def exception = new MockException('an exception was thrown while processing the response!')
-      def flow = withEngine { Engine e -> e
-          .afterFetch()
-          .then { throw exception }
-          .onExceptionHandleWith(MockException) { throwable ->
-            assert exception == throwable
+      def flow = flow { 
+          then { throw exception }
+          onException { 
+            assert exception == it
             exceptionHandled = true
-          }.otherwiseHandleWith {
-            fail('It should never reach here, the exception should be handled by the configured handler.'
-                + ' Look above!!!')
           }
       }
       fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
@@ -109,9 +103,8 @@ final class LocalInstantiationFlowTest {
   @Test
   void 'Should Bind Uri To A Flow'() {
     def fetchPerformed = false
-    def flow = withEngine { Engine e -> e
-      .afterFetch()
-      .then { URIFetcherResponse response ->
+    def flow = flow { 
+      then { URIFetcherResponse response ->
         assert response.succeeded
         fetchPerformed = true
       }
@@ -126,10 +119,9 @@ final class LocalInstantiationFlowTest {
     final val = 'VAL'
 
     def fetchPerformed = false
-    def flow = withEngine { Engine e -> e
-      .afterFetch()
-      .then { URIFetcherResponse response ->
-        assert response.succeeded
+    def flow = flow { 
+      exec { it
+        assert it.succeeded
         assertEquals(val, get(key))
         fetchPerformed = true
       }
@@ -145,10 +137,9 @@ final class LocalInstantiationFlowTest {
     final VAL = 'VAL'
 
     def fetchPerformed = false
-    def flow = withEngine { Engine e -> e
-      .afterFetch()
-      .then { URIFetcherResponse response ->
-        assert response.succeeded
+    def flow = flow { 
+       exec { it
+        assert it.succeeded
         assertEquals(VAL, get(KEY))
         fetchPerformed = true
       }
@@ -163,13 +154,12 @@ final class LocalInstantiationFlowTest {
   void 'Should Flow'() {
     def xsltSource = classpathSource('com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl')
     def actionPerformed = false
-    def pack = withEngine { Engine e -> e
-      .afterFetch()
-      .sanitizeHTML()
-      .transformXML(xsltSource)
-      .toJavaObject(Link)
-      .thenDo { Link link -> actionPerformed = true;  link.title }
-      .then { assertEquals('MercadoLibre Argentina - Donde comprar y vender de todo.', it)  }
+    def pack = flow { 
+      sanitizeHTML()
+      transformXML(xsltSource)
+      toJavaObject(Link)
+      thenDo { Link link -> actionPerformed = true;  link.title }
+      then { assertEquals('MercadoLibre Argentina - Donde comprar y vender de todo.', it)  }
     }
     fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
     assert actionPerformed, 'Did not hadle the exception'
@@ -180,14 +170,13 @@ final class LocalInstantiationFlowTest {
     def xsltSource = classpathSource('com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl')
     def actionPerformed = false
     def timesRun = 0
-    def flow = withEngine { Engine e -> e
-      .afterFetch()
-      .sanitizeHTML()
-      .transformXML(xsltSource)
-      .toJavaObject(Link)
-      .thenDo { actionPerformed = true; it }
-      .forEachIn('categories') { ++timesRun }
-      .then { assert 4 == timesRun }
+    def flow = flow { 
+      sanitizeHTML()
+      transformXML(xsltSource)
+      toJavaObject(Link)
+      thenDo { actionPerformed = true; it }
+      forEachIn('categories') { ++timesRun }
+      then { assert 4 == timesRun }
     }
     fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
     assert actionPerformed, 'Did not hadle the exception'

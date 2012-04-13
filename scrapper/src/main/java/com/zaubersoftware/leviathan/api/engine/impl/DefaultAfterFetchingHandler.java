@@ -31,7 +31,6 @@ import ar.com.zauber.leviathan.api.URIFetcherResponse;
 
 import com.zaubersoftware.leviathan.api.engine.Action;
 import com.zaubersoftware.leviathan.api.engine.ActionAndControlStructureHandler;
-import com.zaubersoftware.leviathan.api.engine.ActionAndThenFetch;
 import com.zaubersoftware.leviathan.api.engine.ActionHandler;
 import com.zaubersoftware.leviathan.api.engine.AfterExceptionCatchDefinition;
 import com.zaubersoftware.leviathan.api.engine.AfterFetchingHandler;
@@ -47,6 +46,7 @@ import com.zaubersoftware.leviathan.api.engine.Engine;
 import com.zaubersoftware.leviathan.api.engine.ErrorTolerantActionAndControlStructureHandler;
 import com.zaubersoftware.leviathan.api.engine.ErrorTolerantAfterThen;
 import com.zaubersoftware.leviathan.api.engine.ExceptionHandler;
+import com.zaubersoftware.leviathan.api.engine.FetchRequest;
 import com.zaubersoftware.leviathan.api.engine.ProcessingFlow;
 import com.zaubersoftware.leviathan.api.engine.impl.pipe.ActionPipe;
 import com.zaubersoftware.leviathan.api.engine.impl.pipe.ClosureAdapterPipe;
@@ -150,7 +150,7 @@ public final class DefaultAfterFetchingHandler extends AbstractExceptionCatchDef
             return new DefaultActionAndControlStructureHandler<R>();
         }
         @Override
-        public AfterFetchingHandler thenDo(final ActionAndThenFetch<T> object) {
+        public AfterFetchingHandler thenDoAndFetch(final Action<T, FetchRequest> action) {
             throw new NotImplementedException();
         }
 
@@ -336,7 +336,7 @@ public final class DefaultAfterFetchingHandler extends AbstractExceptionCatchDef
     }
 
     @Override
-    public AfterFetchingHandler thenDo(final ActionAndThenFetch<URIFetcherResponse> object) {
+    public AfterFetchingHandler thenDoAndFetch(final Action<T, FetchRequest> action) {
         throw new NotImplementedException();
     }
 

@@ -41,11 +41,11 @@ public interface ActionHandler<T>  extends AfterThen {
 
     /**
      * Configures the next processing {@link Action} in the chain and then fetches a new resource.
-     * @param object the {@link Action} to execute over the T object.
+     * @param action the {@link Action} to execute over the T object.
      * @return {@link AfterFetchingHandler} all the available actions to performed over a fetched resource.
      * @throws IllegalStateException if the object is null.
      */
-    AfterFetchingHandler thenDo(ActionAndThenFetch<T> object);
+    AfterFetchingHandler thenDoAndFetch(Action<T, FetchRequest> action);
 
     /**
      * Configures the last processing closure in the chain.

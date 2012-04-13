@@ -21,6 +21,6 @@ class ActionHandlerCategory {
   }
 
   static def thenDo(ActionHandler handler, Closure aBlock) {
-    handler.thenDo(from(aBlock))
+    handler.thenDoAndFetch(from(aBlock))
   }
 }
