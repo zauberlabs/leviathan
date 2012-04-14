@@ -1,12 +1,11 @@
 package com.zaubersoftware.leviathan.api.engine.groovy
 
-import org.springframework.core.io.ClassPathResource
+import UriLike
 
-import com.zaubersoftware.leviathan.api.engine.Action
 import com.zaubersoftware.leviathan.api.engine.ActionHandler
 import com.zaubersoftware.leviathan.api.engine.ControlStructureHanlder
+import com.zaubersoftware.leviathan.api.engine.CurrentThreadURIAndContextDictionary
 import com.zaubersoftware.leviathan.api.engine.ErrorTolerant
-import com.zaubersoftware.leviathan.api.engine.FetchRequest;
 import com.zaubersoftware.leviathan.api.engine.Leviathan
 import com.zaubersoftware.leviathan.api.engine.ProcessingFlow
 
@@ -26,6 +25,8 @@ import com.zaubersoftware.leviathan.api.engine.ProcessingFlow
  */
 class GLeviathan {
 
+   static def ctxMap = new CurrentThreadURIAndContextDictionary()
+   
    static def enableGlobalSupport() {
       ActionHandler.mixin(ActionHandlerCategory)
       ErrorTolerant.mixin(ErrorTolerantCategory)
@@ -56,9 +57,11 @@ class GLeviathan {
          def sanitize() {
             engine = engine.sanitizeHTML()
          }
-         def follow(it) {
-            def uriLike, flow = it()
-            engine = engine.thenDoAndFetch(GAction.from { new FetchRequest  })
+         def follow(block) {
+            then { 
+               def (uriLike, flow) = block(it)
+               ctxMap.ctx.scrapper.scrap(UriLike.toUriAndCtx(uriLike), flow)
+            }
          }
          
       }

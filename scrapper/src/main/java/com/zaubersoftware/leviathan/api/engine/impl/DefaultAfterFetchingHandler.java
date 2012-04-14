@@ -27,7 +27,11 @@ import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
 
+import ar.com.zauber.commons.dao.Closure;
+import ar.com.zauber.leviathan.api.AsyncUriFetcher;
+import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
+import ar.com.zauber.leviathan.common.GenericGetFetchingTask;
 
 import com.zaubersoftware.leviathan.api.engine.Action;
 import com.zaubersoftware.leviathan.api.engine.ActionAndControlStructureHandler;
@@ -336,16 +340,24 @@ public final class DefaultAfterFetchingHandler extends AbstractExceptionCatchDef
     }
 
     @Override
-    public AfterFetchingHandler thenDoAndFetch(final Action<T, FetchRequest> action) {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public ErrorTolerantAfterThen then(final ContextAwareClosure<URIFetcherResponse> closure) {
         this.engine.appendPipe(new ClosureAdapterPipe<URIFetcherResponse>(closure));
         return new DefaultErrorTolerantAfterThen();
     }
 
+    @Override
+    public ErrorTolerantAfterThen thenDoAndFetch(final Action<URIFetcherResponse, FetchRequest> action, final ProcessingFlow processingFlow) {
+       this.engine.appendPipe(new ClosureAdapterPipe<URIFetcherResponse>(new Closure<URIFetcherResponse>() {
+         public void execute(URIFetcherResponse response) {
+            FetchRequest fetchRequest = action.execute(response);
+            AsyncUriFetcher fetcher;
+            URIFetcher syncFetcher;
+            fetcher.scheduleFetch(new GenericGetFetchingTask(syncFetcher, fetchRequest), processingFlow);
+         }
+      }));
+       return new DefaultErrorTolerantAfterThen();
+    }
+    
     @Override
     public AfterFetchingHandler thenFetch(final String uriTemplate) {
         throw new NotImplementedException();
