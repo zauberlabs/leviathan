@@ -153,26 +153,12 @@ public final class DefaultAfterFetchingHandler extends AbstractExceptionCatchDef
             DefaultAfterFetchingHandler.this.engine.appendPipe(new ActionPipe<T, R>(action));
             return new DefaultActionAndControlStructureHandler<R>();
         }
-        @Override
-        public AfterFetchingHandler thenDoAndFetch(final Action<T, FetchRequest> action) {
-            throw new NotImplementedException();
-        }
 
         @Override
         public ErrorTolerantAfterThen then(final ContextAwareClosure<T> closure) {
             Validate.notNull(closure, "The closure cannot be null");
             DefaultAfterFetchingHandler.this.engine.appendPipe(new ClosureAdapterPipe<T>(closure));
             return new DefaultErrorTolerantAfterThen();
-        }
-
-        @Override
-        public AfterFetchingHandler thenFetch(final String uriTemplate) {
-            throw new NotImplementedException();
-        }
-
-        @Override
-        public AfterFetchingHandler thenFetch(final URI uri) {
-            throw new NotImplementedException();
         }
 
         @Override
@@ -343,29 +329,6 @@ public final class DefaultAfterFetchingHandler extends AbstractExceptionCatchDef
     public ErrorTolerantAfterThen then(final ContextAwareClosure<URIFetcherResponse> closure) {
         this.engine.appendPipe(new ClosureAdapterPipe<URIFetcherResponse>(closure));
         return new DefaultErrorTolerantAfterThen();
-    }
-
-    @Override
-    public ErrorTolerantAfterThen thenDoAndFetch(final Action<URIFetcherResponse, FetchRequest> action, final ProcessingFlow processingFlow) {
-       this.engine.appendPipe(new ClosureAdapterPipe<URIFetcherResponse>(new Closure<URIFetcherResponse>() {
-         public void execute(URIFetcherResponse response) {
-            FetchRequest fetchRequest = action.execute(response);
-            AsyncUriFetcher fetcher;
-            URIFetcher syncFetcher;
-            fetcher.scheduleFetch(new GenericGetFetchingTask(syncFetcher, fetchRequest), processingFlow);
-         }
-      }));
-       return new DefaultErrorTolerantAfterThen();
-    }
-    
-    @Override
-    public AfterFetchingHandler thenFetch(final String uriTemplate) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public AfterFetchingHandler thenFetch(final URI uri) {
-        throw new NotImplementedException();
     }
 
     @Override

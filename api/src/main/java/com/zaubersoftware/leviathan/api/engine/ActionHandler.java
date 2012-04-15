@@ -40,37 +40,12 @@ public interface ActionHandler<T>  extends AfterThen {
 
 
     /**
-     * Configures the next processing {@link Action} in the chain and then fetches a new resource.
-     * @param action the {@link Action} to execute over the T object.
-     * @return {@link AfterFetchingHandler} all the available actions to performed over a fetched resource.
-     * @throws IllegalStateException if the object is null.
-     */
-    AfterFetchingHandler thenDoAndFetch(Action<T, FetchRequest> action);
-
-    /**
      * Configures the last processing closure in the chain.
      * @param object the closure to execute over the T object.
      * @return {@link AfterFetchingHandler} all the available actions to performed over a fetched resource.
      * @throws IllegalStateException if the object is null.
      */
     ErrorTolerantAfterThen then(ContextAwareClosure<T> object);
-
-
-    /**
-     * Configures the next resource to be fetched.
-     * @param uriTemplate the location of the resource.
-     * @return {@link AfterFetchingHandler} all the available actions to performed over a fetched resource.
-     * @throws IllegalStateException if the uriTemplate is null.
-     */
-    AfterFetchingHandler thenFetch(String uriTemplate);
-
-    /**
-     * Configures the next resource to be fetched.
-     * @param uri the location of the resource.
-     * @return {@link AfterFetchingHandler} all the available actions to performed over a fetched resource.
-     * @throws IllegalStateException if the uri is null.
-     */
-    AfterFetchingHandler thenFetch(URI uri);
 
     /**
      * Null action.

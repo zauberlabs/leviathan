@@ -106,16 +106,6 @@ public class NewApiTestDriver {
 //                        }
 //                    });
 
-        engine.afterFetch().sanitizeHTML().transformXML("raiz.xsl")
-            .transformXML("otramas.xml")
-            .toJavaObject(Categories.class)
-            .thenDoAndFetch(new ActionAndThenFetch<Categories>() {
-                @Override
-                public FetchRequest execute(final Categories t) {
-                    return null;
-                }
-           });
-
 
         engine.onAnyExceptionDo(new ExceptionHandler() {
             @Override

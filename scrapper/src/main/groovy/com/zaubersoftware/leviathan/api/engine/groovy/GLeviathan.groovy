@@ -33,6 +33,25 @@ class GLeviathan {
       ControlStructureHanlder.mixin(ControlStructureHanlderCategory)
    }
 
+   
+//   class BasicEngine {
+//      @Delegate engine
+//      def then(block) {
+//         engine.thenDo(GAction.from(block))
+//      }
+//   }
+//   
+//   class SplittingEngine {
+//      def engine
+//      
+//      def then(block) {
+//            
+//      }
+//      def pack() {
+//         engine.endFor()
+//         engine.pack()
+//      }
+//   }
 
    static ProcessingFlow flow(closure) {
       def engine = Leviathan.flowBuilder().afterFetch();
@@ -63,7 +82,6 @@ class GLeviathan {
                ctxMap.ctx.scrapper.scrap(UriLike.toUriAndCtx(uriLike), flow)
             }
          }
-         
       }
       closure()
       engine.pack()

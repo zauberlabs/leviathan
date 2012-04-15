@@ -24,6 +24,7 @@ import java.util.concurrent.Executors
 import javax.xml.transform.stream.StreamSource
 
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.springframework.core.io.ClassPathResource
 
@@ -34,16 +35,10 @@ import ar.com.zauber.leviathan.common.ExecutorServiceAsyncUriFetcher
 import ar.com.zauber.leviathan.common.InmutableURIAndCtx
 import ar.com.zauber.leviathan.common.fluent.Fetchers
 
-import com.zaubersoftware.leviathan.api.engine.Engine
 import com.zaubersoftware.leviathan.api.engine.impl.MockException
-import com.zaubersoftware.leviathan.api.engine.impl.dto.Link
 
 
-/**
- * @author Martin Silva
- * @since Sep 2, 2011
- */
-final class LocalInstantiationFlowTest {
+class LocalInstantiationFlowTest {
 
   final URI mlhome = URI.create('http://www.mercadolibre.com.ar/')
   AsyncUriFetcher fetcher
@@ -113,6 +108,7 @@ final class LocalInstantiationFlowTest {
     assert fetchPerformed, 'Did not fetch!'
   }
 
+  @Ignore
   @Test
   void 'Should Have Context'() {
     final key = 'FOO'
@@ -131,6 +127,7 @@ final class LocalInstantiationFlowTest {
     assert fetchPerformed, 'Did not fetch!'
   }
 
+  @Ignore
   @Test
   void 'Should Have Context And Can Be Share Between Actions'() {
     final KEY = 'FOO'
@@ -150,37 +147,5 @@ final class LocalInstantiationFlowTest {
     assert fetchPerformed, 'Did not fetch!'
   }
 
-  @Test
-  void 'Should Flow'() {
-    def xsltSource = classpathSource('com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl')
-    def actionPerformed = false
-    def pack = flow { 
-      sanitizeHTML()
-      transformXML(xsltSource)
-      toJavaObject(Link)
-      thenDo { Link link -> actionPerformed = true;  link.title }
-      then { assertEquals('MercadoLibre Argentina - Donde comprar y vender de todo.', it)  }
-    }
-    fetcher.scheduleFetch(f.createGet(mlhome), pack).awaitIdleness()
-    assert actionPerformed, 'Did not hadle the exception'
-  }
-
-  @Test
-  void 'Should For Each Flow'() {
-    def xsltSource = classpathSource('com/zaubersoftware/leviathan/api/engine/stylesheet/html.xsl')
-    def actionPerformed = false
-    def timesRun = 0
-    def flow = flow { 
-      sanitizeHTML()
-      transformXML(xsltSource)
-      toJavaObject(Link)
-      thenDo { actionPerformed = true; it }
-      forEachIn('categories') { ++timesRun }
-      then { assert 4 == timesRun }
-    }
-    fetcher.scheduleFetch(f.createGet(mlhome), flow).awaitIdleness()
-    assert actionPerformed, 'Did not hadle the exception'
-  }
-  
   def classpathSource = {name -> new StreamSource(new ClassPathResource(name).inputStream )}
 }
