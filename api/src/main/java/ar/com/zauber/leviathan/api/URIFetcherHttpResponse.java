@@ -32,6 +32,11 @@ public interface URIFetcherHttpResponse {
 
     /** content */
     Reader getContent();
+    
+    /**
+     * The content as a string
+     */
+    String getContentAsString();
 
     /**
      * <p><strong>
@@ -58,5 +63,7 @@ public interface URIFetcherHttpResponse {
      * is not present
      */
     List<String> getHeaders(String name);
+
+    
     
 }

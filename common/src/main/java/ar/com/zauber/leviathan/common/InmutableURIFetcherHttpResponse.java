@@ -74,6 +74,11 @@ public class InmutableURIFetcherHttpResponse implements URIFetcherHttpResponse,
         return new StringReader(content);
     }
     
+    @Override
+    public final String getContentAsString() {
+        return content;
+    }
+    
     /** @see URIFetcherResponse#getStatusCode() */
     public final int getStatusCode() {
         return statusCode;
