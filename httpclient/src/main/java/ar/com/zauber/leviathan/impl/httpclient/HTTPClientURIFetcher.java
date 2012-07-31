@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -52,6 +53,7 @@ import ar.com.zauber.leviathan.common.InmutableURIFetcherHttpResponse;
 import ar.com.zauber.leviathan.common.InmutableURIFetcherResponse;
 import ar.com.zauber.leviathan.common.ResponseMetadata;
 import ar.com.zauber.leviathan.impl.httpclient.charset.DefaultHttpCharsetStrategy;
+import ar.com.zauber.leviathan.impl.httpclient.charset.SkipBytesException;
 
 /**
  * {@link URIFetcher} that uses Apache's HttpClient components
@@ -135,13 +137,13 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
 
                     final List<NameValuePair> pairs = new ArrayList<NameValuePair>();
                     
-                    for (String simpleParam : body.getSimpleParameters()) {
+                    for (final String simpleParam : body.getSimpleParameters()) {
                         pairs.add(new BasicNameValuePair(simpleParam,
                                   body.getSimpleParameter(simpleParam)));
                     }
                     
-                    for (String collectionParam : body.getCollectionParameters()) {
-                        for (String value : body.getCollectionParameter(collectionParam)) {
+                    for (final String collectionParam : body.getCollectionParameters()) {
+                        for (final String value : body.getCollectionParameter(collectionParam)) {
                             pairs.add(new BasicNameValuePair(collectionParam, value));
                         }
                     }
@@ -151,7 +153,7 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
                     entity.setContentType("application/x-www-form-urlencoded");
                     httpPost.setEntity(entity);
                     return fetchInternal(uriAndCtx, httpPost);
-                } catch(Throwable t) {
+                } catch(final Throwable t) {
                     return new InmutableURIFetcherResponse(uriAndCtx, t);
                 }
             }
@@ -177,15 +179,22 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
             final HttpEntity entity = response.getEntity();
             Validate.notNull(entity);
             
-            InputStream content = entity.getContent();
+            final InputStream content = entity.getContent();
             Validate.notNull(content);
             
-            final byte[] data = IOUtils.toByteArray(content);
+            byte[] data = IOUtils.toByteArray(content);
 
             final ResponseMetadata meta = getMetaResponse(uri, response, entity);
-            final Charset charset 
-                = charsetStrategy.getCharset(meta, new ByteArrayInputStream(data));
-
+            
+            Charset charset;
+            try {
+               charset = charsetStrategy.getCharset(meta, new ByteArrayInputStream(data));
+            } catch (final SkipBytesException e) {
+               charset = e.getCharset();
+               e.getBytesToSkip();
+               data = Arrays.copyOfRange(data, e.getBytesToSkip() - 1, data.length);
+            }
+               
             return new InmutableURIFetcherResponse(
                 uriAndCtx,
                 new InmutableURIFetcherHttpResponse(
@@ -214,10 +223,10 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
      * @return the headers map 
      */
     private Map<String, List<String>> extractHeaders(final HttpResponse response) {
-        Map<String, List<String>> out = new TreeMap<String, List<String>>();
+        final Map<String, List<String>> out = new TreeMap<String, List<String>>();
         
         final Header[] allHeaders = response.getAllHeaders();
-        for (Header header : allHeaders) {
+        for (final Header header : allHeaders) {
             List<String> headers = out.get(header.getName());
             if (headers == null) {
                 headers = new ArrayList<String>();
