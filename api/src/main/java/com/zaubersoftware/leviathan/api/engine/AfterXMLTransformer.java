@@ -17,7 +17,8 @@ package com.zaubersoftware.leviathan.api.engine;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
+
+import org.w3c.dom.Node;
 
 /**
  * Interface that defines all the available actions that can be configured for an XML resource 
@@ -56,5 +57,10 @@ public interface AfterXMLTransformer extends JavaObjectTransformer {
      * after an XML Transformation.
      */
     AfterXMLTransformer transformXML(Templates xsl);
+    
+    /**
+     * Transform XML using custom code
+     */
+    AfterXMLTransformer transformXML(Pipe<Node, Node> pipe);
     
 }

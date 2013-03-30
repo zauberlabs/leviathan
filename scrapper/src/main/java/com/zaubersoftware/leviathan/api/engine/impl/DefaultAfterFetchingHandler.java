@@ -17,7 +17,6 @@ package com.zaubersoftware.leviathan.api.engine.impl;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.URI;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -31,8 +30,6 @@ import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.Validate;
 import org.w3c.dom.Node;
 
-import ar.com.zauber.commons.web.transformation.processors.DocumentProvider;
-import ar.com.zauber.commons.web.transformation.processors.impl.DocumentBuilderFactoryDocumentProvider;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
 
 import com.zaubersoftware.leviathan.api.engine.Action;
@@ -245,7 +242,13 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
             DefaultAfterFetchingHandler.this.engine.appendPipe(new ToJavaObjectPipe<T>(aClass));
             return new DefaultActionAndControlStructureHandler<T>();
         }
-
+        @Override
+        public <T> AfterJavaObjectHandler<T> toJavaObject(final Pipe<Node, T> pipe) {
+            Validate.notNull(pipe, "pipe cannot be null");
+            DefaultAfterFetchingHandler.this.engine.appendPipe(pipe);
+            return new DefaultActionAndControlStructureHandler<T>();
+        }
+        
         @Override
         public AfterXMLTransformer transformXML(final String xsl) {
             Validate.notNull(xsl, "The XSLT path cannot be null");
@@ -271,7 +274,12 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
             DefaultAfterFetchingHandler.this.engine.appendPipe(new XMLPipe(xsl));
             return this;
         }
-
+        @Override
+        public AfterXMLTransformer transformXML(Pipe<Node, Node> pipe) {
+            Validate.notNull(pipe, "The pipe cannot be null");
+            DefaultAfterFetchingHandler.this.engine.appendPipe(pipe);
+            return this;
+        }
     }
 
     /**
@@ -310,12 +318,25 @@ public final class DefaultAfterFetchingHandler implements AfterFetchingHandler {
     }
 
     @Override
+    public AfterXMLTransformer transformXML(final Pipe<Node, Node> pipe) {
+        this.engine.appendPipe(pipe);
+        return this;
+    }
+    
+    @Override
     public <T> AfterJavaObjectHandler<T> toJavaObject(final Class<T> aClass) {
         Validate.notNull(aClass, "The class cannot be null");
         this.engine.appendPipe(new ToJavaObjectPipe<T>(aClass));
         return new DefaultActionAndControlStructureHandler<T>();
     }
 
+    @Override
+    public <T> AfterJavaObjectHandler<T> toJavaObject(final Pipe<Node, T> pipe) {
+        Validate.notNull(pipe, "pipe cannot be null");
+        this.engine.appendPipe(pipe);
+        return new DefaultActionAndControlStructureHandler<T>();
+    }
+    
     @Override
     public ActionHandler<URIFetcherResponse> onAnyExceptionDo(final ExceptionHandler handler) {
         Validate.notNull(handler, "The handler cannot be null");
