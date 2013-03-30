@@ -15,6 +15,8 @@
  */
 package com.zaubersoftware.leviathan.api.engine;
 
+import org.w3c.dom.Node;
+
 /**
  * Defines the method to convert a document into a Java object. 
  * 
@@ -37,4 +39,9 @@ public interface JavaObjectTransformer {
      */
     <T> AfterJavaObjectHandler<T> toJavaObject(Class<T> aClass);
 
+    /**
+     * Deserializes the JSON or XML document into a Java object of the given {@link Class} using
+     * custom code
+     */
+    <T> AfterJavaObjectHandler<T> toJavaObject(Pipe<Node, T> pipe);
 }
