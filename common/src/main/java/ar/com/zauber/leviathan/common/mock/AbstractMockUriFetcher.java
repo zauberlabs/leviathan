@@ -104,11 +104,13 @@ public abstract class AbstractMockUriFetcher extends AbstractURIFetcher {
                                 new UnknownHostException(uri.getHost()));
                     } else {
                         try {
+                            final byte [] bytes = IOUtils.toByteArray(is);
                             ret = new InmutableURIFetcherResponse(uriAndCtx,
-                                    new InmutableURIFetcherHttpResponse(new String(
-                                            IOUtils.toByteArray(is), charset
-                                                    .displayName()), 200,
-                                            Collections.EMPTY_MAP));
+                                    new InmutableURIFetcherHttpResponse(
+                                        new String(bytes, charset.displayName()), 
+                                        200,
+                                        Collections.EMPTY_MAP,
+                                        bytes));
                         } catch (IOException e) {
                             throw new UnhandledException(e);
                         } finally {
