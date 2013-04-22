@@ -44,6 +44,7 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParamBean;
 import org.apache.http.params.HttpProtocolParams;
 
+import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.common.CharsetStrategy;
@@ -78,8 +79,12 @@ public final class BulkURIFetchers {
         // void
     }
     
-    /** create a safe {@link URIFetcher} */
     public static URIFetcher createSafeHttpClientURIFetcher() {
+        return createSafeHttpClientURIFetcher(null);
+    }
+    
+    /** create a safe {@link URIFetcher} */
+    public static URIFetcher createSafeHttpClientURIFetcher(final Closure<HttpParams> paramsClosure) {
         final Map<String, Scheme> registries = new HashMap<String, Scheme>();
         registries.put("http", new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
         registries.put("https", new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
@@ -87,7 +92,9 @@ public final class BulkURIFetchers {
         schemaRegistry.setItems(registries);
         
         final HttpParams params = createHttpParams();
-        
+        if(params != null) {
+            paramsClosure.equals(params);
+        }
         final ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemaRegistry);
         final HttpClient httpclient = new DefaultHttpClient(cm, params);
         
