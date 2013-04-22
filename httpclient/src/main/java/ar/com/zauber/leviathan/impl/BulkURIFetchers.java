@@ -19,11 +19,6 @@ import static java.util.Arrays.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpVersion;
 import org.apache.http.client.HttpClient;
@@ -45,16 +40,8 @@ import org.apache.http.params.HttpProtocolParamBean;
 import org.apache.http.params.HttpProtocolParams;
 
 import ar.com.zauber.commons.dao.Closure;
-import ar.com.zauber.leviathan.api.AsyncUriFetcher;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.common.CharsetStrategy;
-import ar.com.zauber.leviathan.common.async.FetchQueueAsyncUriFetcher;
-import ar.com.zauber.leviathan.common.async.Job;
-import ar.com.zauber.leviathan.common.async.JobScheduler;
-import ar.com.zauber.leviathan.common.async.impl.BlockingQueueJobQueue;
-import ar.com.zauber.leviathan.common.async.impl.MultiDomainPoliteJobQueue;
-import ar.com.zauber.leviathan.common.async.impl.OutputStreamAsyncUriFetcherObserver;
-import ar.com.zauber.leviathan.common.utils.BlockingRejectedExecutionHandler;
 import ar.com.zauber.leviathan.impl.httpclient.HTTPClientURIFetcher;
 import ar.com.zauber.leviathan.impl.httpclient.charset.ChainedCharsetStrategy;
 import ar.com.zauber.leviathan.impl.httpclient.charset.DefaultHttpCharsetStrategy;
@@ -93,7 +80,7 @@ public final class BulkURIFetchers {
         
         final HttpParams params = createHttpParams();
         if(params != null) {
-            paramsClosure.equals(params);
+            paramsClosure.execute(params);
         }
         final ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemaRegistry);
         final HttpClient httpclient = new DefaultHttpClient(cm, params);
