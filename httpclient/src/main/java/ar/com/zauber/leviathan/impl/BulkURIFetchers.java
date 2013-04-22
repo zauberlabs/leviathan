@@ -84,7 +84,7 @@ public final class BulkURIFetchers {
         schemaRegistry.setItems(registries);
         
         final HttpParams params = createHttpParams();
-        if(params != null) {
+        if(paramsClosure != null) {
             paramsClosure.execute(params);
         }
         final ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemaRegistry);
