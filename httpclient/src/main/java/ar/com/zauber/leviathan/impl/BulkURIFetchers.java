@@ -72,6 +72,11 @@ public final class BulkURIFetchers {
     
     /** create a safe {@link URIFetcher} */
     public static URIFetcher createSafeHttpClientURIFetcher(final Closure<HttpParams> paramsClosure) {
+        return createSafeHttpClientURIFetcher(paramsClosure, null);
+    }
+    /** create a safe {@link URIFetcher} */
+    public static URIFetcher createSafeHttpClientURIFetcher(final Closure<HttpParams> paramsClosure,
+            final Closure<DefaultHttpClient> httpClientClosure) {
         final Map<String, Scheme> registries = new HashMap<String, Scheme>();
         registries.put("http", new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
         registries.put("https", new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
@@ -83,8 +88,10 @@ public final class BulkURIFetchers {
             paramsClosure.execute(params);
         }
         final ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemaRegistry);
-        final HttpClient httpclient = new DefaultHttpClient(cm, params);
-        
+        final DefaultHttpClient httpclient = new DefaultHttpClient(cm, params);
+        if(httpClientClosure != null) {
+            httpClientClosure.execute(httpclient);
+        }
         final CharsetStrategy charsetStrategy = new ChainedCharsetStrategy(asList(
                 new DefaultHttpCharsetStrategy(), new FixedCharsetStrategy("utf-8")));
         
