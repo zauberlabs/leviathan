@@ -174,17 +174,27 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
             Validate.notNull(uri, "uri is null");
             
             response  = httpClient.execute(httpMethod);
+            final Map<String, List<String>> headers = extractHeaders(response);
             Validate.notNull(response);
             
-            final HttpEntity entity = response.getEntity();
+            HttpEntity entity = response.getEntity();
             Validate.notNull(entity);
             
-            final InputStream content = entity.getContent();
+            InputStream content = entity.getContent();
             Validate.notNull(content);
             
-            byte[] data = IOUtils.toByteArray(content);
+            byte[] data;
+            ResponseMetadata meta; 
+            try {
+                data = IOUtils.toByteArray(content);
+                meta = getMetaResponse(uri, response, entity);
+            } finally {
+                content.close();
+                content = null;
+                response = null;
+                entity = null;
+            }
 
-            final ResponseMetadata meta = getMetaResponse(uri, response, entity);
             
             Charset charset;
             try {
@@ -200,7 +210,7 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
                 new InmutableURIFetcherHttpResponse(
                     new String(data, charset.displayName()), 
                     meta.getStatusCode(), 
-                    extractHeaders(response), data));
+                    headers, data));
             
         } catch (final Throwable e) {
             return new InmutableURIFetcherResponse(uriAndCtx, e);
