@@ -42,6 +42,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import ar.com.zauber.commons.dao.Closure;
 import ar.com.zauber.leviathan.api.FetchingTask;
 import ar.com.zauber.leviathan.api.URIFetcher;
 import ar.com.zauber.leviathan.api.URIFetcherResponse;
@@ -79,22 +80,47 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
         this.charsetStrategy = defaultStrategy;
         this.httpClient = httpClient;
     }
-    
-    
-    
+
+    public abstract class HTTPClientFetchingTask implements FetchingTask {
+        private final URIAndCtx uriAndCtx;
+        private Closure<HttpUriRequest> configureClosure;
+        
+        public HTTPClientFetchingTask(final URIAndCtx uriAndCtx) {
+            this.uriAndCtx = uriAndCtx;
+        }
+        
+        @Override
+        public URIAndCtx getURIAndCtx() {
+            return uriAndCtx;
+        }
+
+        protected abstract HttpUriRequest toURIRequest();
+            
+        @Override
+        public URIFetcherResponse execute() {
+            final HttpUriRequest req = toURIRequest();
+            if(configureClosure != null) {
+                configureClosure.execute(req);
+            }
+            
+            return fetchInternal(uriAndCtx, req);
+        }
+
+        public Closure<HttpUriRequest> getConfigureClosure() {
+            return configureClosure;
+        }
+
+        public void setConfigureClosure(Closure<HttpUriRequest> configureClosure) {
+            this.configureClosure = configureClosure;
+        }
+    }
     
     @Override
     public final FetchingTask createGet(final URIAndCtx uriAndCtx) {
-        return new FetchingTask() {
-            
+        return new HTTPClientFetchingTask(uriAndCtx) {
             @Override
-            public URIAndCtx getURIAndCtx() {
-                return uriAndCtx;
-            }
-            
-            @Override
-            public URIFetcherResponse execute() {
-                return fetchInternal(uriAndCtx, new HttpGet(uriAndCtx.getURI()));
+            protected HttpUriRequest toURIRequest() {
+                return new HttpGet(uriAndCtx.getURI());
             }
         };
     }
@@ -242,7 +268,7 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
      * @param response
      * @return the headers map 
      */
-    private Map<String, List<String>> extractHeaders(final HttpResponse response) {
+    public static Map<String, List<String>> extractHeaders(final HttpResponse response) {
         final Map<String, List<String>> out = new TreeMap<String, List<String>>();
         
         final Header[] allHeaders = response.getAllHeaders();
