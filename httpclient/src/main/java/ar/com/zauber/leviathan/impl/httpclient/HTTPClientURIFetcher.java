@@ -178,7 +178,14 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
             Validate.notNull(response);
             
             HttpEntity entity = response.getEntity();
-            Validate.notNull(entity);
+            if(entity == null) {
+                return new InmutableURIFetcherResponse(
+                        uriAndCtx,
+                        new InmutableURIFetcherHttpResponse(
+                            "", 
+                            getStatus(response), 
+                            headers, new byte[0]));
+            }
             
             InputStream content = entity.getContent();
             Validate.notNull(content);
@@ -217,7 +224,10 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
         } finally {
             if(response != null) {
                 try {
-                    response.getEntity().consumeContent();
+                    final HttpEntity e = response.getEntity();
+                    if(e != null) {
+                        e.consumeContent();
+                    }
                 } catch (final IOException e) {
                     return new InmutableURIFetcherResponse(uriAndCtx, e);
                 }
@@ -263,9 +273,7 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
                                     ? entity.getContentEncoding().getValue()
                                     : null;
         
-        final int status = (response.getStatusLine() != null) 
-                                ? response.getStatusLine().getStatusCode() 
-                                : 0;
+        final int status = getStatus(response);
 
         return new InmutableResponseMetadata(
                 uri, 
@@ -273,6 +281,16 @@ public class HTTPClientURIFetcher extends AbstractURIFetcher {
                 contentEncoding,
                 status, 
                 EntityUtils.getContentCharSet(entity));
+    }
+
+    /**
+     * @param response
+     * @return
+     */
+    private static int getStatus(final HttpResponse response) {
+        return (response.getStatusLine() != null) 
+                                ? response.getStatusLine().getStatusCode() 
+                                : 0;
     }
 
 
