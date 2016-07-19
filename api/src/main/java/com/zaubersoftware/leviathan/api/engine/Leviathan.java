@@ -31,12 +31,12 @@ public class Leviathan {
         try {
             engine = (Engine) Class.forName("com.zaubersoftware.leviathan.api.engine.impl.DefaultEngine")
                     .newInstance();
-        } catch (InstantiationException e) {
-            throw new IllegalStateException();
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException();
-        } catch (ClassNotFoundException e) {
-            throw new IllegalStateException();
+        } catch (final InstantiationException e) {
+            throw new IllegalStateException("initializing Engine", e);
+        } catch (final IllegalAccessException e) {
+            throw new IllegalStateException("initializing Engine", e);
+        } catch (final ClassNotFoundException e) {
+            throw new IllegalStateException("initializing Engine", e);
         }
     }
     
